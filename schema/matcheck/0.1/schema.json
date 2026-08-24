@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matjson.org/schema/matcheck/0.1/schema.json",
+  "title": "MatCheckJSON v0.1 — Concept Placeholder",
+  "description": "Proposed machine-readable results of evaluating MatJSON requirements against normalized evidence. Detailed semantics are TBC.",
+  "x-matjson-profile": "matcheck",
+  "x-matjson-status": "tbc",
+  "type": "object",
+  "required": [
+    "matjson",
+    "check",
+    "results",
+    "summary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "matjson": {
+      "type": "object",
+      "required": [
+        "profile",
+        "version"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "profile": {
+          "const": "matcheck"
+        },
+        "version": {
+          "const": "0.1"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "id",
+        "performed_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "performed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "status"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "not_applicable",
+              "needs_project_input",
+              "missing_evidence",
+              "requisition_gap",
+              "manual_review_required"
+            ]
+          },
+          "required": {},
+          "reported": {},
+          "evidence": {
+            "type": "array"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "overall_status": {
+          "type": "string"
+        },
+        "counts": {
+          "type": "object"
+        }
+      }
+    },
+    "extensions": {
+      "type": "object"
+    }
+  }
+}

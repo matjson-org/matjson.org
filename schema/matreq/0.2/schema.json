@@ -1,0 +1,1348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matjson.org/schema/matreq/0.2/schema.json",
+  "title": "MatReqJSON Schema v0.2",
+  "description": "Schema for machine-readable material-related requirements imposed by codes, standards, recommended practices, technical reports, purchaser specifications, and similar governing documents. MatReqJSON supplements base MatSpecJSON and is activated by requirements or references contained in a material requisition or other contract document. Version 0.2 adds structured test/sampling fields, service-envelope and qualification rules, richer evidence/checkability, multi-source provenance, and extraction coverage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document",
+    "invocation_model",
+    "scope",
+    "rules",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2"
+    },
+    "document": {
+      "$ref": "#/$defs/document"
+    },
+    "invocation_model": {
+      "$ref": "#/$defs/invocationModel"
+    },
+    "scope": {
+      "$ref": "#/$defs/documentScope"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentReference"
+      }
+    },
+    "requisition_interface": {
+      "type": "array",
+      "description": "Inputs or decisions that the governing document requires the purchaser/material requisition to provide. These are not project values; they define what the requisition must resolve when the associated rule is active.",
+      "items": {
+        "$ref": "#/$defs/requisitionInput"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    }
+  },
+  "$defs": {
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "organization",
+        "designation",
+        "document_type",
+        "title",
+        "edition"
+      ],
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "string",
+          "description": "Canonical designation, e.g. API 663, API RP 934-A, API TR 938-C, NACE MR0175/ISO 15156, ASME BPVC Section VIII Division 1."
+        },
+        "aliases": {
+          "type": "array",
+          "description": "Common designations that may appear in material requisitions and special material requirements. Used for reference resolution, not as separate standards.",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "document_type": {
+          "enum": [
+            "code",
+            "standard",
+            "specification",
+            "recommended_practice",
+            "technical_report",
+            "service_standard",
+            "purchaser_specification",
+            "regulation",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "edition": {
+          "$ref": "#/$defs/edition"
+        }
+      }
+    },
+    "edition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publication"
+      ],
+      "properties": {
+        "number": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "publication": {
+          "type": "string",
+          "description": "Publication date or edition year, preferably YYYY or YYYY-MM."
+        },
+        "addenda": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "publication"
+            ],
+            "properties": {
+              "number": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "publication": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "reaffirmed": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "errata": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "publication"
+            ],
+            "properties": {
+              "number": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "publication": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "other_revisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "invocationModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted_sources",
+        "document_reference",
+        "scoped_reference",
+        "direct_rule_reference",
+        "contractual_reference_strength",
+        "cross_reference_policy"
+      ],
+      "properties": {
+        "accepted_sources": {
+          "type": "array",
+          "description": "Documents from which an invocation may be established. The material requisition remains the project-specific source of truth; these fields merely identify the documents that may contain the same requisition requirements.",
+          "items": {
+            "enum": [
+              "material_requisition",
+              "special_material_requirements",
+              "purchase_specification",
+              "material_datasheet",
+              "purchase_order",
+              "other_contract_document"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "document_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "behavior"
+          ],
+          "properties": {
+            "behavior": {
+              "const": "activate_all_applicable_rules"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "scoped_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "supported_scopes",
+            "behavior"
+          ],
+          "properties": {
+            "supported_scopes": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "part",
+                  "section",
+                  "subsection",
+                  "clause",
+                  "appendix",
+                  "annex",
+                  "table",
+                  "figure"
+                ]
+              },
+              "uniqueItems": true
+            },
+            "behavior": {
+              "const": "activate_rules_in_referenced_scope_and_required_dependencies"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "direct_rule_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "behavior"
+          ],
+          "properties": {
+            "behavior": {
+              "const": "activate_referenced_rule_and_required_dependencies"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "contractual_reference_strength": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mandatory_compliance",
+            "reference_only"
+          ],
+          "properties": {
+            "mandatory_compliance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "behavior"
+              ],
+              "properties": {
+                "behavior": {
+                  "const": "treat_invoked_scope_as_contract_requirement"
+                },
+                "examples": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "reference_only": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "behavior"
+              ],
+              "properties": {
+                "behavior": {
+                  "const": "do_not_activate_without_additional_mandatory_language"
+                },
+                "examples": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": "A material requisition may elevate an otherwise informative/example source scope into a binding contractual requirement when it explicitly requires compliance, e.g. 'Material shall meet API TR 938-C Appendix A'. Merely saying 'refer to' or 'see' does not by itself create the same obligation."
+        },
+        "cross_reference_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "default"
+          ],
+          "properties": {
+            "default": {
+              "const": "explicit_effect_only"
+            },
+            "description": {
+              "type": "string",
+              "description": "A citation to another standard does not automatically load that standard's full MatReq. Each cross-reference must state its effect, such as full compliance, scoped compliance, test method only, definition only, or informative guidance."
+            }
+          }
+        }
+      }
+    },
+    "documentScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "equipment": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "industries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "material_families": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "product_forms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "included_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excluded_topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "normativity",
+        "targets",
+        "activation",
+        "requirement",
+        "verification",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "material_selection",
+            "product_form",
+            "chemistry",
+            "mechanical",
+            "impact",
+            "hardness",
+            "metallurgy",
+            "corrosion_testing",
+            "heat_treatment",
+            "manufacturing",
+            "welding_consumable",
+            "fabrication",
+            "nde",
+            "pmi",
+            "documentation",
+            "traceability",
+            "marking",
+            "dimensions",
+            "external_standard",
+            "other"
+          ]
+        },
+        "normativity": {
+          "$ref": "#/$defs/normativity"
+        },
+        "targets": {
+          "$ref": "#/$defs/targets"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "requirement": {
+          "$ref": "#/$defs/requirement"
+        },
+        "effect": {
+          "$ref": "#/$defs/effect"
+        },
+        "verification": {
+          "$ref": "#/$defs/verification"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/dependencies"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/documentReference"
+          }
+        },
+        "source": {
+          "$ref": "#/$defs/sourceRef"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "group_id": {
+          "type": "string"
+        },
+        "structured_level": {
+          "enum": [
+            "fully_structured",
+            "partially_structured",
+            "text_preserved",
+            "lookup_required"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "normativity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_level"
+      ],
+      "properties": {
+        "source_level": {
+          "enum": [
+            "mandatory",
+            "recommended",
+            "permitted",
+            "prohibited",
+            "informative",
+            "example"
+          ]
+        },
+        "source_modal": {
+          "enum": [
+            "shall",
+            "should",
+            "may",
+            "can",
+            "must",
+            "prohibited",
+            "none",
+            "other"
+          ]
+        },
+        "contractual_elevation_allowed": {
+          "type": "boolean",
+          "description": "True when explicit mandatory invocation in the material requisition can make an informative/example source scope contractually binding."
+        }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "material": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "families": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "specifications": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "grades": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "uns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "product_forms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pressure_retaining": {
+          "type": "boolean"
+        },
+        "process_wetted": {
+          "type": "boolean"
+        },
+        "joint_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weld_processes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "service_sides": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis"
+      ],
+      "properties": {
+        "basis": {
+          "enum": [
+            "when_document_invoked",
+            "when_rule_scope_invoked",
+            "when_condition_met",
+            "when_document_invoked_and_condition_met",
+            "when_scope_invoked_and_condition_met",
+            "when_explicitly_invoked_only"
+          ]
+        },
+        "when": {
+          "$ref": "#/$defs/conditionExpr"
+        },
+        "requisition_input_ids": {
+          "type": "array",
+          "description": "IDs from requisition_interface that must be resolved by the material requisition when this rule is active.",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "conditionExpr": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/conditionLeaf"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/conditionExpr"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/conditionExpr"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/conditionExpr"
+            }
+          }
+        }
+      ]
+    },
+    "conditionLeaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "op"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "in",
+            "not_in",
+            "exists",
+            "contains"
+          ]
+        },
+        "value": {},
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "property_limit",
+            "composition_limit",
+            "computed_limit",
+            "required_condition",
+            "required_test",
+            "required_examination",
+            "required_heat_treatment",
+            "required_product_form",
+            "required_manufacturing_route",
+            "required_document",
+            "required_report_field",
+            "required_traceability",
+            "required_marking",
+            "prohibited",
+            "allowed_only",
+            "relationship_constraint",
+            "reference_compliance",
+            "purchaser_defined",
+            "decision_procedure",
+            "other",
+            "service_limit",
+            "required_qualification",
+            "required_procedure",
+            "sampling_requirement",
+            "test_acceptance",
+            "required_reporting",
+            "figure_lookup",
+            "table_lookup",
+            "material_compatibility",
+            "design_property_restriction"
+          ]
+        },
+        "property": {
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "between",
+            "in",
+            "not_in"
+          ]
+        },
+        "value": {},
+        "minimum": {},
+        "maximum": {},
+        "unit": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array"
+        },
+        "text": {
+          "type": "string"
+        },
+        "document": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "calculation": {
+          "$ref": "#/$defs/calculation"
+        },
+        "value_from_requisition": {
+          "type": "string",
+          "description": "ID of the purchaser/project value that must be obtained from the material requisition; does not store the project value in the MatReq."
+        },
+        "referenced_standard": {
+          "$ref": "#/$defs/referenceTarget"
+        },
+        "method": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "frequency": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "sampling": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "acceptance_criteria": {},
+        "procedure": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "timing": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "scope": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "reporting": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "specimen": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "alternatives": {
+          "type": "array"
+        },
+        "lookup": {
+          "type": "object"
+        },
+        "basis": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "subject": {
+          "type": [
+            "string",
+            "array"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "calculation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "expression",
+        "inputs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "result_unit": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/sourceRef"
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship"
+      ],
+      "properties": {
+        "relationship": {
+          "enum": [
+            "supplements",
+            "restricts",
+            "replaces",
+            "requires_additional_test",
+            "requires_additional_reporting",
+            "invokes",
+            "prohibits",
+            "selects",
+            "purchaser_defined",
+            "relationship_constraint"
+          ]
+        },
+        "base_requirement": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "matspec": {
+              "type": "string"
+            },
+            "grade": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          }
+        },
+        "conflict_resolution": {
+          "enum": [
+            "supplement",
+            "explicit_override",
+            "most_stringent",
+            "source_precedence",
+            "project_selection",
+            "no_automatic_resolution"
+          ]
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence",
+        "mode"
+      ],
+      "properties": {
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Evidence artifact types. Core values include MTR, CMTR, COC, PMI_report, NDE_report, hardness_report, impact_report, corrosion_test_report, metallurgical_test_report, ferrite_report, heat_treatment_chart, hydrotest_report, PQR, WPS, production_test_plate_report, traceability_record, inspection_record, material_requisition, and design_calculation."
+        },
+        "mode": {
+          "enum": [
+            "direct",
+            "computed",
+            "inspection_record",
+            "record_review",
+            "cross_document",
+            "manual_review"
+          ]
+        },
+        "result_if_missing": {
+          "enum": [
+            "missing_evidence",
+            "needs_requisition_input",
+            "manual_review_required",
+            "unverified"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checkability": {
+          "enum": [
+            "mtr_direct",
+            "mtr_computed",
+            "mtr_statement",
+            "supporting_report",
+            "requisition_completeness",
+            "design_or_service_evaluation",
+            "cross_document",
+            "manual_only"
+          ]
+        },
+        "evidence_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requires_rule_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "activates_rule_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "referenceTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "designation"
+      ],
+      "properties": {
+        "designation": {
+          "type": "string"
+        },
+        "edition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_type": {
+          "enum": [
+            "document",
+            "part",
+            "section",
+            "subsection",
+            "clause",
+            "appendix",
+            "annex",
+            "table",
+            "figure"
+          ]
+        },
+        "scope_id": {
+          "type": "string"
+        }
+      }
+    },
+    "documentReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "effect"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/referenceTarget"
+        },
+        "effect": {
+          "enum": [
+            "invokes_all_applicable",
+            "invokes_scoped",
+            "test_method_only",
+            "acceptance_criteria_only",
+            "definition_only",
+            "guidance_only",
+            "informative_only"
+          ]
+        },
+        "activation_when": {
+          "$ref": "#/$defs/conditionExpr"
+        },
+        "source": {
+          "$ref": "#/$defs/sourceRef"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requisitionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "boolean",
+            "number",
+            "string",
+            "selection",
+            "acceptance_limit",
+            "standard_invocation",
+            "scope_invocation"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "required_when": {
+          "$ref": "#/$defs/conditionExpr"
+        },
+        "allowed_values": {
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/sourceRef"
+        }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clause"
+      ],
+      "properties": {
+        "clause": {
+          "type": "string"
+        },
+        "section_path": {
+          "type": "array",
+          "description": "Hierarchical path used for scoped invocation matching, e.g. ['Annex A', 'A.2 Tubing', 'A.2.1'].",
+          "items": {
+            "type": "string"
+          }
+        },
+        "page": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "table": {
+          "type": "string"
+        },
+        "figure": {
+          "type": "string"
+        },
+        "text_type": {
+          "enum": [
+            "normative",
+            "informative",
+            "example",
+            "note",
+            "annex",
+            "appendix",
+            "table",
+            "figure",
+            "other",
+            "mandatory_appendix",
+            "nonmandatory_appendix",
+            "normative_annex",
+            "informative_annex"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "extraction_method"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "extracted_on": {
+          "type": "string"
+        },
+        "extraction_method": {
+          "enum": [
+            "manual",
+            "assisted",
+            "automated",
+            "mixed"
+          ]
+        },
+        "review_status": {
+          "enum": [
+            "draft",
+            "reviewed",
+            "validated"
+          ]
+        },
+        "review_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage": {
+          "enum": [
+            "full_material_scope",
+            "targeted_material_scope",
+            "partial_draft"
+          ]
+        },
+        "rules_generated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_file": {
+          "type": "string"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_scope_status"
+      ],
+      "properties": {
+        "material_scope_status": {
+          "enum": [
+            "full",
+            "targeted",
+            "partial"
+          ]
+        },
+        "included": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lookup_required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-matjson-profile": "matreq",
+  "x-matjson-status": "draft",
+  "x-matjson-source": "MatJSON working schema; canonicalized for the matjson.org starter site."
+}

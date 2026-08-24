@@ -1,0 +1,217 @@
+{
+  "generated": "2026-08-24",
+  "files": [
+    {
+      "path": ".nojekyll",
+      "bytes": 0
+    },
+    {
+      "path": "CNAME",
+      "bytes": 12
+    },
+    {
+      "path": "README.md",
+      "bytes": 1184
+    },
+    {
+      "path": "about/index.html",
+      "bytes": 6388
+    },
+    {
+      "path": "assets/css/styles.css",
+      "bytes": 21614
+    },
+    {
+      "path": "assets/img/favicon.svg",
+      "bytes": 1114
+    },
+    {
+      "path": "assets/img/hex-pattern.svg",
+      "bytes": 339
+    },
+    {
+      "path": "assets/img/logo-mark.svg",
+      "bytes": 1114
+    },
+    {
+      "path": "assets/js/site.js",
+      "bytes": 4411
+    },
+    {
+      "path": "design/matjson-homepage-concept.png",
+      "bytes": 1529432
+    },
+    {
+      "path": "design/matjson-homepage-implementation-preview.png",
+      "bytes": 211916
+    },
+    {
+      "path": "docs/IMPLEMENTATION_QA.md",
+      "bytes": 5213
+    },
+    {
+      "path": "docs/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
+      "bytes": 22667
+    },
+    {
+      "path": "downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
+      "bytes": 22667
+    },
+    {
+      "path": "downloads/matcheck-v0.1-placeholder.schema.json",
+      "bytes": 2374
+    },
+    {
+      "path": "downloads/matjson-core-v0.1-placeholder.schema.json",
+      "bytes": 1953
+    },
+    {
+      "path": "downloads/matrecord-v0.1-placeholder.schema.json",
+      "bytes": 2786
+    },
+    {
+      "path": "downloads/matreq-v0.2.schema.json",
+      "bytes": 32809
+    },
+    {
+      "path": "downloads/matspec-v0.2.10.schema.json",
+      "bytes": 23523
+    },
+    {
+      "path": "examples/index.html",
+      "bytes": 5964
+    },
+    {
+      "path": "examples/synthetic-alloy.matspec.json",
+      "bytes": 1252
+    },
+    {
+      "path": "examples/synthetic-compliance.matcheck.json",
+      "bytes": 762
+    },
+    {
+      "path": "examples/synthetic-mill-report.matrecord.json",
+      "bytes": 730
+    },
+    {
+      "path": "examples/synthetic-service.matreq.json",
+      "bytes": 4121
+    },
+    {
+      "path": "governance/index.html",
+      "bytes": 6423
+    },
+    {
+      "path": "guides/index.html",
+      "bytes": 5912
+    },
+    {
+      "path": "index.html",
+      "bytes": 18064
+    },
+    {
+      "path": "netlify.toml",
+      "bytes": 174
+    },
+    {
+      "path": "profiles/core/index.html",
+      "bytes": 6353
+    },
+    {
+      "path": "profiles/matcheck/index.html",
+      "bytes": 6104
+    },
+    {
+      "path": "profiles/matrecord/index.html",
+      "bytes": 6332
+    },
+    {
+      "path": "profiles/matreq/index.html",
+      "bytes": 6496
+    },
+    {
+      "path": "profiles/matspec/index.html",
+      "bytes": 6516
+    },
+    {
+      "path": "registry/index.html",
+      "bytes": 6105
+    },
+    {
+      "path": "repository/index.html",
+      "bytes": 6220
+    },
+    {
+      "path": "resources/index.html",
+      "bytes": 5878
+    },
+    {
+      "path": "robots.txt",
+      "bytes": 64
+    },
+    {
+      "path": "schema/core/0.1/schema.json",
+      "bytes": 1953
+    },
+    {
+      "path": "schema/core/latest/schema.json",
+      "bytes": 1953
+    },
+    {
+      "path": "schema/index.json",
+      "bytes": 1172
+    },
+    {
+      "path": "schema/matcheck/0.1/schema.json",
+      "bytes": 2374
+    },
+    {
+      "path": "schema/matcheck/latest/schema.json",
+      "bytes": 2374
+    },
+    {
+      "path": "schema/matrecord/0.1/schema.json",
+      "bytes": 2786
+    },
+    {
+      "path": "schema/matrecord/latest/schema.json",
+      "bytes": 2786
+    },
+    {
+      "path": "schema/matreq/0.2/schema.json",
+      "bytes": 32809
+    },
+    {
+      "path": "schema/matreq/latest/schema.json",
+      "bytes": 32809
+    },
+    {
+      "path": "schema/matspec/0.2.10/schema.json",
+      "bytes": 23523
+    },
+    {
+      "path": "schema/matspec/latest/schema.json",
+      "bytes": 23523
+    },
+    {
+      "path": "schemas/index.html",
+      "bytes": 7713
+    },
+    {
+      "path": "sitemap.xml",
+      "bytes": 940
+    },
+    {
+      "path": "spec/index.html",
+      "bytes": 8835
+    },
+    {
+      "path": "tools/index.html",
+      "bytes": 6019
+    },
+    {
+      "path": "vercel.json",
+      "bytes": 299
+    }
+  ]
+}

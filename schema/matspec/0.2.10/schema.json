@@ -1,0 +1,793 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matjson.org/schema/matspec/0.2.10/schema.json",
+  "title": "MatSpecJSON v0.2 (schema patch 0.2.10 - permissive only)",
+  "description": "Material specification acceptance criteria. Encodes the limits a mill test report must satisfy, with a clause citation on every value.",
+  "type": "object",
+  "required": [
+    "matspec",
+    "specification",
+    "provenance",
+    "grades"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "matspec": {
+      "const": "0.2",
+      "description": "Format version and type discriminator. Refuse files with an unrecognised version rather than partially reading them."
+    },
+    "specification": {
+      "type": "object",
+      "required": [
+        "designation",
+        "organization",
+        "title",
+        "edition"
+      ],
+      "properties": {
+        "designation": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "adopted_from": {
+          "type": "object",
+          "properties": {
+            "organization": {
+              "type": "string"
+            },
+            "designation": {
+              "type": "string"
+            }
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "edition": {
+          "type": "string"
+        },
+        "publication": {
+          "type": "string"
+        },
+        "product_forms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "enum": [
+            "product",
+            "general_requirements"
+          ],
+          "default": "product",
+          "description": "A general-requirements specification imposes criteria that apply THROUGH a product specification. It has no grades of its own and must never be selected as the governing document for a grade."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source",
+        "extracted",
+        "method"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "object"
+        },
+        "extracted": {
+          "type": "string",
+          "format": "date"
+        },
+        "method": {
+          "enum": [
+            "manual",
+            "assisted",
+            "automated"
+          ]
+        },
+        "extracted_scope": {
+          "type": "string"
+        }
+      },
+      "description": "Where the data came from. Intrinsic to the file. Distinct from verification, which is a claim about accuracy made by a consumer and is deliberately not modelled here."
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "designation",
+          "role"
+        ],
+        "properties": {
+          "designation": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "manufacturing": {
+      "type": "object"
+    },
+    "grades": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/$defs/grade"
+      },
+      "description": " A general-requirements specification (SA-20, SA-450, SA-530, SA-1016, SA-480, SA-960, SA-961) defines no grades and carries an empty array. Declare it with specification.kind = 'general_requirements'."
+    },
+    "required_tests": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notExtracted"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/test"
+          }
+        }
+      ]
+    },
+    "supplementary_requirements": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notExtracted"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "notes": {
+      "type": "object",
+      "description": "Note id to text. Values reference these by id.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Implementation-specific data. NOT part of the conformance surface - a conforming reader ignores it. Use this for workflow state that belongs to your process rather than to the specification: review status, internal ids, routing. Verification of a file's accuracy lives here or outside the file entirely, because it is an assertion about an instance by a party in a workflow, not a property of the specification being described.",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "notExtracted": {
+      "type": "object",
+      "required": [
+        "extracted",
+        "note"
+      ],
+      "description": "An explicit gap. Distinguishes 'not captured' from 'no requirement'.",
+      "properties": {
+        "extracted": {
+          "const": false
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "unit": {
+      "enum": [
+        "wt%",
+        "%",
+        "ksi",
+        "MPa",
+        "ft-lb",
+        "J",
+        "in",
+        "mm",
+        "mils",
+        "HBW",
+        "HRB",
+        "HRC",
+        "HV",
+        "degF",
+        "degC",
+        "ppm",
+        "count"
+      ]
+    },
+    "value": {
+      "type": "object",
+      "description": "One acceptance bound. Either min or max may be null; a citation is mandatory.",
+      "required": [
+        "unit",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "enum": [
+            "heat",
+            "product",
+            "both"
+          ]
+        },
+        "applies_when": {
+          "$ref": "#/$defs/appliesWhen"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "balance": {
+          "type": "boolean",
+          "description": "Element makes up the remainder. min and max do not apply and must be null."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "balance": {
+                "const": true
+              }
+            },
+            "required": [
+              "balance"
+            ]
+          },
+          "then": {
+            "properties": {
+              "min": {
+                "type": "null"
+              },
+              "max": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "valueSet": {
+      "type": "object",
+      "description": "Sibling values in different unit systems. Not conversions - both are specified in the source.",
+      "required": [
+        "values"
+      ],
+      "properties": {
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/value"
+          }
+        }
+      }
+    },
+    "band": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "inclusive": {
+          "enum": [
+            "min",
+            "max",
+            "both",
+            "none"
+          ],
+          "description": "Which end is inclusive. 'over 2 in. to 4 in., incl' is min exclusive, max inclusive."
+        }
+      }
+    },
+    "appliesWhen": {
+      "type": "object",
+      "description": "Selector. Every present key must match for the value to apply.",
+      "additionalProperties": false,
+      "properties": {
+        "thickness": {
+          "$ref": "#/$defs/band"
+        },
+        "diameter": {
+          "$ref": "#/$defs/band"
+        },
+        "temperature": {
+          "$ref": "#/$defs/band"
+        },
+        "product_form": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "gauge_length": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "value",
+                "unit"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "unit": {
+                  "$ref": "#/$defs/unit"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "multiple",
+                "of"
+              ],
+              "additionalProperties": false,
+              "description": "Gauge length as a multiple of a dimension - bolting states elongation 'in 4D'.",
+              "properties": {
+                "multiple": {
+                  "type": "number"
+                },
+                "of": {
+                  "enum": [
+                    "diameter",
+                    "thickness"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "specimen_size": {
+          "type": "string"
+        },
+        "orientation": {
+          "enum": [
+            "longitudinal",
+            "transverse",
+            "any"
+          ]
+        },
+        "class": {
+          "type": "string",
+          "description": "Property class, e.g. SA-193 Class 1, 1A, 2, 2B. The same grade carries different mechanicals per class."
+        },
+        "temper": {
+          "type": "string",
+          "description": "Temper designation, e.g. O61, H55, H80 for copper alloys."
+        },
+        "size_designation": {
+          "type": "string",
+          "description": "Free-text size band where the source does not express it numerically."
+        },
+        "specified_minimum_uts": {
+          "$ref": "#/$defs/band",
+          "description": "Band on the SPECIFIED MINIMUM ultimate tensile strength of the grade being supplied - not the measured UTS. SA-20 Supplementary Requirement S20 selects its carbon-equivalent maximum this way, and without it the four S20 bounds are indistinguishable to a checker."
+        },
+        "test_method": {
+          "type": "string",
+          "description": "The measurement method a bound is stated against, where a specification gives DIFFERENT acceptance values for different methods of measuring the same property. SB-171 Table 3 is the case: it carries two yield strength columns, and for C61400 they differ (30 ksi versus 28 ksi at 0.2 % offset). Without this selector the two bounds are indistinguishable and a checker cannot choose. Distinct from the common situation where a specification permits either method against ONE value - that needs no selector."
+        }
+      }
+    },
+    "grade": {
+      "type": "object",
+      "required": [
+        "id",
+        "designation",
+        "chemistry"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "object",
+          "properties": {
+            "grade": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "class": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "uns": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[A-Z][0-9]{5}$"
+            },
+            "uns_note": {
+              "type": "string"
+            }
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "chemistry": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/notExtracted"
+            },
+            {
+              "type": "object",
+              "required": [
+                "elements"
+              ],
+              "properties": {
+                "elements": {
+                  "type": "object",
+                  "description": "Element symbol to an ARRAY of bounds - one element commonly has several, selected by thickness, diameter, class or analysis basis.",
+                  "additionalProperties": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/valueOrAlternatives"
+                    },
+                    "description": "Element symbol to an ARRAY of bounds. A member may be a value or an {'any_of': [...]} alternatives object - SA-516 Grade 60 manganese is a real case: Table 1 footnote C permits either of two ranges, and modelling them as two array members would make a checker demand both and reject conforming material."
+                  }
+                },
+                "notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "pren_note": {
+                  "type": "string",
+                  "description": "Composite chemistry bound (e.g. a PREN floor) that cannot be expressed as a value in v0.2. Must be checked manually."
+                }
+              }
+            }
+          ]
+        },
+        "mechanical": {
+          "oneOf": [
+            {
+              "type": "null",
+              "description": "The specification imposes no mechanical property requirement. SA-179 is a real example: its tensile figures are EXPLANATORY NOTE design assumptions, not acceptance criteria."
+            },
+            {
+              "$ref": "#/$defs/notExtracted"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "tensile_strength": {
+                  "oneOf": [
+                    {
+                      "type": "null",
+                      "description": "The specification imposes no requirement for this property."
+                    },
+                    {
+                      "$ref": "#/$defs/notExtracted"
+                    },
+                    {
+                      "$ref": "#/$defs/valueSet"
+                    }
+                  ]
+                },
+                "yield_strength": {
+                  "oneOf": [
+                    {
+                      "type": "null",
+                      "description": "The specification imposes no requirement for this property."
+                    },
+                    {
+                      "$ref": "#/$defs/notExtracted"
+                    },
+                    {
+                      "$ref": "#/$defs/valueSet"
+                    }
+                  ]
+                },
+                "elongation": {
+                  "oneOf": [
+                    {
+                      "type": "null",
+                      "description": "The specification imposes no requirement for this property."
+                    },
+                    {
+                      "$ref": "#/$defs/notExtracted"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/value"
+                      }
+                    }
+                  ]
+                },
+                "reduction_of_area": {
+                  "oneOf": [
+                    {
+                      "type": "null",
+                      "description": "The specification imposes no requirement for this property."
+                    },
+                    {
+                      "$ref": "#/$defs/notExtracted"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/value"
+                      }
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "description": "Mechanical property requirements. additionalProperties is false so that a notExtracted object {extracted:false, note:...} matches exactly one branch of the oneOf. Without it the two branches are both satisfied and the oneOf fails - the object is ambiguous, not invalid. SB-366 is the case: it states no mechanical table of its own and sends properties to the source material specification."
+            }
+          ]
+        },
+        "hardness": {
+          "oneOf": [
+            {
+              "type": "null",
+              "description": "The specification imposes no hardness requirement."
+            },
+            {
+              "$ref": "#/$defs/notExtracted"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/valueOrAlternatives"
+              }
+            }
+          ]
+        },
+        "impact": {
+          "oneOf": [
+            {
+              "type": "null",
+              "description": "The specification imposes no impact requirement."
+            },
+            {
+              "$ref": "#/$defs/notExtracted"
+            },
+            {
+              "type": "object",
+              "required": [
+                "values"
+              ],
+              "additionalProperties": false,
+              "description": "Impact requirements. 'applies_when' on each value carries the applicability trigger (thickness, specimen size, temperature).",
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/value"
+                  }
+                },
+                "test_temperature": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/valueSet"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "extracted",
+                        "note"
+                      ],
+                      "additionalProperties": false,
+                      "description": "The specification imposes an impact ENERGY requirement but states NO test temperature, or the temperature was not captured. SA-203 Para 7.2.1 is the case: energy is fixed at 20 ft-lbf [27 J] but temperature and orientation are 'a matter of agreement between the purchaser and supplier'. Without this the file cannot record that the Code is silent on temperature - which is the difference between a Code non-conformance and a contractual question.",
+                      "properties": {
+                        "extracted": {
+                          "const": false
+                        },
+                        "note": {
+                          "type": "string"
+                        },
+                        "applicability": {
+                          "type": "string",
+                          "description": "When the impact requirement applies at all, where it is conditional."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "applicability": {
+                  "type": "string",
+                  "description": "When impact testing is triggered at all."
+                },
+                "specimen_sizes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "heat_treatment": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/notExtracted"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "requirement",
+                  "source"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "requirement": {
+                    "type": "string",
+                    "description": "e.g. 'quenched and tempered', 'carbide solution treated', 'annealed'"
+                  },
+                  "temperature": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/notExtracted",
+                        "description": "The specification states no temperature for this grade - SA-182 Table 1 gives 'not specified' for F 6a - or the value was not captured."
+                      },
+                      {
+                        "$ref": "#/$defs/valueSet"
+                      }
+                    ]
+                  },
+                  "cooling": {
+                    "type": "string"
+                  },
+                  "applies_when": {
+                    "$ref": "#/$defs/appliesWhen"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "test": {
+      "type": "object",
+      "required": [
+        "test",
+        "required",
+        "source"
+      ],
+      "properties": {
+        "test": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "frequency": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "per": {
+              "type": "string"
+            },
+            "count": {
+              "type": "number"
+            }
+          }
+        },
+        "method": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "alternatives": {
+      "type": "object",
+      "required": [
+        "any_of"
+      ],
+      "additionalProperties": false,
+      "description": "Satisfying ANY member is acceptance. Specifications state hardness as '223 HBW or 96 HRB' - two scales, either acceptable, not two separate requirements.",
+      "properties": {
+        "any_of": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/value"
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "applies_when": {
+          "$ref": "#/$defs/appliesWhen",
+          "description": "Selector for the alternatives block as a whole. SA-193 Table 2 is the case: hardness is banded by diameter AND offered on two scales, so the any_of needs its own applies_when. Without it, banded alternatives are indistinguishable to a checker."
+        }
+      }
+    },
+    "valueOrAlternatives": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/value"
+        },
+        {
+          "$ref": "#/$defs/alternatives"
+        }
+      ]
+    }
+  },
+  "x-matjson-profile": "matspec",
+  "x-matjson-status": "draft",
+  "x-matjson-source": "MatJSON working schema; canonicalized for the matjson.org starter site."
+}

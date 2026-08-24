@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MatReqJSON — MatJSON</title>
+  <meta name="description" content="Machine-readable application, service, fabrication, equipment-code, and purchaser material requirements.">
+  <meta name="theme-color" content="#061321">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../../index.html" aria-label="MatJSON home">
+      <img src="../../assets/img/logo-mark.svg" alt="" width="48" height="48">
+      <span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation"><a href="../../index.html">Home</a><a href="../../schemas/index.html" aria-current="page">Schemas</a><a href="../../spec/index.html">Specification</a><a href="../../guides/index.html">Guides</a><a href="../../resources/index.html">Resources</a><a href="../../about/index.html">About</a></nav>
+    <div class="header-actions">
+      <a class="icon-button" href="https://github.com/matjson-org" aria-label="MatJSON on GitHub" target="_blank" rel="noopener noreferrer"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"/><path d="M9 19c-3 .9-3-1.5-4.2-2"/></svg></a>
+      <button class="search-button" type="button" data-search-toggle aria-label="Search the site"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg><span>Search</span></button>
+      <button class="icon-button menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Open navigation"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../index.html">Home</a><span>/</span><a href="../../schemas/index.html">Schemas</a><span>/</span><span>MatReqJSON</span></div><h1>MatReqJSON</h1><p>Machine-readable application, service, fabrication, equipment-code, and purchaser material requirements.</p><div class="page-meta"><span class="meta-chip">Working draft · v0.2</span><span class="meta-chip">.matreq.json</span></div></div></section>
+<section class="section"><div class="container docs-layout"><aside class="docs-nav"><strong>MatReqJSON</strong><a href="#overview">Overview</a><a href="../../schema/matreq/0.2/schema.json">View schema</a><a href="../../downloads/matreq-v0.2.schema.json" download>Download schema</a><a href="../../examples/index.html">Examples</a></aside><article class="prose"><h2 id="overview">Overview</h2><p>MatReqJSON represents atomic rules imposed in addition to a base material specification and activated through a material requisition or contract document.</p><h2>Rule anatomy</h2><ul><li>Stable rule identifier and category</li><li>Source normativity and project activation</li><li>Material, product-form, component, weld-region, service, and fabrication targets</li><li>Boolean applicability conditions</li><li>Typed requirement behavior and effect on MatSpec</li><li>Verification evidence and source provenance</li></ul><h2>Requisition activation</h2><p>Whole-document, scoped section, annex, clause, and direct purchaser invocations are supported conceptually. The material requisition remains the project-specific source of truth.</p><h2>Known work</h2><ul><li>Executable decision graphs</li><li>Multidimensional tables and curves</li><li>Effective-requirement resolver</li><li>Formal formulas, sampling, and retest models</li></ul><h2>Schema access</h2><p><a href="../../schema/matreq/0.2/schema.json">Open the versioned JSON Schema</a> or <a href="../../downloads/matreq-v0.2.schema.json" download>download a local copy</a>.</p></article></div></section></main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-brand"><img src="../../assets/img/logo-mark.svg" alt=""><strong>MatJSON</strong></div>
+      <p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p>
+    </div>
+    <div class="footer-col"><strong>Specification</strong><a href="../../schemas/index.html">Schemas</a><a href="../../spec/index.html">Architecture</a><a href="../../profiles/matspec/index.html">MatSpecJSON</a><a href="../../profiles/matreq/index.html">MatReqJSON</a></div>
+    <div class="footer-col"><strong>Resources</strong><a href="../../examples/index.html">Examples</a><a href="../../registry/index.html">Registry</a><a href="../../tools/index.html">Tools</a><a href="../../governance/index.html">Governance</a></div>
+    <div class="footer-col"><strong>Project</strong><a href="../../about/index.html">About</a><a href="../../downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md">Project context</a><a href="https://github.com/matjson-org" target="_blank" rel="noopener noreferrer">GitHub</a><a href="../../about/#legal">Legal boundary</a></div>
+  </div>
+  <div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="../../governance/#licensing">Proposed licensing</a> · <a href="../../about/#non-affiliation">Non-affiliation</a></span></div>
+</footer>
+<dialog class="search-dialog" id="site-search" aria-label="Site search">
+  <div class="search-shell">
+    <div class="search-head"><input id="site-search-input" type="search" placeholder="Search MatJSON pages" autocomplete="off"><button class="search-close" type="button" data-search-close aria-label="Close search">×</button></div>
+    <div class="search-results" id="site-search-results"></div>
+  </div>
+</dialog>
+<script>const ROOT = "../../";</script>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

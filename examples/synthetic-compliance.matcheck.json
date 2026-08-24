@@ -1,0 +1,40 @@
+{
+  "matjson": {
+    "profile": "matcheck",
+    "version": "0.1"
+  },
+  "check": {
+    "id": "MJC-2026-0001",
+    "performed_at": "2026-08-24T20:00:00Z",
+    "tool": "MatJSON example checker",
+    "reviewer": null
+  },
+  "results": [
+    {
+      "requirement_id": "MJ-SMR-1-4.1",
+      "origin": {
+        "type": "matreq",
+        "document": "MJ-SMR-1"
+      },
+      "status": "pass",
+      "required": {
+        "report_field": "chemistry.X"
+      },
+      "reported": {
+        "value": 1.5,
+        "unit": "wt%"
+      },
+      "evidence": [
+        "MJR-2026-0001"
+      ],
+      "explanation": "The synthetic CMTR reports element X."
+    }
+  ],
+  "summary": {
+    "overall_status": "pass",
+    "counts": {
+      "pass": 1
+    }
+  },
+  "extensions": {}
+}

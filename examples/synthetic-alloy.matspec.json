@@ -1,0 +1,54 @@
+{
+  "matspec": "0.2",
+  "specification": {
+    "designation": "MJ-100",
+    "organization": "MatJSON Examples",
+    "title": "Synthetic Alloy Plate for Demonstration Only",
+    "edition": "2026",
+    "product_forms": [
+      "plate"
+    ],
+    "kind": "product"
+  },
+  "provenance": {
+    "source": "Original synthetic MatJSON example; not an engineering specification.",
+    "extracted": "2026-08-24",
+    "method": "manual",
+    "extracted_scope": "Complete synthetic example"
+  },
+  "grades": [
+    {
+      "id": "MJ-100-A",
+      "designation": {
+        "grade": "A",
+        "class": null,
+        "type": null,
+        "uns": null
+      },
+      "chemistry": {
+        "elements": {
+          "X": [
+            {
+              "min": 1.0,
+              "max": 2.0,
+              "unit": "wt%",
+              "source": "Synthetic Table 1"
+            }
+          ]
+        },
+        "notes": [
+          "Element X is fictitious. Do not use this example for engineering."
+        ]
+      },
+      "mechanical": null,
+      "hardness": null,
+      "impact": null,
+      "heat_treatment": null
+    }
+  ],
+  "required_tests": [],
+  "supplementary_requirements": [],
+  "notes": {
+    "synthetic": "All values are invented for demonstration."
+  }
+}

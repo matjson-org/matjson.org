@@ -1,0 +1,39 @@
+{
+  "matjson": {
+    "profile": "matrecord",
+    "version": "0.1"
+  },
+  "record": {
+    "id": "MJR-2026-0001",
+    "document_type": "CMTR",
+    "issuer": "Example Mill",
+    "issued": "2026-08-24",
+    "source_file": "synthetic-cmtr.pdf"
+  },
+  "materials": [
+    {
+      "specification": "MJ-100",
+      "grade": "A",
+      "heat": "H-EXAMPLE",
+      "lot": "L-01",
+      "product_form": "plate",
+      "chemistry": {
+        "X": {
+          "value": 1.5,
+          "unit": "wt%"
+        }
+      },
+      "mechanical": {},
+      "heat_treatment": [],
+      "tests": []
+    }
+  ],
+  "evidence": [
+    {
+      "type": "CMTR",
+      "reference": "MJR-2026-0001",
+      "extraction_confidence": 1.0
+    }
+  ],
+  "extensions": {}
+}

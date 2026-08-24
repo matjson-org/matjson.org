@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/schema/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Content-Type = "application/schema+json; charset=utf-8"

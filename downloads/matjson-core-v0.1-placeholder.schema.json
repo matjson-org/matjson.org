@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matjson.org/schema/core/0.1/schema.json",
+  "title": "MatJSON Core v0.1 — Architecture Placeholder",
+  "description": "Shared semantic primitives for MatJSON profiles. This starter schema is intentionally incomplete and must not be treated as a stable production contract.",
+  "x-matjson-profile": "core",
+  "x-matjson-status": "tbc",
+  "type": "object",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "format": "uri",
+      "description": "Stable MatJSON identifier or another authoritative URI."
+    },
+    "quantity": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "document",
+        "locator"
+      ],
+      "properties": {
+        "document": {
+          "type": "string"
+        },
+        "edition": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "page": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "text_role": {
+          "enum": [
+            "normative",
+            "informative",
+            "example",
+            "note",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "expression": {
+      "type": "object",
+      "description": "TBC Boolean or numeric expression tree for applicability, calculations, and decision procedures."
+    },
+    "extensionContainer": {
+      "type": "object",
+      "propertyNames": {
+        "format": "uri"
+      },
+      "additionalProperties": true
+    }
+  }
+}

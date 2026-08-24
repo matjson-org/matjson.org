@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://matjson.org/</loc></url>
+  <url><loc>https://matjson.org/schemas/</loc></url>
+  <url><loc>https://matjson.org/spec/</loc></url>
+  <url><loc>https://matjson.org/guides/</loc></url>
+  <url><loc>https://matjson.org/resources/</loc></url>
+  <url><loc>https://matjson.org/about/</loc></url>
+  <url><loc>https://matjson.org/registry/</loc></url>
+  <url><loc>https://matjson.org/examples/</loc></url>
+  <url><loc>https://matjson.org/tools/</loc></url>
+  <url><loc>https://matjson.org/governance/</loc></url>
+  <url><loc>https://matjson.org/profiles/core/</loc></url>
+  <url><loc>https://matjson.org/profiles/matspec/</loc></url>
+  <url><loc>https://matjson.org/profiles/matreq/</loc></url>
+  <url><loc>https://matjson.org/profiles/matrecord/</loc></url>
+  <url><loc>https://matjson.org/profiles/matcheck/</loc></url>
+</urlset>

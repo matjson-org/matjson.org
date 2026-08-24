@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tools — MatJSON</title>
+  <meta name="description" content="MatJSON validator, CLI, SDK, resolver, API, and comparison tooling roadmap.">
+  <meta name="theme-color" content="#061321">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../index.html" aria-label="MatJSON home">
+      <img src="../assets/img/logo-mark.svg" alt="" width="48" height="48">
+      <span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Specification</a><a href="../guides/index.html">Guides</a><a href="../resources/index.html" aria-current="page">Resources</a><a href="../about/index.html">About</a></nav>
+    <div class="header-actions">
+      <a class="icon-button" href="https://github.com/matjson-org" aria-label="MatJSON on GitHub" target="_blank" rel="noopener noreferrer"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"/><path d="M9 19c-3 .9-3-1.5-4.2-2"/></svg></a>
+      <button class="search-button" type="button" data-search-toggle aria-label="Search the site"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg><span>Search</span></button>
+      <button class="icon-button menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Open navigation"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><span>Tools</span></div><h1>Tools roadmap</h1><p>Reference validators, SDKs, resolvers, and evidence-comparison tooling planned for the MatJSON ecosystem.</p><div class="page-meta"><span class="meta-chip">CLI</span><span class="meta-chip">Python</span><span class="meta-chip">TypeScript</span><span class="meta-chip">API</span></div></div></section>
+<section class="section"><div class="container docs-layout"><aside class="docs-nav"><strong>Tools</strong><a href="#cli">CLI</a><a href="#sdks">SDKs</a><a href="#api">API</a><a href="#sequence">Implementation sequence</a></aside><article class="prose"><h2 id="cli">Command-line interface</h2><pre><code>matjson validate file.json
+matjson inspect file.json
+matjson resolve requisition.json
+matjson compare record.json requirements.json
+matjson migrate --from 0.2 --to 0.3 file.json</code></pre><h2 id="sdks">Reference SDKs</h2><p>Python and TypeScript are the first recommended implementations because they cover engineering automation, backend services, browser applications, and AI workflows.</p><h2 id="api">Potential API surface</h2><pre><code>GET  /api/v1/schemas
+GET  /api/v1/documents
+GET  /api/v1/rules/{organization}/{designation}/{edition}/{clause}
+GET  /api/v1/vocabularies/{name}
+POST /api/v1/validate</code></pre><h2 id="sequence">Implementation sequence</h2><ol><li>Schema validator and semantic linter</li><li>Controlled-vocabulary package</li><li>Effective-requirement resolver</li><li>MatRecord normalization</li><li>MatCheck evaluation and reporting</li></ol></article></div></section></main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-brand"><img src="../assets/img/logo-mark.svg" alt=""><strong>MatJSON</strong></div>
+      <p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p>
+    </div>
+    <div class="footer-col"><strong>Specification</strong><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Architecture</a><a href="../profiles/matspec/index.html">MatSpecJSON</a><a href="../profiles/matreq/index.html">MatReqJSON</a></div>
+    <div class="footer-col"><strong>Resources</strong><a href="../examples/index.html">Examples</a><a href="../registry/index.html">Registry</a><a href="../tools/index.html">Tools</a><a href="../governance/index.html">Governance</a></div>
+    <div class="footer-col"><strong>Project</strong><a href="../about/index.html">About</a><a href="../downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md">Project context</a><a href="https://github.com/matjson-org" target="_blank" rel="noopener noreferrer">GitHub</a><a href="../about/#legal">Legal boundary</a></div>
+  </div>
+  <div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="../governance/#licensing">Proposed licensing</a> · <a href="../about/#non-affiliation">Non-affiliation</a></span></div>
+</footer>
+<dialog class="search-dialog" id="site-search" aria-label="Site search">
+  <div class="search-shell">
+    <div class="search-head"><input id="site-search-input" type="search" placeholder="Search MatJSON pages" autocomplete="off"><button class="search-close" type="button" data-search-close aria-label="Close search">×</button></div>
+    <div class="search-results" id="site-search-results"></div>
+  </div>
+</dialog>
+<script>const ROOT = "../";</script>
+<script src="../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "headers": [
+    {
+      "source": "/schema/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/schema+json; charset=utf-8"
+        }
+      ]
+    }
+  ]
+}

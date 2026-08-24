@@ -1,0 +1,153 @@
+{
+  "schema_version": "0.2",
+  "document": {
+    "organization": "MatJSON Examples",
+    "designation": "MJ-SMR-1",
+    "aliases": [
+      "Synthetic Service Material Requirements"
+    ],
+    "document_type": "purchaser_specification",
+    "title": "Synthetic Service Material Requirements",
+    "edition": {
+      "publication": "2026-08"
+    }
+  },
+  "invocation_model": {
+    "accepted_sources": [
+      "material_requisition",
+      "special_material_requirements",
+      "purchase_specification",
+      "material_datasheet",
+      "purchase_order",
+      "other_contract_document"
+    ],
+    "document_reference": {
+      "behavior": "activate_all_applicable_rules",
+      "description": "A mandatory whole-document reference activates all applicable rules."
+    },
+    "scoped_reference": {
+      "supported_scopes": [
+        "part",
+        "section",
+        "subsection",
+        "clause",
+        "appendix",
+        "annex",
+        "table",
+        "figure"
+      ],
+      "behavior": "activate_rules_in_referenced_scope_and_required_dependencies",
+      "description": "A mandatory scoped reference activates rules in that scope and explicit dependencies."
+    },
+    "direct_rule_reference": {
+      "behavior": "activate_referenced_rule_and_required_dependencies",
+      "description": "A direct rule reference activates that rule and explicit dependencies."
+    },
+    "contractual_reference_strength": {
+      "mandatory_compliance": {
+        "behavior": "treat_invoked_scope_as_contract_requirement",
+        "examples": [
+          "Material shall meet MJ-SMR-1."
+        ]
+      },
+      "reference_only": {
+        "behavior": "do_not_activate_without_additional_mandatory_language",
+        "examples": [
+          "See MJ-SMR-1 for guidance."
+        ]
+      }
+    },
+    "cross_reference_policy": {
+      "default": "explicit_effect_only",
+      "description": "Cross-references have only the explicitly declared effect."
+    }
+  },
+  "scope": {
+    "industries": [
+      "synthetic_demo"
+    ],
+    "material_families": [
+      "synthetic_alloy"
+    ],
+    "product_forms": [
+      "plate"
+    ],
+    "description": "Original synthetic example demonstrating an added CMTR report-field requirement.",
+    "included_sections": [
+      "4.1"
+    ]
+  },
+  "requisition_interface": [],
+  "rules": [
+    {
+      "id": "MJ-SMR-1-4.1",
+      "title": "Report synthetic chemistry element X",
+      "category": "documentation",
+      "normativity": {
+        "source_level": "mandatory",
+        "source_modal": "shall",
+        "contractual_elevation_allowed": false
+      },
+      "targets": {
+        "material": {
+          "families": [
+            "synthetic_alloy"
+          ]
+        },
+        "product_forms": [
+          "plate"
+        ],
+        "pressure_retaining": true
+      },
+      "activation": {
+        "basis": "when_document_invoked"
+      },
+      "requirement": {
+        "kind": "required_report_field",
+        "document": "CMTR",
+        "fields": [
+          "chemistry.X"
+        ],
+        "text": "The CMTR shall report synthetic element X."
+      },
+      "verification": {
+        "evidence": [
+          "CMTR"
+        ],
+        "mode": "direct",
+        "result_if_missing": "missing_evidence",
+        "checkability": "mtr_direct",
+        "evidence_fields": [
+          "chemistry.X"
+        ]
+      },
+      "source": {
+        "clause": "4.1",
+        "section_path": [
+          "Section 4",
+          "4.1"
+        ],
+        "page": 1,
+        "text_type": "normative"
+      },
+      "structured_level": "fully_structured"
+    }
+  ],
+  "provenance": {
+    "source": "Original synthetic MatJSON example; not an engineering standard.",
+    "source_file": "synthetic-service.matreq.json",
+    "extracted_on": "2026-08-24",
+    "extraction_method": "manual",
+    "review_status": "draft",
+    "coverage": "full_material_scope",
+    "rules_generated": 1,
+    "review_notes": [
+      "All content is invented for demonstration."
+    ],
+    "unresolved_items": []
+  },
+  "notes": [
+    "For demonstration only. Do not use for engineering."
+  ],
+  "extensions": {}
+}
