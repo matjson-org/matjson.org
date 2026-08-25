@@ -20,7 +20,14 @@
     button.addEventListener('click', async () => {
       const target = document.querySelector(button.dataset.copy);
       if (!target) return;
-      const text = target.innerText.replace(/^\s*\d+\s?/gm, '');
+      const codeLines = target.querySelectorAll('.code-line');
+      const text = codeLines.length
+        ? Array.from(codeLines, (line) => {
+            const level = Number.parseInt(line.dataset.indent || '0', 10);
+            const content = line.children[1]?.innerText || '';
+            return `${'  '.repeat(Number.isFinite(level) ? level : 0)}${content}`;
+          }).join('\n')
+        : target.innerText.replace(/^\s*\d+\s?/gm, '');
       try {
         await navigator.clipboard.writeText(text);
         const original = button.innerHTML;
@@ -38,6 +45,9 @@
   const pages = [
     { title: 'MatJSON home', description: 'Open material data interoperability specification.', href: ROOT + 'index.html' },
     { title: 'Schema suite', description: 'Core, MatSpec, MatReq, MatRecord, and MatCheck.', href: ROOT + 'schemas/index.html' },
+    { title: 'Schema reference', description: 'Linked, human-readable reference docs with collapsible schema trees.', href: ROOT + 'reference/index.html' },
+    { title: 'MatSpecJSON reference', description: 'Root fields, definitions, and interactive MatSpec schema.', href: ROOT + 'reference/matspec/index.html' },
+    { title: 'MatReqJSON reference', description: 'Root fields, rule definitions, and interactive MatReq schema.', href: ROOT + 'reference/matreq/index.html' },
     { title: 'Why MatJSON', description: 'Why materials specifications, MTRs, APIs, automation, and AI need a common JSON format.', href: ROOT + 'why-matjson/index.html' },
     { title: 'Architecture specification', description: 'Profiles, identifiers, conformance, and invocation.', href: ROOT + 'spec/index.html' },
     { title: 'MatSpecJSON', description: 'Intrinsic material and product specification requirements.', href: ROOT + 'profiles/matspec/index.html' },

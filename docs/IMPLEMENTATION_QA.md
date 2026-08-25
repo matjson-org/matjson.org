@@ -1,65 +1,90 @@
 # MatJSON Website Implementation QA
 
-**Date:** 2026-08-24  
-**Implementation:** Static HTML, CSS, JavaScript, JSON Schema, and synthetic JSON examples  
+**Date:** 2026-08-25  
+**Implementation:** Static HTML, CSS, JavaScript, JSON Schema, synthetic examples, and generated human-readable schema reference documentation  
 **Design concept:** `design/matjson-homepage-concept.png`  
 **Implementation preview:** `design/matjson-homepage-implementation-preview.png`
 
 ## Verification approach
 
-The environment's installed Chromium is controlled by an administrator policy that blocks navigation to localhost, local files, data URLs, and `about:blank` under Playwright (`ERR_BLOCKED_BY_ADMINISTRATOR`). The Playwright-managed browser was not preinstalled, and the environment could not download it because external DNS access was unavailable.
+The environment's installed Chromium could not complete local or localhost rendering and timed out even for a small static page. Browser automation was therefore unavailable for final visual interaction testing.
 
-The website was therefore verified using the following fallback methods:
+The website was verified using the following fallback methods:
 
-1. WeasyPrint CSS rendering at a 1536 × 1024 first-viewport size for visual comparison.
-2. A forced 390 px mobile-layout render to inspect the responsive composition.
-3. Static HTML parsing and local-link resolution across all pages.
-4. JavaScript syntax checking with Node.js.
-5. JSON Schema meta-validation using Draft 2020-12 validators.
-6. Validation of all four synthetic example documents against their corresponding schemas.
-7. Accessibility-oriented static checks for page titles, one H1 per page, duplicate IDs, image alt attributes, and button accessible names.
+1. Static HTML parsing and local-link/anchor resolution across every page.
+2. JavaScript syntax checking with Node.js.
+3. JSON Schema Draft 2020-12 meta-validation.
+4. Validation of all four synthetic example documents against their corresponding schemas.
+5. Reference-document integrity checks comparing rendered field/definition counts with the canonical schema files.
+6. Native HTML `<details>` structures for collapsible schema objects, arrays, alternatives, conditions, and definitions.
+7. WeasyPrint renders of the reference index and a reduced MatSpec reference page for visual inspection.
+8. Accessibility-oriented checks for titles, exactly one H1, duplicate IDs, image alt attributes, and button accessible names.
+9. Direct comparison of versioned, `latest`, and downloadable schema copies by SHA-256.
 
 ## Test results
 
-- HTML pages checked: **16**
-- Missing local links or assets: **0**
+- HTML pages checked: **23**
+- Missing local links, anchors, or assets: **0**
 - Duplicate IDs: **0**
 - Pages with missing or multiple H1 elements: **0**
 - Images missing `alt`: **0**
 - Buttons missing accessible names: **0**
-- JSON Schema files meta-validated: **10**
+- JSON files parsed: **22**
 - Synthetic examples validated: **4 / 4**
-- JavaScript syntax check: **passed**
+- JavaScript syntax checks: **passed**
+- Reference profile pages generated: **5 / 5**
+- Reference index page generated: **1 / 1**
+- MatSpec root fields documented: **10 / 10**
+- MatSpec reusable definitions documented: **10 / 10**
+- MatReq root fields documented: **11 / 11**
+- MatReq reusable definitions documented: **21 / 21**
+- Published property-table rows without an explanation: **0**
+- MatSpec versioned/latest/download copies: **byte-identical**
+- MatReq versioned/latest/download copies: **byte-identical**
+
+## Human-readable reference update
+
+The website now includes a dedicated `/reference/` documentation surface inspired by the navigation and linking principles of mature JSON-format documentation sites while retaining the MatJSON visual system.
+
+Each profile reference includes:
+
+- an overview and profile-specific data-flow explanation;
+- a persistent, filterable section/field/definition navigation rail;
+- a root-field table showing field, type, required/optional status, and explanation;
+- links from referenced types to their reusable definitions;
+- reusable-definition pages with related-definition links and composition summaries;
+- a full schema tree built from the canonical JSON Schema;
+- native expand/collapse controls for objects, arrays, `allOf`, `oneOf`, `anyOf`, conditions, and definitions;
+- Expand All and Collapse All controls;
+- schema-tree and definition filtering;
+- raw schema and download links;
+- source-link copy controls;
+- SEO metadata and sitemap entries.
+
+Reference content is generated at build time using `tools/build_schema_reference.py`. After a canonical schema changes, running that command regenerates field tables, definition links, and the interactive tree before deployment.
+
+## Schema version confirmation
+
+- **MatSpecJSON:** v0.2.10, canonical `$id` `https://matjson.org/schema/matspec/0.2.10/schema.json`
+- **MatReqJSON:** v0.2, canonical `$id` `https://matjson.org/schema/matreq/0.2/schema.json`
+- **MatJSON Core:** v0.1 architecture placeholder — TBC
+- **MatRecordJSON:** v0.1 concept placeholder — TBC
+- **MatCheckJSON:** v0.1 concept placeholder — TBC
+
+The reference-document update does not change the conformance behavior of MatSpecJSON or MatReqJSON. It adds documentation and navigation around the existing canonical schemas.
 
 ## Fidelity ledger
 
-| Comparison point | Concept evidence | Implementation evidence | Result |
-| --- | --- | --- | --- |
-| Header | Dark navy header, MatJSON wordmark, essential navigation, search, repository control | Matching dark header, original SVG mark, same navigation hierarchy, search dialog, GitHub control | Matched; the control now links to the live MatJSON GitHub organization |
-| Hero composition | Two-column hero with large white/teal headline and code panel | Two-column hero with the same visual hierarchy, teal emphasis, valid synthetic MatSpec code, and two CTAs | Matched |
-| Palette | Navy, teal, white, restrained blue/violet/orange/green profile colors | Same primary palette and profile-specific accents | Matched |
-| Schema suite | Five distinct profile cards | Five cards for Core, MatSpec, MatReq, MatRecord, and MatCheck with exact requested purposes and extensions | Matched |
-| Principle strip | Interoperable, traceable, extensible, automatable | Same four principles with code-native SVG icons | Matched |
-| Typography and density | Clean documentation-site typography and low-to-medium density | System UI stack with disciplined heading, body, code, control, and metadata styles | Matched in fallback render |
-| Footer | Dark footer with specification, resource, project, licensing, and legal links | Same footer role, plus project context and non-affiliation links | Matched and expanded |
-| Responsive behavior | Professional documentation site expected to collapse cleanly | CSS breakpoints at 1060 px, 860 px, and 580 px; mobile menu, one-column cards, scrollable code, and stacked footer | Structurally verified; live Chromium interaction could not be executed in this environment |
-
-## Above-the-fold copy diff
-
-The implementation preserves the accepted concept's information architecture while using project-approved copy from the MatJSON discussion. No decorative eyebrow, badge, fake metric, or unrelated claim was introduced above the fold.
-
-Intentional copy changes:
-
-- The hero uses “materials data” rather than “Materials Data” for sentence-style capitalization.
-- The code sample uses an original synthetic specification instead of a real ASME/API designation, avoiding redistribution and accuracy concerns.
-- The secondary CTA now says “View on GitHub” and links to the live MatJSON GitHub organization.
-
-## Intentional deviations
-
-1. The website includes additional lifecycle, architecture, roadmap, legal-boundary, and documentation sections beyond the compact generated concept because the user explicitly requested all profile links and a professional schema website.
-2. Organization-level GitHub controls route to https://github.com/matjson-org, while the homepage source button targets https://github.com/matjson-org/matjson.org. The local repository page remains the project repository-structure roadmap.
-3. Standards-derived MatReq libraries are intentionally excluded from the public website package pending rights review.
-4. MatJSON Core, MatRecordJSON, and MatCheckJSON are explicitly marked TBC and use minimal placeholder schemas.
+| Comparison point | Intended behavior | Implementation result |
+| --- | --- | --- |
+| Documentation navigation | Persistent hierarchy and fast movement between concepts | Sidebar links to overview, root fields, schema tree, and every reusable definition |
+| Human-readable object documentation | Explain each object rather than showing raw JSON alone | Property tables and definition cards provide field, type, requirement status, and explanation |
+| Schema relationships | Referenced objects should be easy to discover | `$ref` and related-definition links jump to the corresponding definition sections |
+| Complex schema inspection | Objects and arrays should not overwhelm the reader | Native collapsible tree plus expand/collapse-all controls |
+| Searchability | Large schemas must be filterable | Synchronized field/definition/tree filters with match counts |
+| Raw-source access | Human-readable docs should not hide the normative schema | Direct Raw JSON Schema and Download Schema actions remain visible |
+| Visual integration | New reference docs should look like MatJSON, not a copied third-party site | Existing navy/teal design tokens, typography, header, footer, and responsive patterns retained |
+| Mobile behavior | Sidebar and tables should remain usable on narrow screens | Sidebar becomes non-sticky; flow stacks; tables scroll; schema rows and controls stack |
 
 ## Core interaction path
 
@@ -68,19 +93,28 @@ Implemented interactions include:
 - responsive navigation and mobile-menu state;
 - site-search dialog and client-side page filtering;
 - copy-code control;
-- working local navigation across profile, schema, guide, registry, tools, governance, and about pages;
+- schema-reference filtering;
+- Expand All / Collapse All for the schema tree;
+- native per-object and per-array disclosure controls;
+- automatic opening of ancestor objects for hash-linked fields;
+- copy-link controls for reusable definitions;
 - direct schema and Markdown downloads.
 
-Static source review confirms that these interaction handlers are wired. Live interaction automation could not be completed because Chromium navigation was blocked by the environment policy described above.
+JavaScript syntax and handler wiring were statically verified. Native `<details>` elements provide per-node expand/collapse behavior even when JavaScript is disabled; JavaScript adds filtering, global expansion controls, and copy-link behavior.
 
-## 2026-08-24 schema and presentation update
+## Intentional boundaries
 
-- Reformatted the homepage MatSpec example to preserve JSON indentation and expanded the `grades` array across multiple lines.
-- Added explicit MatJSON normative-language policy: project-authored mandatory requirements use `must` / `must not`.
-- Verified the published MatSpecJSON schema is the current v0.2.10 working schema, with only canonical MatJSON.org `$id` and publication metadata added.
-- Verified the published MatReqJSON schema is the current v0.2 working schema, with only canonical MatJSON.org publication metadata and wording modernization in a non-behavioral description.
-- Verified versioned, `latest`, and downloadable copies are byte-identical within each profile.
-- All 16 HTML pages have zero broken local references and zero duplicate element IDs.
-- All JSON files parse successfully and all four synthetic examples validate against their corresponding schemas.
-- Chromium rendering was attempted in the container but timed out because of the environment; structural and schema QA were completed as the fallback.
+1. The human-readable pages explain the MatJSON schema vocabulary; they do not reproduce copyrighted standards content.
+2. Core, MatRecord, and MatCheck remain clearly marked as placeholders/TBC.
+3. Standards-derived data libraries remain excluded from the public website package pending rights review.
+4. Reference prose is documentation metadata and does not alter the canonical JSON Schema validation rules.
 
+## Homepage code-sample indentation update — v8
+
+The homepage MatSpec example now uses explicit semantic indentation levels rather than relying on collapsible HTML whitespace:
+
+- root fields: 2 spaces;
+- nested specification fields: 4 spaces;
+- grade object fields: 6 spaces.
+
+The Copy control reconstructs the example from the same `data-indent` values, so the copied output is valid, consistently two-space-indented JSON. A reduced rendering of the production code-block styles was visually inspected, and the shared CSS/JavaScript cache key was advanced to `20260825-8`.
