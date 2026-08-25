@@ -7,7 +7,7 @@
   <meta name="description" content="MatJSON profile architecture, invocation, versioning, identifiers, conformance, and extension rules.">
   <meta name="theme-color" content="#061321">
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../assets/css/styles.css?v=20260824-4">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260824-5">
   
 </head>
 <body>
@@ -28,17 +28,18 @@
   </div>
 </header>
 <main id="main"><section class="page-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><span>Specification</span></div><h1>Architecture specification</h1><p>The design principles that make MatJSON interoperable, traceable, extensible, and safe to automate.</p><div class="page-meta"><span class="meta-chip">Profile family</span><span class="meta-chip">Rule provenance</span><span class="meta-chip">Evidence-aware</span></div></div></section>
-<section class="section"><div class="container docs-layout"><aside class="docs-nav"><strong>Architecture</strong><a href="#profiles">Profiles</a><a href="#stack">Requirements stack</a><a href="#invocation">Invocation</a><a href="#versioning">Versioning</a><a href="#identifiers">Identifiers</a><a href="#conformance">Conformance</a><a href="#extensions">Extensions</a><a href="#copyright">Publication boundary</a></aside><article class="prose">
+<section class="section"><div class="container docs-layout"><aside class="docs-nav"><strong>Architecture</strong><a href="#profiles">Profiles</a><a href="#stack">Requirements stack</a><a href="#invocation">Invocation</a><a href="#normative-language">Normative language</a><a href="#versioning">Versioning</a><a href="#identifiers">Identifiers</a><a href="#conformance">Conformance</a><a href="#extensions">Extensions</a><a href="#copyright">Publication boundary</a></aside><article class="prose">
 <h2 id="profiles">Profiles</h2><p>MatJSON is a family of related profiles rather than one monolithic document. MatSpec captures intrinsic material-specification requirements. MatReq captures application overlays. MatRecord and MatCheck will normalize evidence and compliance outcomes. MatJSON Core will host shared semantics.</p>
 <table><thead><tr><th>Profile</th><th>Primary question</th><th>Status</th></tr></thead><tbody><tr><td>MatSpec</td><td>What does the material specification intrinsically require?</td><td>Working draft</td></tr><tr><td>MatReq</td><td>What additional requirements does another governing document impose?</td><td>Working draft</td></tr><tr><td>MatRecord</td><td>What evidence was actually reported?</td><td>TBC</td></tr><tr><td>MatCheck</td><td>What passed, failed, is missing, or needs review?</td><td>TBC</td></tr></tbody></table>
 <h2 id="stack">Effective requirements stack</h2><pre><code>MatSpecJSON
     + invoked MatReqJSON documents
     + direct material requisition requirements
     = effective material requirements</code></pre><p>The material requisition remains the project-specific source of truth. MatJSON does not currently define a separate MatCtx profile.</p>
-<h2 id="invocation">Invocation</h2><p>A requisition can invoke an entire standard, a section, a clause, an annex, or a direct purchaser-defined requirement. Informative or example content can be contractually elevated when the purchaser explicitly invokes it using mandatory language.</p><pre><code>Material shall meet NACE MR0175.
-Material shall meet API TR 938-C Appendix A.
-Carbon steel shall comply with API 663 Section 8.2.
-Maximum carbon equivalent shall be 0.43.</code></pre><p>Reference-only language such as “see” or “for guidance” must not silently import an entire document.</p>
+<h2 id="invocation">Invocation</h2><p>A requisition can invoke an entire standard, a section, a clause, an annex, or a direct purchaser-defined requirement. Informative or example content can be contractually elevated when the purchaser explicitly invokes it using mandatory language.</p><pre><code>Material must meet NACE MR0175.
+Material must meet API TR 938-C Appendix A.
+Carbon steel must comply with API 663 Section 8.2.
+Maximum carbon equivalent must be 0.43.</code></pre><p>Reference-only language such as “see” or “for guidance” must not silently import an entire document.</p>
+<h2 id="normative-language">Normative language</h2><p>MatJSON-authored requirements use <strong>must</strong> and <strong>must not</strong> for mandatory behavior. Recommended behavior uses <strong>should</strong>, and optional behavior uses <strong>may</strong>. Source-document modal wording is preserved separately as provenance when needed.</p>
 <h2 id="versioning">Versioning</h2><p>MatJSON separates the profile/schema version from the edition of the source engineering document. These are independent dimensions.</p><pre><code>{
   "matjson": { "profile": "matreq", "version": "0.2" },
   "document": {
@@ -79,6 +80,6 @@ https://matjson.org/id/rule/api/663/2022/8.2.2</code></pre>
   </div>
 </dialog>
 <script>const ROOT = "../";</script>
-<script src="../assets/js/site.js?v=20260824-4"></script>
+<script src="../assets/js/site.js?v=20260824-5"></script>
 </body>
 </html>

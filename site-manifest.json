@@ -11,15 +11,15 @@
     },
     {
       "path": "README.md",
-      "bytes": 1199
+      "bytes": 1422
     },
     {
       "path": "about/index.html",
-      "bytes": 7051
+      "bytes": 7212
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 22689
+      "bytes": 22643
     },
     {
       "path": "assets/img/favicon.svg",
@@ -32,6 +32,10 @@
     {
       "path": "assets/img/logo-mark.svg",
       "bytes": 1114
+    },
+    {
+      "path": "assets/img/uzair-syed-ahmed.jpg",
+      "bytes": 127597
     },
     {
       "path": "assets/js/site.js",
@@ -47,15 +51,15 @@
     },
     {
       "path": "docs/IMPLEMENTATION_QA.md",
-      "bytes": 5314
+      "bytes": 6397
     },
     {
       "path": "docs/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
-      "bytes": 22667
+      "bytes": 22977
     },
     {
       "path": "downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
-      "bytes": 22667
+      "bytes": 22977
     },
     {
       "path": "downloads/matcheck-v0.1-placeholder.schema.json",
@@ -71,7 +75,7 @@
     },
     {
       "path": "downloads/matreq-v0.2.schema.json",
-      "bytes": 32809
+      "bytes": 32808
     },
     {
       "path": "downloads/matspec-v0.2.10.schema.json",
@@ -79,7 +83,7 @@
     },
     {
       "path": "examples/index.html",
-      "bytes": 5972
+      "bytes": 5998
     },
     {
       "path": "examples/synthetic-alloy.matspec.json",
@@ -95,19 +99,19 @@
     },
     {
       "path": "examples/synthetic-service.matreq.json",
-      "bytes": 4121
+      "bytes": 4118
     },
     {
       "path": "governance/index.html",
-      "bytes": 6431
+      "bytes": 6457
     },
     {
       "path": "guides/index.html",
-      "bytes": 5920
+      "bytes": 5946
     },
     {
       "path": "index.html",
-      "bytes": 18088
+      "bytes": 18420
     },
     {
       "path": "netlify.toml",
@@ -115,35 +119,35 @@
     },
     {
       "path": "profiles/core/index.html",
-      "bytes": 6361
+      "bytes": 6387
     },
     {
       "path": "profiles/matcheck/index.html",
-      "bytes": 6112
+      "bytes": 6138
     },
     {
       "path": "profiles/matrecord/index.html",
-      "bytes": 6340
+      "bytes": 6366
     },
     {
       "path": "profiles/matreq/index.html",
-      "bytes": 6504
+      "bytes": 6530
     },
     {
       "path": "profiles/matspec/index.html",
-      "bytes": 6524
+      "bytes": 6550
     },
     {
       "path": "registry/index.html",
-      "bytes": 6113
+      "bytes": 6139
     },
     {
       "path": "repository/index.html",
-      "bytes": 6308
+      "bytes": 6334
     },
     {
       "path": "resources/index.html",
-      "bytes": 5886
+      "bytes": 5912
     },
     {
       "path": "robots.txt",
@@ -179,11 +183,11 @@
     },
     {
       "path": "schema/matreq/0.2/schema.json",
-      "bytes": 32809
+      "bytes": 32808
     },
     {
       "path": "schema/matreq/latest/schema.json",
-      "bytes": 32809
+      "bytes": 32808
     },
     {
       "path": "schema/matspec/0.2.10/schema.json",
@@ -195,7 +199,7 @@
     },
     {
       "path": "schemas/index.html",
-      "bytes": 7721
+      "bytes": 7747
     },
     {
       "path": "sitemap.xml",
@@ -203,11 +207,11 @@
     },
     {
       "path": "spec/index.html",
-      "bytes": 8843
+      "bytes": 9266
     },
     {
       "path": "tools/index.html",
-      "bytes": 6027
+      "bytes": 6053
     },
     {
       "path": "vercel.json",
