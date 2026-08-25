@@ -45,3 +45,8 @@ Website/source repository: https://github.com/matjson-org/matjson.org
 ## Cache-busting
 
 Static CSS and JavaScript references include a release query version (`v=20260824-4`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
+
+
+## Search indexing
+
+The deployed site includes canonical URLs, Open Graph/Twitter metadata, Schema.org JSON-LD, `robots.txt`, and `sitemap.xml`. After deployment, add `matjson.org` to Google Search Console and submit `https://matjson.org/sitemap.xml`. Use URL Inspection to request indexing for the homepage, `/why-matjson/`, `/schemas/`, `/spec/`, and `/about/`.
