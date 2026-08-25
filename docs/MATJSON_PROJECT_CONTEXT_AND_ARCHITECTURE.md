@@ -116,7 +116,7 @@ A material requisition may invoke MatReq content in several ways.
 Example:
 
 ```text
-Material shall comply with NACE MR0175 / ISO 15156.
+Material must comply with NACE MR0175 / ISO 15156.
 ```
 
 The corresponding MatReq file is loaded and all applicable rules are evaluated.
@@ -126,7 +126,7 @@ The corresponding MatReq file is loaded and all applicable rules are evaluated.
 Example:
 
 ```text
-Material shall meet API TR 938-C Appendix A.
+Material must meet API TR 938-C Appendix A.
 ```
 
 Only the rules within that appendix are activated, together with dependencies explicitly required by those rules.
@@ -136,7 +136,7 @@ Only the rules within that appendix are activated, together with dependencies ex
 Example:
 
 ```text
-Carbon steel materials shall comply with API 663 Section 8.2.
+Carbon steel materials must comply with API 663 Section 8.2.
 ```
 
 The applicable rules under that section are activated.
@@ -146,7 +146,7 @@ The applicable rules under that section are activated.
 Example:
 
 ```text
-Carbon equivalent shall not exceed 0.43.
+Carbon equivalent must not exceed 0.43.
 ```
 
 This direct requisition requirement becomes part of the effective requirement set even if the source clause is not separately cited.
@@ -169,6 +169,10 @@ An informative or example annex can become contractually mandatory when the mate
 
 1. the source document labels the content informative or exemplary; and
 2. the purchaser contractually invoked that content.
+
+### 5.7 Normative language
+
+MatJSON-authored requirements use **must** and **must not** for mandatory behavior. Recommended behavior uses **should**, and optional behavior uses **may**. Source-document modal wording may be retained separately as provenance when faithful representation of the source is required.
 
 ## 6. Rule model for MatReqJSON
 

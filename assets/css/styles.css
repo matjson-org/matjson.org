@@ -123,7 +123,8 @@ code, pre { font-family: var(--font-code); }
 .copy-button { display: inline-flex; align-items: center; gap: 7px; color: #c1cfdb; border: 0; background: transparent; font-size: 12px; }
 .copy-button:hover { color: var(--teal); }
 .code-body { overflow: auto; padding: 15px 18px 18px; color: #d8e6f3; font-family: var(--font-code); font-size: 13px; line-height: 1.7; }
-.code-line { display: grid; grid-template-columns: 28px 1fr; min-width: 620px; }
+.code-line { display: grid; grid-template-columns: 28px minmax(0, 1fr); min-width: 0; }
+.code-line > span:last-child { white-space: pre; }
 .line-no { color: #5f7589; user-select: none; }
 .t-key { color: #63c8ff; }
 .t-str { color: #78e6ad; }

@@ -330,7 +330,7 @@
               }
             }
           },
-          "description": "A material requisition may elevate an otherwise informative/example source scope into a binding contractual requirement when it explicitly requires compliance, e.g. 'Material shall meet API TR 938-C Appendix A'. Merely saying 'refer to' or 'see' does not by itself create the same obligation."
+          "description": "A material requisition may elevate an otherwise informative/example source scope into a binding contractual requirement when it explicitly requires compliance, e.g. 'Material must meet API TR 938-C Appendix A'. Merely saying 'refer to' or 'see' does not by itself create the same obligation."
         },
         "cross_reference_policy": {
           "type": "object",

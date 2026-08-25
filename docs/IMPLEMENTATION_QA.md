@@ -72,3 +72,15 @@ Implemented interactions include:
 - direct schema and Markdown downloads.
 
 Static source review confirms that these interaction handlers are wired. Live interaction automation could not be completed because Chromium navigation was blocked by the environment policy described above.
+
+## 2026-08-24 schema and presentation update
+
+- Reformatted the homepage MatSpec example to preserve JSON indentation and expanded the `grades` array across multiple lines.
+- Added explicit MatJSON normative-language policy: project-authored mandatory requirements use `must` / `must not`.
+- Verified the published MatSpecJSON schema is the current v0.2.10 working schema, with only canonical MatJSON.org `$id` and publication metadata added.
+- Verified the published MatReqJSON schema is the current v0.2 working schema, with only canonical MatJSON.org publication metadata and wording modernization in a non-behavioral description.
+- Verified versioned, `latest`, and downloadable copies are byte-identical within each profile.
+- All 16 HTML pages have zero broken local references and zero duplicate element IDs.
+- All JSON files parse successfully and all four synthetic examples validate against their corresponding schemas.
+- Chromium rendering was attempted in the container but timed out because of the environment; structural and schema QA were completed as the fallback.
+
