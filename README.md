@@ -40,3 +40,8 @@ This is a polished project starter, not an accredited or verified industry stand
 MatJSON organization: https://github.com/matjson-org
 
 Website/source repository: https://github.com/matjson-org/matjson.org
+
+
+## Cache-busting
+
+Static CSS and JavaScript references include a release query version (`v=20260824-4`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
