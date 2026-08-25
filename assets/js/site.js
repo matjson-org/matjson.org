@@ -48,6 +48,7 @@
     { title: 'Registry', description: 'Canonical identifiers and package metadata.', href: ROOT + 'registry/index.html' },
     { title: 'Tools', description: 'Validator, CLI, APIs, and planned SDKs.', href: ROOT + 'tools/index.html' },
     { title: 'Governance', description: 'RFCs, contribution, review, and publication process.', href: ROOT + 'governance/index.html' },
+    { title: 'About MatJSON', description: 'Mission, creator, scope, and publication boundary.', href: ROOT + 'about/index.html' },
     { title: 'GitHub & repository', description: 'MatJSON GitHub organization and repository roadmap.', href: ROOT + 'repository/index.html' }
   ];
 
