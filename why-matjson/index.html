@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Why MatJSON — A Common JSON Standard for Materials Data</title>
+<meta content="Why engineering materials data needs a common machine-readable format for specifications, standards, MTRs, CMTRs, compliance checks, APIs, automation, and AI." name="description"/>
+<meta content="#061321" name="theme-color"/>
+<link href="../assets/img/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="../assets/css/styles.css?v=20260825-6" rel="stylesheet"/>
+<link href="https://matjson.org/why-matjson/" rel="canonical"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<meta content="MatJSON" property="og:site_name"/>
+<meta content="article" property="og:type"/>
+<meta content="Why MatJSON — A Common JSON Standard for Materials Data" property="og:title"/>
+<meta content="Why engineering materials data needs a common machine-readable format for specifications, standards, MTRs, CMTRs, compliance checks, APIs, automation, and AI." property="og:description"/>
+<meta content="https://matjson.org/why-matjson/" property="og:url"/>
+<meta content="https://matjson.org/design/matjson-homepage-implementation-preview.png" property="og:image"/>
+<meta content="MatJSON open materials data schema documentation" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Why MatJSON — A Common JSON Standard for Materials Data" name="twitter:title"/>
+<meta content="Why engineering materials data needs a common machine-readable format for specifications, standards, MTRs, CMTRs, compliance checks, APIs, automation, and AI." name="twitter:description"/>
+<meta content="https://matjson.org/design/matjson-homepage-implementation-preview.png" name="twitter:image"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://matjson.org/#website","url":"https://matjson.org/","name":"MatJSON","description":"Open, vendor-neutral JSON schemas for engineering materials data.","inLanguage":"en"},{"@type":"Organization","@id":"https://matjson.org/#organization","name":"MatJSON","url":"https://matjson.org/","sameAs":["https://github.com/matjson-org"]},{"@type":"WebPage","@id":"https://matjson.org/why-matjson/#webpage","url":"https://matjson.org/why-matjson/","name":"Why MatJSON — A Common JSON Standard for Materials Data","description":"Why engineering materials data needs a common machine-readable format for specifications, standards, MTRs, CMTRs, compliance checks, APIs, automation, and AI.","isPartOf":{"@id":"https://matjson.org/#website"},"about":{"@id":"https://matjson.org/#organization"},"inLanguage":"en","mainEntity":{"@id":"https://matjson.org/why-matjson/#article"}},{"@type":"TechArticle","@id":"https://matjson.org/why-matjson/#article","headline":"Why MatJSON — A Common JSON Standard for Materials Data","description":"Why engineering materials data needs a common machine-readable format for specifications, standards, MTRs, CMTRs, compliance checks, APIs, automation, and AI.","url":"https://matjson.org/why-matjson/","author":{"@id":"https://matjson.org/about/#uzair-syed-ahmed"},"publisher":{"@id":"https://matjson.org/#organization"},"inLanguage":"en"}]}</script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="container header-inner">
+<a aria-label="MatJSON home" class="brand" href="../index.html">
+<img alt="" height="48" src="../assets/img/logo-mark.svg" width="48"/>
+<span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span>
+</a>
+<nav aria-label="Primary navigation" class="nav"><a href="../index.html">Home</a><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Specification</a><a href="../guides/index.html">Guides</a><a href="../resources/index.html">Resources</a><a href="../about/index.html">About</a></nav>
+<div class="header-actions">
+<a aria-label="MatJSON on GitHub" class="icon-button" href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"></path><path d="M9 19c-3 .9-3-1.5-4.2-2"></path></svg></a>
+<button aria-label="Search the site" class="search-button" data-search-toggle="" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.8-3.8"></path></svg><span>Search</span></button>
+<button aria-expanded="false" aria-label="Open navigation" class="icon-button menu-toggle" data-menu-toggle="" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div>
+</div>
+</header>
+<main id="main"><section class="page-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><span>Why MatJSON</span></div><h1>Why materials data needs a common JSON standard</h1><p>Engineering material data is everywhere—specifications, standards, requisitions, MTRs, CMTRs, test reports, and compliance reviews—but the interfaces between them are still largely bespoke.</p><div class="page-meta"><span class="meta-chip">Interoperability</span><span class="meta-chip">Automation</span><span class="meta-chip">AI-ready</span></div></div></section>
+<section class="section"><div class="container docs-layout"><aside class="docs-nav"><strong>Why MatJSON</strong><a href="#problem">The problem</a><a href="#lifecycle">The lifecycle</a><a href="#profiles">The profiles</a><a href="#interoperability">Interoperability</a><a href="#ai">Automation &amp; AI</a><a href="#open">Open approach</a></aside><article class="prose"><h2 id="problem">Materials data is structured for documents, not software</h2><p>Material requirements are commonly communicated through specifications, codes and standards, purchaser requisitions, manuals, and drawings. Evidence then arrives in MTRs, CMTRs, material certificates, heat-treatment records, NDE reports, and other documents. These sources are readable by engineers, but software typically has to rediscover the structure each time.</p><p>The result is repeated extraction work, custom parsers for individual document formats, inconsistent field names, duplicated engineering logic, and weak interoperability between engineering, quality, procurement, inspection, and AI systems.</p><h2 id="lifecycle">The same material data moves through a lifecycle</h2><p>A material starts with a governing material or product specification. Application standards and service requirements can add or restrict requirements. A purchaser requisition resolves project-specific choices. The supplier then provides MTR or CMTR evidence, and the material is checked against the effective requirements.</p><pre><code>Material specification
+        +
+Application / service requirements
+        +
+Purchaser requisition
+        ↓
+Effective material requirements
+        +
+MTR / CMTR / supporting evidence
+        ↓
+Material compliance result</code></pre><p>MatJSON defines interoperable JSON profiles for the major information objects in that lifecycle instead of forcing every software system to invent its own representation.</p><h2 id="profiles">A profile for each information object</h2><ul><li><strong>MatSpecJSON</strong> represents intrinsic requirements of a material or product specification.</li><li><strong>MatReqJSON</strong> represents additional requirements imposed by codes, service standards, equipment standards, fabrication practices, and purchaser specifications.</li><li><strong>MatRecordJSON</strong> is the planned normalized representation of MTRs, CMTRs, test reports, and other evidence.</li><li><strong>MatCheckJSON</strong> is the planned machine-readable record of compliance results and supporting evidence.</li><li><strong>MatJSON Core</strong> provides shared units, provenance, identifiers, selectors, expressions, and extension rules.</li></ul><p><a href="../schemas/index.html">Explore the MatJSON schema suite →</a></p><h2 id="interoperability">Software should exchange meaning, not just text</h2><p>A common materials data schema makes it possible for independently developed systems to exchange the same concepts: chemistry limits, mechanical properties, heat treatment, hardness, impact testing, NDE, product form, traceability, evidence, and requirement provenance. An ERP system, engineering application, inspection platform, supplier portal, API, or analytics service can then communicate using predictable structures rather than organization-specific exports.</p><p>This is the core interoperability goal: a material specification JSON file, an MTR JSON record, and a compliance result should be understandable by different software without writing a new parser for every handoff.</p><h2 id="ai">Better structure for APIs, automation, and AI</h2><p>AI can read documents, but repeatable engineering workflows benefit from explicit semantics. Structured data lets software distinguish a requirement from evidence, a maximum from a minimum, a mandatory project invocation from a source recommendation, and a missing requisition input from an MTR failure.</p><p>That makes MatJSON useful for material-data APIs, MTR and CMTR parsing, automated compliance checks, procurement workflows, engineering knowledge systems, analytics, and AI agents that need traceable source-aware material data.</p><h2 id="open">An open interoperability layer</h2><p>MatJSON is intended as an open, vendor-neutral interchange specification rather than a proprietary database. Organizations can keep their own systems, workflows, and licensed standards content while exchanging machine-readable materials data through a shared format.</p><div class="notice"><strong>MatJSON does not replace engineering standards or licensed source documents.</strong> It defines a common data structure for representing and exchanging material information while preserving source provenance and publication boundaries.</div><p>Initial use cases come from pressure equipment and heat exchangers, but the underlying problem also exists in aerospace, automotive, structural steel, pipelines, nuclear, marine, additive manufacturing, medical devices, electrical conductors, and other material-intensive industries.</p></article></div></section></main>
+<footer class="site-footer">
+<div class="container footer-grid">
+<div>
+<div class="footer-brand"><img alt="" src="../assets/img/logo-mark.svg"/><strong>MatJSON</strong></div>
+<p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p>
+</div>
+<div class="footer-col"><strong>Specification</strong><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Architecture</a><a href="../profiles/matspec/index.html">MatSpecJSON</a><a href="../profiles/matreq/index.html">MatReqJSON</a></div>
+<div class="footer-col"><strong>Resources</strong><a href="../examples/index.html">Examples</a><a href="../registry/index.html">Registry</a><a href="../tools/index.html">Tools</a><a href="../governance/index.html">Governance</a></div>
+<div class="footer-col"><strong>Project</strong><a href="../about/index.html">About</a><a href="../downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md">Project context</a><a href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank">GitHub</a><a href="../about/#legal">Legal boundary</a></div>
+</div>
+<div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="../governance/#licensing">Proposed licensing</a> · <a href="../about/#non-affiliation">Non-affiliation</a></span></div>
+</footer>
+<dialog aria-label="Site search" class="search-dialog" id="site-search">
+<div class="search-shell">
+<div class="search-head"><input autocomplete="off" id="site-search-input" placeholder="Search MatJSON pages" type="search"/><button aria-label="Close search" class="search-close" data-search-close="" type="button">×</button></div>
+<div class="search-results" id="site-search-results"></div>
+</div>
+</dialog>
+<script>const ROOT = "../";</script>
+<script src="../assets/js/site.js?v=20260825-6"></script>
+</body>
+</html>

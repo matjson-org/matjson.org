@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-24",
+  "generated": "2026-08-25",
   "files": [
     {
       "path": ".nojekyll",
@@ -11,11 +11,11 @@
     },
     {
       "path": "README.md",
-      "bytes": 1422
+      "bytes": 1788
     },
     {
       "path": "about/index.html",
-      "bytes": 7212
+      "bytes": 9727
     },
     {
       "path": "assets/css/styles.css",
@@ -39,7 +39,7 @@
     },
     {
       "path": "assets/js/site.js",
-      "bytes": 4543
+      "bytes": 4716
     },
     {
       "path": "design/matjson-homepage-concept.png",
@@ -83,7 +83,7 @@
     },
     {
       "path": "examples/index.html",
-      "bytes": 5998
+      "bytes": 8166
     },
     {
       "path": "examples/synthetic-alloy.matspec.json",
@@ -103,15 +103,15 @@
     },
     {
       "path": "governance/index.html",
-      "bytes": 6457
+      "bytes": 9145
     },
     {
       "path": "guides/index.html",
-      "bytes": 5946
+      "bytes": 8347
     },
     {
       "path": "index.html",
-      "bytes": 18420
+      "bytes": 20751
     },
     {
       "path": "netlify.toml",
@@ -119,35 +119,35 @@
     },
     {
       "path": "profiles/core/index.html",
-      "bytes": 6387
+      "bytes": 9064
     },
     {
       "path": "profiles/matcheck/index.html",
-      "bytes": 6138
+      "bytes": 8937
     },
     {
       "path": "profiles/matrecord/index.html",
-      "bytes": 6366
+      "bytes": 9111
     },
     {
       "path": "profiles/matreq/index.html",
-      "bytes": 6530
+      "bytes": 9397
     },
     {
       "path": "profiles/matspec/index.html",
-      "bytes": 6550
+      "bytes": 9285
     },
     {
       "path": "registry/index.html",
-      "bytes": 6139
+      "bytes": 8284
     },
     {
       "path": "repository/index.html",
-      "bytes": 6334
+      "bytes": 8284
     },
     {
       "path": "resources/index.html",
-      "bytes": 5912
+      "bytes": 8285
     },
     {
       "path": "robots.txt",
@@ -199,23 +199,31 @@
     },
     {
       "path": "schemas/index.html",
-      "bytes": 7747
+      "bytes": 9831
+    },
+    {
+      "path": "site-manifest.json",
+      "bytes": 4264
     },
     {
       "path": "sitemap.xml",
-      "bytes": 940
+      "bytes": 1546
     },
     {
       "path": "spec/index.html",
-      "bytes": 9266
+      "bytes": 12044
     },
     {
       "path": "tools/index.html",
-      "bytes": 6053
+      "bytes": 8138
     },
     {
       "path": "vercel.json",
       "bytes": 299
+    },
+    {
+      "path": "why-matjson/index.html",
+      "bytes": 12743
     }
   ]
 }
