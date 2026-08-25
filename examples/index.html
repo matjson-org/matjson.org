@@ -1,54 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Examples — MatJSON</title>
-  <meta name="description" content="Synthetic MatSpec, MatReq, MatRecord, and MatCheck JSON examples.">
-  <meta name="theme-color" content="#061321">
-  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../assets/css/styles.css?v=20260824-5">
-  
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>MatJSON Examples — Synthetic Material Specification and MTR JSON</title>
+<meta content="Copyright-safe synthetic MatJSON examples for material specifications, application requirements, MTR records, and compliance results." name="description"/>
+<meta content="#061321" name="theme-color"/>
+<link href="../assets/img/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="../assets/css/styles.css?v=20260825-6" rel="stylesheet"/>
+<link href="https://matjson.org/examples/" rel="canonical"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<meta content="MatJSON" property="og:site_name"/>
+<meta content="website" property="og:type"/>
+<meta content="MatJSON Examples — Synthetic Material Specification and MTR JSON" property="og:title"/>
+<meta content="Copyright-safe synthetic MatJSON examples for material specifications, application requirements, MTR records, and compliance results." property="og:description"/>
+<meta content="https://matjson.org/examples/" property="og:url"/>
+<meta content="https://matjson.org/design/matjson-homepage-implementation-preview.png" property="og:image"/>
+<meta content="MatJSON open materials data schema documentation" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="MatJSON Examples — Synthetic Material Specification and MTR JSON" name="twitter:title"/>
+<meta content="Copyright-safe synthetic MatJSON examples for material specifications, application requirements, MTR records, and compliance results." name="twitter:description"/>
+<meta content="https://matjson.org/design/matjson-homepage-implementation-preview.png" name="twitter:image"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://matjson.org/#website","url":"https://matjson.org/","name":"MatJSON","description":"Open, vendor-neutral JSON schemas for engineering materials data.","inLanguage":"en"},{"@type":"Organization","@id":"https://matjson.org/#organization","name":"MatJSON","url":"https://matjson.org/","sameAs":["https://github.com/matjson-org"]},{"@type":"WebPage","@id":"https://matjson.org/examples/#webpage","url":"https://matjson.org/examples/","name":"MatJSON Examples — Synthetic Material Specification and MTR JSON","description":"Copyright-safe synthetic MatJSON examples for material specifications, application requirements, MTR records, and compliance results.","isPartOf":{"@id":"https://matjson.org/#website"},"about":{"@id":"https://matjson.org/#organization"},"inLanguage":"en"}]}</script></head>
 <body>
-
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
-  <div class="container header-inner">
-    <a class="brand" href="../index.html" aria-label="MatJSON home">
-      <img src="../assets/img/logo-mark.svg" alt="" width="48" height="48">
-      <span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Specification</a><a href="../guides/index.html">Guides</a><a href="../resources/index.html" aria-current="page">Resources</a><a href="../about/index.html">About</a></nav>
-    <div class="header-actions">
-      <a class="icon-button" href="https://github.com/matjson-org" aria-label="MatJSON on GitHub" target="_blank" rel="noopener noreferrer"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"/><path d="M9 19c-3 .9-3-1.5-4.2-2"/></svg></a>
-      <button class="search-button" type="button" data-search-toggle aria-label="Search the site"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg><span>Search</span></button>
-      <button class="icon-button menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Open navigation"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    </div>
-  </div>
+<div class="container header-inner">
+<a aria-label="MatJSON home" class="brand" href="../index.html">
+<img alt="" height="48" src="../assets/img/logo-mark.svg" width="48"/>
+<span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span>
+</a>
+<nav aria-label="Primary navigation" class="nav"><a href="../index.html">Home</a><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Specification</a><a href="../guides/index.html">Guides</a><a aria-current="page" href="../resources/index.html">Resources</a><a href="../about/index.html">About</a></nav>
+<div class="header-actions">
+<a aria-label="MatJSON on GitHub" class="icon-button" href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"></path><path d="M9 19c-3 .9-3-1.5-4.2-2"></path></svg></a>
+<button aria-label="Search the site" class="search-button" data-search-toggle="" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.8-3.8"></path></svg><span>Search</span></button>
+<button aria-expanded="false" aria-label="Open navigation" class="icon-button menu-toggle" data-menu-toggle="" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div>
+</div>
 </header>
 <main id="main"><section class="page-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><span>Examples</span></div><h1>Synthetic examples</h1><p>Copyright-safe example documents that demonstrate the MatJSON lifecycle without reproducing proprietary standards content.</p><div class="page-meta"><span class="meta-chip">Original examples</span><span class="meta-chip">Not engineering data</span></div></div></section>
 <section class="section"><div class="container"><div class="example-grid"><article class="example-card"><h3>MatSpec example</h3><p>A fictitious alloy plate with a synthetic chemistry requirement.</p><a class="text-link" href="synthetic-alloy.matspec.json">Open JSON</a></article><article class="example-card"><h3>MatReq example</h3><p>A synthetic purchaser requirement that adds a CMTR reporting field.</p><a class="text-link" href="synthetic-service.matreq.json">Open JSON</a></article><article class="example-card"><h3>MatRecord example</h3><p>A normalized synthetic CMTR record using the concept placeholder schema.</p><a class="text-link" href="synthetic-mill-report.matrecord.json">Open JSON</a></article><article class="example-card"><h3>MatCheck example</h3><p>A synthetic compliance result linking the requirement to reported evidence.</p><a class="text-link" href="synthetic-compliance.matcheck.json">Open JSON</a></article></div><div class="prose"><div class="notice warning"><strong>Demonstration only:</strong> All example specifications, values, organizations, and evidence are invented. Do not use them for engineering or procurement.</div></div></div></section></main>
-
 <footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      <div class="footer-brand"><img src="../assets/img/logo-mark.svg" alt=""><strong>MatJSON</strong></div>
-      <p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p>
-    </div>
-    <div class="footer-col"><strong>Specification</strong><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Architecture</a><a href="../profiles/matspec/index.html">MatSpecJSON</a><a href="../profiles/matreq/index.html">MatReqJSON</a></div>
-    <div class="footer-col"><strong>Resources</strong><a href="../examples/index.html">Examples</a><a href="../registry/index.html">Registry</a><a href="../tools/index.html">Tools</a><a href="../governance/index.html">Governance</a></div>
-    <div class="footer-col"><strong>Project</strong><a href="../about/index.html">About</a><a href="../downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md">Project context</a><a href="https://github.com/matjson-org" target="_blank" rel="noopener noreferrer">GitHub</a><a href="../about/#legal">Legal boundary</a></div>
-  </div>
-  <div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="../governance/#licensing">Proposed licensing</a> · <a href="../about/#non-affiliation">Non-affiliation</a></span></div>
+<div class="container footer-grid">
+<div>
+<div class="footer-brand"><img alt="" src="../assets/img/logo-mark.svg"/><strong>MatJSON</strong></div>
+<p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p>
+</div>
+<div class="footer-col"><strong>Specification</strong><a href="../schemas/index.html">Schemas</a><a href="../spec/index.html">Architecture</a><a href="../profiles/matspec/index.html">MatSpecJSON</a><a href="../profiles/matreq/index.html">MatReqJSON</a></div>
+<div class="footer-col"><strong>Resources</strong><a href="../examples/index.html">Examples</a><a href="../registry/index.html">Registry</a><a href="../tools/index.html">Tools</a><a href="../governance/index.html">Governance</a></div>
+<div class="footer-col"><strong>Project</strong><a href="../about/index.html">About</a><a href="../downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md">Project context</a><a href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank">GitHub</a><a href="../about/#legal">Legal boundary</a></div>
+</div>
+<div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="../governance/#licensing">Proposed licensing</a> · <a href="../about/#non-affiliation">Non-affiliation</a></span></div>
 </footer>
-<dialog class="search-dialog" id="site-search" aria-label="Site search">
-  <div class="search-shell">
-    <div class="search-head"><input id="site-search-input" type="search" placeholder="Search MatJSON pages" autocomplete="off"><button class="search-close" type="button" data-search-close aria-label="Close search">×</button></div>
-    <div class="search-results" id="site-search-results"></div>
-  </div>
+<dialog aria-label="Site search" class="search-dialog" id="site-search">
+<div class="search-shell">
+<div class="search-head"><input autocomplete="off" id="site-search-input" placeholder="Search MatJSON pages" type="search"/><button aria-label="Close search" class="search-close" data-search-close="" type="button">×</button></div>
+<div class="search-results" id="site-search-results"></div>
+</div>
 </dialog>
 <script>const ROOT = "../";</script>
-<script src="../assets/js/site.js?v=20260824-5"></script>
+<script src="../assets/js/site.js?v=20260825-6"></script>
 </body>
 </html>

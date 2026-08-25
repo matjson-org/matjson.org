@@ -38,6 +38,7 @@
   const pages = [
     { title: 'MatJSON home', description: 'Open material data interoperability specification.', href: ROOT + 'index.html' },
     { title: 'Schema suite', description: 'Core, MatSpec, MatReq, MatRecord, and MatCheck.', href: ROOT + 'schemas/index.html' },
+    { title: 'Why MatJSON', description: 'Why materials specifications, MTRs, APIs, automation, and AI need a common JSON format.', href: ROOT + 'why-matjson/index.html' },
     { title: 'Architecture specification', description: 'Profiles, identifiers, conformance, and invocation.', href: ROOT + 'spec/index.html' },
     { title: 'MatSpecJSON', description: 'Intrinsic material and product specification requirements.', href: ROOT + 'profiles/matspec/index.html' },
     { title: 'MatReqJSON', description: 'Application and purchaser material requirement overlays.', href: ROOT + 'profiles/matreq/index.html' },
