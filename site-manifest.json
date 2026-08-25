@@ -11,15 +11,15 @@
     },
     {
       "path": "README.md",
-      "bytes": 1788
+      "bytes": 2291
     },
     {
       "path": "about/index.html",
-      "bytes": 9727
+      "bytes": 9821
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 22643
+      "bytes": 37349
     },
     {
       "path": "assets/img/favicon.svg",
@@ -38,8 +38,12 @@
       "bytes": 127597
     },
     {
+      "path": "assets/js/schema-reference.js",
+      "bytes": 4467
+    },
+    {
       "path": "assets/js/site.js",
-      "bytes": 4716
+      "bytes": 5193
     },
     {
       "path": "design/matjson-homepage-concept.png",
@@ -51,11 +55,15 @@
     },
     {
       "path": "docs/IMPLEMENTATION_QA.md",
-      "bytes": 6397
+      "bytes": 6631
     },
     {
       "path": "docs/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
       "bytes": 22977
+    },
+    {
+      "path": "docs/REFERENCE_DOCS_V7.md",
+      "bytes": 956
     },
     {
       "path": "downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
@@ -83,7 +91,7 @@
     },
     {
       "path": "examples/index.html",
-      "bytes": 8166
+      "bytes": 8260
     },
     {
       "path": "examples/synthetic-alloy.matspec.json",
@@ -103,15 +111,15 @@
     },
     {
       "path": "governance/index.html",
-      "bytes": 9145
+      "bytes": 9239
     },
     {
       "path": "guides/index.html",
-      "bytes": 8347
+      "bytes": 8441
     },
     {
       "path": "index.html",
-      "bytes": 20751
+      "bytes": 20839
     },
     {
       "path": "netlify.toml",
@@ -119,35 +127,59 @@
     },
     {
       "path": "profiles/core/index.html",
-      "bytes": 9064
+      "bytes": 9529
     },
     {
       "path": "profiles/matcheck/index.html",
-      "bytes": 8937
+      "bytes": 9418
     },
     {
       "path": "profiles/matrecord/index.html",
-      "bytes": 9111
+      "bytes": 9594
     },
     {
       "path": "profiles/matreq/index.html",
-      "bytes": 9397
+      "bytes": 9886
     },
     {
       "path": "profiles/matspec/index.html",
-      "bytes": 9285
+      "bytes": 9773
+    },
+    {
+      "path": "reference/core/index.html",
+      "bytes": 27439
+    },
+    {
+      "path": "reference/index.html",
+      "bytes": 9737
+    },
+    {
+      "path": "reference/matcheck/index.html",
+      "bytes": 25746
+    },
+    {
+      "path": "reference/matrecord/index.html",
+      "bytes": 27940
+    },
+    {
+      "path": "reference/matreq/index.html",
+      "bytes": 274645
+    },
+    {
+      "path": "reference/matspec/index.html",
+      "bytes": 170423
     },
     {
       "path": "registry/index.html",
-      "bytes": 8284
+      "bytes": 8378
     },
     {
       "path": "repository/index.html",
-      "bytes": 8284
+      "bytes": 8378
     },
     {
       "path": "resources/index.html",
-      "bytes": 8285
+      "bytes": 8379
     },
     {
       "path": "robots.txt",
@@ -163,7 +195,7 @@
     },
     {
       "path": "schema/index.json",
-      "bytes": 1172
+      "bytes": 1476
     },
     {
       "path": "schema/matcheck/0.1/schema.json",
@@ -199,23 +231,27 @@
     },
     {
       "path": "schemas/index.html",
-      "bytes": 9831
-    },
-    {
-      "path": "site-manifest.json",
-      "bytes": 4264
+      "bytes": 10581
     },
     {
       "path": "sitemap.xml",
-      "bytes": 1546
+      "bytes": 2089
     },
     {
       "path": "spec/index.html",
-      "bytes": 12044
+      "bytes": 12138
+    },
+    {
+      "path": "tools/__pycache__/build_schema_reference.cpython-313.pyc",
+      "bytes": 60512
+    },
+    {
+      "path": "tools/build_schema_reference.py",
+      "bytes": 45993
     },
     {
       "path": "tools/index.html",
-      "bytes": 8138
+      "bytes": 8232
     },
     {
       "path": "vercel.json",
@@ -223,7 +259,11 @@
     },
     {
       "path": "why-matjson/index.html",
-      "bytes": 12743
+      "bytes": 12837
     }
-  ]
+  ],
+  "totals": {
+    "files": 65,
+    "bytes": 2991819
+  }
 }

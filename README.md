@@ -19,6 +19,7 @@ The folder can be deployed directly to GitHub Pages, Cloudflare Pages, Netlify, 
 ## Included
 
 - Full responsive website and documentation pages
+- Linked schema reference docs with searchable property tables and collapsible object/array trees
 - Current MatSpecJSON v0.2.10 schema
 - Current MatReqJSON v0.2 schema
 - Placeholder Core, MatRecord, and MatCheck schemas
@@ -44,9 +45,14 @@ Website/source repository: https://github.com/matjson-org/matjson.org
 
 ## Cache-busting
 
-Static CSS and JavaScript references include a release query version (`v=20260824-4`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
+Static CSS and JavaScript references include a release query version (`v=20260825-7`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
 
 
 ## Search indexing
 
 The deployed site includes canonical URLs, Open Graph/Twitter metadata, Schema.org JSON-LD, `robots.txt`, and `sitemap.xml`. After deployment, add `matjson.org` to Google Search Console and submit `https://matjson.org/sitemap.xml`. Use URL Inspection to request indexing for the homepage, `/why-matjson/`, `/schemas/`, `/spec/`, and `/about/`.
+
+
+## Schema reference
+
+Human-readable reference pages are published under `/reference/`. They are generated at build time from the canonical versioned schema files, so property tables, `$ref` links, reusable definitions, and the collapsible schema tree remain aligned with the raw JSON Schema. After changing a published schema, run `python tools/build_schema_reference.py` before committing the website.

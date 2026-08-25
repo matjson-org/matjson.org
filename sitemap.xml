@@ -17,4 +17,10 @@
   <url><loc>https://matjson.org/profiles/matreq/</loc><lastmod>2026-08-25</lastmod></url>
   <url><loc>https://matjson.org/profiles/matrecord/</loc><lastmod>2026-08-25</lastmod></url>
   <url><loc>https://matjson.org/profiles/matcheck/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/core/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/matspec/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/matreq/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/matrecord/</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://matjson.org/reference/matcheck/</loc><lastmod>2026-08-25</lastmod></url>
 </urlset>
