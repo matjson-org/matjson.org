@@ -47,7 +47,7 @@
       "mandatory_compliance": {
         "behavior": "treat_invoked_scope_as_contract_requirement",
         "examples": [
-          "Material shall meet MJ-SMR-1."
+          "Material must meet MJ-SMR-1."
         ]
       },
       "reference_only": {
@@ -85,7 +85,7 @@
       "category": "documentation",
       "normativity": {
         "source_level": "mandatory",
-        "source_modal": "shall",
+        "source_modal": "must",
         "contractual_elevation_allowed": false
       },
       "targets": {
@@ -108,7 +108,7 @@
         "fields": [
           "chemistry.X"
         ],
-        "text": "The CMTR shall report synthetic element X."
+        "text": "The CMTR must report synthetic element X."
       },
       "verification": {
         "evidence": [
