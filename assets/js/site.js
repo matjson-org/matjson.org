@@ -172,4 +172,70 @@
       document.querySelector('[data-search-toggle]')?.click();
     }
   });
+
+  // Collapsible linked JSON Schema. The schema is rendered statically so it
+  // remains readable without JavaScript; this layer only manages folding.
+  const schemaNodes = [...document.querySelectorAll('[data-schema-node]')];
+  if (schemaNodes.length) {
+    const directChild = (node, className) => [...node.children].find((child) => child.classList?.contains(className));
+
+    const setSchemaCollapsed = (node, collapsed) => {
+      const openLine = directChild(node, 'schema-code-open');
+      const toggle = openLine?.querySelector('[data-schema-toggle]');
+      if (!toggle) return;
+      if (!toggle.dataset.schemaLabel) {
+        toggle.dataset.schemaLabel = (toggle.getAttribute('aria-label') || 'schema section')
+          .replace(/^(Collapse|Expand)\s+/, '');
+      }
+      node.classList.toggle('is-collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.setAttribute('aria-label', `${collapsed ? 'Expand' : 'Collapse'} ${toggle.dataset.schemaLabel}`);
+    };
+
+    document.addEventListener('click', (event) => {
+      const toggle = event.target.closest('[data-schema-toggle]');
+      if (!toggle) return;
+      const node = toggle.closest('[data-schema-node]');
+      if (!node) return;
+      setSchemaCollapsed(node, !node.classList.contains('is-collapsed'));
+    });
+
+    document.querySelectorAll('[data-schema-expand-all]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const section = button.closest('.reference-simple-section') || document;
+        section.querySelectorAll('[data-schema-node]').forEach((node) => setSchemaCollapsed(node, false));
+      });
+    });
+
+    document.querySelectorAll('[data-schema-collapse-all]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const section = button.closest('.reference-simple-section') || document;
+        const nodes = [...section.querySelectorAll('[data-schema-node]')];
+        nodes.forEach((node, index) => setSchemaCollapsed(node, index !== 0));
+      });
+    });
+
+    const revealSchemaTarget = () => {
+      if (!window.location.hash) return;
+      let id;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); }
+      catch { id = window.location.hash.slice(1); }
+      const target = document.getElementById(id);
+      if (!target) return;
+      let node = target.closest('[data-schema-node]');
+      while (node) {
+        setSchemaCollapsed(node, false);
+        node = node.parentElement?.closest('[data-schema-node]') || null;
+      }
+      window.requestAnimationFrame(() => target.scrollIntoView({ block: 'center' }));
+    };
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (link) window.setTimeout(revealSchemaTarget, 0);
+    });
+    window.addEventListener('hashchange', revealSchemaTarget);
+    window.requestAnimationFrame(revealSchemaTarget);
+  }
+
 })();

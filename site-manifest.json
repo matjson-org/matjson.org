@@ -19,11 +19,11 @@
     },
     {
       "path": "about/index.html",
-      "bytes": 11505
+      "bytes": 11611
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 58312
+      "bytes": 61337
     },
     {
       "path": "assets/img/favicon.svg",
@@ -47,7 +47,7 @@
     },
     {
       "path": "assets/js/site.js",
-      "bytes": 8365
+      "bytes": 11296
     },
     {
       "path": "design/matjson-homepage-concept.png",
@@ -70,6 +70,10 @@
       "bytes": 2423
     },
     {
+      "path": "docs/IMPLEMENTATION_QA_V12.md",
+      "bytes": 1590
+    },
+    {
       "path": "docs/IMPLEMENTATION_QA_V9.md",
       "bytes": 1544
     },
@@ -88,6 +92,10 @@
     {
       "path": "docs/REFERENCE_DOCS_V11.md",
       "bytes": 1185
+    },
+    {
+      "path": "docs/REFERENCE_DOCS_V12.md",
+      "bytes": 1055
     },
     {
       "path": "docs/REFERENCE_DOCS_V7.md",
@@ -123,7 +131,7 @@
     },
     {
       "path": "examples/index.html",
-      "bytes": 9934
+      "bytes": 10040
     },
     {
       "path": "examples/synthetic-alloy.matspec.json",
@@ -143,15 +151,15 @@
     },
     {
       "path": "governance/index.html",
-      "bytes": 10923
+      "bytes": 11029
     },
     {
       "path": "guides/index.html",
-      "bytes": 10145
+      "bytes": 10251
     },
     {
       "path": "index.html",
-      "bytes": 22730
+      "bytes": 22836
     },
     {
       "path": "netlify.toml",
@@ -159,203 +167,203 @@
     },
     {
       "path": "profiles/core/index.html",
-      "bytes": 11201
+      "bytes": 11307
     },
     {
       "path": "profiles/matcheck/index.html",
-      "bytes": 11120
+      "bytes": 11226
     },
     {
       "path": "profiles/matrecord/index.html",
-      "bytes": 11296
+      "bytes": 11402
     },
     {
       "path": "profiles/matreq/index.html",
-      "bytes": 11578
+      "bytes": 11684
     },
     {
       "path": "profiles/matspec/index.html",
-      "bytes": 11465
+      "bytes": 11571
     },
     {
       "path": "reference/core/definitions/expression/index.html",
-      "bytes": 11098
+      "bytes": 12021
     },
     {
       "path": "reference/core/definitions/extension-container/index.html",
-      "bytes": 11382
+      "bytes": 12881
     },
     {
       "path": "reference/core/definitions/identifier/index.html",
-      "bytes": 10970
+      "bytes": 11918
     },
     {
       "path": "reference/core/definitions/quantity/index.html",
-      "bytes": 14753
+      "bytes": 19095
     },
     {
       "path": "reference/core/definitions/source/index.html",
-      "bytes": 16431
+      "bytes": 22710
     },
     {
       "path": "reference/core/index.html",
-      "bytes": 26347
+      "bytes": 42328
     },
     {
       "path": "reference/index.html",
-      "bytes": 10860
+      "bytes": 10966
     },
     {
       "path": "reference/matcheck/index.html",
-      "bytes": 31684
+      "bytes": 50530
     },
     {
       "path": "reference/matrecord/index.html",
-      "bytes": 36370
+      "bytes": 60560
     },
     {
       "path": "reference/matreq/definitions/activation/index.html",
-      "bytes": 19279
+      "bytes": 25506
     },
     {
       "path": "reference/matreq/definitions/calculation/index.html",
-      "bytes": 17444
+      "bytes": 22916
     },
     {
       "path": "reference/matreq/definitions/condition-expr/index.html",
-      "bytes": 20506
+      "bytes": 30535
     },
     {
       "path": "reference/matreq/definitions/condition-leaf/index.html",
-      "bytes": 17127
+      "bytes": 21763
     },
     {
       "path": "reference/matreq/definitions/coverage/index.html",
-      "bytes": 19628
+      "bytes": 27382
     },
     {
       "path": "reference/matreq/definitions/dependencies/index.html",
-      "bytes": 15864
+      "bytes": 19600
     },
     {
       "path": "reference/matreq/definitions/document/index.html",
-      "bytes": 21166
+      "bytes": 28236
     },
     {
       "path": "reference/matreq/definitions/document-reference/index.html",
-      "bytes": 18916
+      "bytes": 25144
     },
     {
       "path": "reference/matreq/definitions/document-scope/index.html",
-      "bytes": 23091
+      "bytes": 32773
     },
     {
       "path": "reference/matreq/definitions/edition/index.html",
-      "bytes": 28046
+      "bytes": 45817
     },
     {
       "path": "reference/matreq/definitions/effect/index.html",
-      "bytes": 20972
+      "bytes": 28612
     },
     {
       "path": "reference/matreq/definitions/invocation-model/index.html",
-      "bytes": 46620
+      "bytes": 73991
     },
     {
       "path": "reference/matreq/definitions/normativity/index.html",
-      "bytes": 18048
+      "bytes": 23452
     },
     {
       "path": "reference/matreq/definitions/provenance/index.html",
-      "bytes": 23035
+      "bytes": 33480
     },
     {
       "path": "reference/matreq/definitions/reference-target/index.html",
-      "bytes": 17779
+      "bytes": 23608
     },
     {
       "path": "reference/matreq/definitions/requirement/index.html",
-      "bytes": 45556
+      "bytes": 71560
     },
     {
       "path": "reference/matreq/definitions/requisition-input/index.html",
-      "bytes": 20130
+      "bytes": 27017
     },
     {
       "path": "reference/matreq/definitions/rule/index.html",
-      "bytes": 34433
+      "bytes": 49868
     },
     {
       "path": "reference/matreq/definitions/source-ref/index.html",
-      "bytes": 22470
+      "bytes": 32229
     },
     {
       "path": "reference/matreq/definitions/targets/index.html",
-      "bytes": 32505
+      "bytes": 49311
     },
     {
       "path": "reference/matreq/definitions/verification/index.html",
-      "bytes": 23785
+      "bytes": 33270
     },
     {
       "path": "reference/matreq/index.html",
-      "bytes": 287720
+      "bytes": 523878
     },
     {
       "path": "reference/matspec/definitions/alternatives/index.html",
-      "bytes": 16710
+      "bytes": 21068
     },
     {
       "path": "reference/matspec/definitions/applies-when/index.html",
-      "bytes": 32758
+      "bytes": 49762
     },
     {
       "path": "reference/matspec/definitions/band/index.html",
-      "bytes": 15422
+      "bytes": 19835
     },
     {
       "path": "reference/matspec/definitions/grade/index.html",
-      "bytes": 76957
+      "bytes": 137482
     },
     {
       "path": "reference/matspec/definitions/not-extracted/index.html",
-      "bytes": 13719
+      "bytes": 16928
     },
     {
       "path": "reference/matspec/definitions/test/index.html",
-      "bytes": 18351
+      "bytes": 25436
     },
     {
       "path": "reference/matspec/definitions/unit/index.html",
-      "bytes": 13044
+      "bytes": 14916
     },
     {
       "path": "reference/matspec/definitions/value/index.html",
-      "bytes": 25166
+      "bytes": 39845
     },
     {
       "path": "reference/matspec/definitions/value-or-alternatives/index.html",
-      "bytes": 12105
+      "bytes": 14665
     },
     {
       "path": "reference/matspec/definitions/value-set/index.html",
-      "bytes": 13832
+      "bytes": 16998
     },
     {
       "path": "reference/matspec/index.html",
-      "bytes": 181003
+      "bytes": 333617
     },
     {
       "path": "registry/index.html",
-      "bytes": 10062
+      "bytes": 10168
     },
     {
       "path": "repository/index.html",
-      "bytes": 10082
+      "bytes": 10188
     },
     {
       "path": "resources/index.html",
-      "bytes": 10063
+      "bytes": 10169
     },
     {
       "path": "robots.txt",
@@ -407,7 +415,7 @@
     },
     {
       "path": "schemas/index.html",
-      "bytes": 12573
+      "bytes": 12679
     },
     {
       "path": "sitemap.xml",
@@ -415,15 +423,15 @@
     },
     {
       "path": "spec/index.html",
-      "bytes": 13812
+      "bytes": 13918
     },
     {
       "path": "tools/build_schema_reference.py",
-      "bytes": 40343
+      "bytes": 43476
     },
     {
       "path": "tools/index.html",
-      "bytes": 9916
+      "bytes": 10022
     },
     {
       "path": "tools/schema_reference_hints.py",
@@ -435,11 +443,11 @@
     },
     {
       "path": "why-matjson/index.html",
-      "bytes": 14541
+      "bytes": 14647
     }
   ],
   "totals": {
-    "files": 109,
-    "bytes": 3885317
+    "files": 111,
+    "bytes": 4699280
   }
 }

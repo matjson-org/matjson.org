@@ -10,7 +10,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_DATE = "2026-08-26"
-ASSET_VERSION = "20260826-11"
+ASSET_VERSION = "20260826-12"
 
 PROFILES = {
     "matspec": {
@@ -230,7 +230,7 @@ def header_html(prefix: str, active: str) -> str:
         )
     profile_menu = ''.join(profile_items)
     return f'''<header class="site-header"><div class="container header-inner">
-<a aria-label="MatJSON home" class="brand" href="{prefix}index.html"><img alt="" height="42" src="{prefix}assets/img/logo-mark.svg" width="42"/><span class="brand-name">MatJSON</span></a>
+<a aria-label="MatJSON home" class="brand" href="{prefix}index.html"><img alt="" height="42" src="{prefix}assets/img/logo-mark.svg" width="42"/><span class="brand-copy"><span class="brand-name">MatJSON</span><span class="brand-tag">Material standards, structured for software</span></span></a>
 <nav aria-label="Primary navigation" class="nav">
 <a{current("home")} href="{prefix}index.html">Home</a>
 <a{current("about")} href="{prefix}about/index.html">About</a>
@@ -324,15 +324,35 @@ def schema_scalar_html(value, *, key: str | None = None, main_page: bool = True)
 
 
 def linked_schema_html(value, *, main_page: bool = True) -> str:
-    """Render exact JSON using the linked-schema method used by Lottie Docs."""
-    lines: list[str] = []
+    """Render the exact schema as linked, collapsible JSON.
 
-    def add_line(depth: int, body: str, *, line_id: str | None = None, classes: str = '') -> None:
+    The visual model follows the Lottie Docs schema page: the schema remains the
+    primary artifact, object names retain stable anchors, local ``$ref`` values
+    jump to their targets, and definitions expose a small documentation-book
+    link. JavaScript only controls folding; the JSON remains readable without it.
+    """
+
+    book_svg = (
+        '<svg aria-hidden="true" viewBox="0 0 16 16">'
+        '<path d="M2.25 2.75h3.1A2.65 2.65 0 0 1 8 5.4v7.1a2.65 2.65 0 0 0-2.65-2.65h-3.1z"/>'
+        '<path d="M13.75 2.75h-3.1A2.65 2.65 0 0 0 8 5.4v7.1a2.65 2.65 0 0 1 2.65-2.65h3.1z"/>'
+        '</svg>'
+    )
+    chevron_svg = (
+        '<svg aria-hidden="true" viewBox="0 0 12 12">'
+        '<path d="m3 4 3 3 3-3"/>'
+        '</svg>'
+    )
+
+    def line_html(depth: int, body: str, *, line_id: str | None = None, classes: str = '', toggle: str = '') -> str:
         attrs = f' id="{escape(line_id, quote=True)}"' if line_id else ''
         class_value = 'schema-code-line' + (f' {classes}' if classes else '')
-        lines.append(f'<span class="{class_value}"{attrs}>{"    " * depth}{body}</span>')
+        return (
+            f'<span class="{class_value}"{attrs} style="--schema-depth:{depth}">'
+            f'{toggle}{"    " * depth}{body}</span>'
+        )
 
-    def key_html(key: str, child_path: tuple[object, ...], linked: bool) -> str:
+    def key_link_html(key: str, child_path: tuple[object, ...], linked: bool) -> str:
         encoded = escape(json.dumps(key, ensure_ascii=False))
         if not linked:
             return f'<span class="schema-key">{encoded}</span>'
@@ -345,53 +365,115 @@ def linked_schema_html(value, *, main_page: bool = True) -> str:
             f'title="Link to {escape(pointer, quote=True)}">{encoded}</a>'
         )
 
-    def add_comma() -> None:
-        if lines:
-            lines[-1] = lines[-1][:-7] + '<span class="schema-punctuation">,</span></span>'
+    def documentation_link(child_path: tuple[object, ...]) -> str:
+        if not main_page or len(child_path) != 2 or child_path[0] != '$defs':
+            return ''
+        definition = str(child_path[1])
+        label = humanize(definition)
+        return (
+            f'<a class="schema-doc-link" href="definitions/{slug(definition)}/index.html" '
+            f'aria-label="Open {escape(label, quote=True)} documentation" '
+            f'title="Open {escape(label, quote=True)} documentation">{book_svg}</a>'
+        )
 
-    def render(node, depth: int, path: tuple[object, ...], prefix: str = '', *, line_id: str | None = None, classes: str = '') -> None:
-        if isinstance(node, dict):
-            if not node:
-                add_line(depth, prefix + '<span class="schema-punctuation">{}</span>', line_id=line_id)
-                return
-            add_line(depth, prefix + '<span class="schema-punctuation">{</span>', line_id=line_id, classes=classes)
-            items = list(node.items())
-            for index, (key, child) in enumerate(items):
-                child_path = path + (key,)
-                linked = isinstance(child, dict)
-                child_prefix = key_html(str(key), child_path, linked) + '<span class="schema-punctuation">: </span>'
-                child_id = schema_anchor_path(child_path) if linked else None
-                child_classes = ''
-                if child_path == ('$defs',):
-                    child_classes = 'schema-defs-line'
-                elif len(child_path) == 2 and child_path[0] == '$defs':
-                    child_classes = 'schema-definition-line'
-                render(child, depth + 1, child_path, child_prefix, line_id=child_id, classes=child_classes)
-                if index < len(items) - 1:
-                    add_comma()
-            add_line(depth, '<span class="schema-punctuation">}</span>')
-            return
+    def node_classes(path: tuple[object, ...]) -> str:
+        if path == ('$defs',):
+            return 'schema-defs-line'
+        if len(path) == 2 and path[0] == '$defs':
+            return 'schema-definition-line'
+        return ''
 
-        if isinstance(node, list):
-            if not node:
-                add_line(depth, prefix + '<span class="schema-punctuation">[]</span>', line_id=line_id)
-                return
-            add_line(depth, prefix + '<span class="schema-punctuation">[</span>', line_id=line_id, classes=classes)
-            for index, child in enumerate(node):
-                child_path = path + (index,)
-                child_id = schema_anchor_path(child_path) if isinstance(child, dict) else None
-                render(child, depth + 1, child_path, line_id=child_id)
-                if index < len(node) - 1:
-                    add_comma()
-            add_line(depth, '<span class="schema-punctuation">]</span>')
-            return
+    def render(
+        node,
+        depth: int,
+        path: tuple[object, ...],
+        *,
+        key: str | None = None,
+        last: bool = True,
+        line_id: str | None = None,
+    ) -> str:
+        is_array = isinstance(node, list)
+        is_object = isinstance(node, dict)
+        comma = '' if last else '<span class="schema-punctuation">,</span>'
 
-        current_key = str(path[-1]) if path else None
-        add_line(depth, prefix + schema_scalar_html(node, key=current_key, main_page=main_page), line_id=line_id, classes=classes)
+        if not is_array and not is_object:
+            prefix = ''
+            if key is not None:
+                prefix = key_link_html(key, path, False) + '<span class="schema-punctuation">: </span>'
+            return line_html(
+                depth,
+                prefix + schema_scalar_html(node, key=key, main_page=main_page) + comma,
+                line_id=line_id,
+                classes=node_classes(path),
+            )
 
-    render(value, 0, tuple(), line_id='schema-root')
-    return '<div class="schema-code-shell"><pre class="linked-schema"><code>' + '\n'.join(lines) + '</code></pre></div>'
+        open_char, close_char = ('[', ']') if is_array else ('{', '}')
+        entries = list(enumerate(node)) if is_array else list(node.items())
+        prefix = ''
+        if key is not None:
+            prefix = key_link_html(key, path, True) + documentation_link(path) + '<span class="schema-punctuation">: </span>'
 
+        if not entries:
+            compact = f'<span class="schema-punctuation">{open_char}{close_char}</span>{comma}'
+            return line_html(depth, prefix + compact, line_id=line_id, classes=node_classes(path))
+
+        label = key if key is not None else ('root array' if is_array else 'root object')
+        toggle = (
+            f'<button class="schema-collapse-toggle" data-schema-toggle type="button" '
+            f'aria-expanded="true" aria-label="Collapse {escape(str(label), quote=True)}">'
+            f'{chevron_svg}</button>'
+        )
+        folded = (
+            '<span class="schema-fold-summary" aria-hidden="true">'
+            f' … <span class="schema-punctuation">{close_char}</span>{comma}</span>'
+        )
+        open_line = line_html(
+            depth,
+            prefix + f'<span class="schema-punctuation">{open_char}</span>' + folded,
+            line_id=line_id,
+            classes=('schema-code-open ' + node_classes(path)).strip(),
+            toggle=toggle,
+        )
+
+        children = []
+        for index, entry in enumerate(entries):
+            child_last = index == len(entries) - 1
+            if is_array:
+                child_index, child = entry
+                child_path = path + (child_index,)
+                child_key = None
+            else:
+                child_key, child = entry
+                child_path = path + (child_key,)
+            child_id = schema_anchor_path(child_path) if isinstance(child, (dict, list)) else None
+            children.append(
+                render(
+                    child,
+                    depth + 1,
+                    child_path,
+                    key=child_key,
+                    last=child_last,
+                    line_id=child_id,
+                )
+            )
+
+        close_line = line_html(
+            depth,
+            f'<span class="schema-punctuation">{close_char}</span>{comma}',
+            classes='schema-code-close',
+        )
+        return (
+            '<span class="schema-code-node" data-schema-node>'
+            + open_line
+            + '<span class="schema-code-children">'
+            + '\n'.join(children)
+            + '</span>'
+            + close_line
+            + '</span>'
+        )
+
+    rendered = render(value, 0, tuple(), last=True, line_id='schema-root')
+    return '<div class="schema-code-shell"><pre class="linked-schema"><code>' + rendered + '</code></pre></div>'
 
 def root_field_rows(profile: str, schema: dict) -> str:
     required = set(schema.get("required", []))
@@ -463,6 +545,10 @@ def definition_list(profile: str, schema: dict) -> str:
     return '<div class="definition-directory">' + "".join(rows) + '</div>'
 
 
+
+def schema_view_actions() -> str:
+    return '<div class="schema-view-actions" aria-label="Schema display controls"><button data-schema-expand-all type="button">Expand all</button><button data-schema-collapse-all type="button">Collapse all</button></div>'
+
 def main_reference_body(profile: str, schema: dict) -> str:
     meta = PROFILES[profile]
     note = ""
@@ -470,7 +556,7 @@ def main_reference_body(profile: str, schema: dict) -> str:
         note = '''<p class="schema-design-note"><strong>Version naming:</strong> the published v0.2 schema retains <code>matspec</code> for compatibility. The proposed v0.3 direction is <code>"matjson": {"profile": "matspec", "version": "0.3"}</code>, so profile identity and version remain explicit.</p>'''
     schema_html = linked_schema_html(schema, main_page=True)
     return f'''<section class="page-hero compact-doc-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../index.html">Home</a><span>/</span><a href="../index.html">Docs</a><span>/</span><span>{escape(meta['name'])}</span></div><h1>{escape(meta['name'])}</h1><p>{escape(meta['description'])}</p><div class="doc-subline"><span class="profile-status status-{escape(meta['status_class'])}">{escape(meta['status'])}</span><span>{escape(meta['stage_label'])}</span><span>{escape(meta['extension'])}</span></div><div class="doc-link-row"><a href="../../{meta['schema_href']}">Raw schema</a><a download href="../../{meta['download_href']}">Download</a><a href="../../{meta['profile_href']}">Profile overview</a></div></div></section>
-<section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema)}<article class="reference-browser-main"><section id="schema" class="reference-simple-section first"><div class="section-title-row"><div><h2>JSON Schema</h2><p>This page shows the published JSON Schema as one formatted document. Highlighted objects provide direct section links, and each <code>$ref</code> value jumps to its target. You can also open the <a href="../../{meta['schema_href']}">raw schema file</a>.</p></div></div>{note}{schema_html}</section></article></div></section>'''
+<section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema)}<article class="reference-browser-main"><section id="schema" class="reference-simple-section first"><div class="section-title-row"><div><h2>JSON Schema</h2><p>This page shows the published JSON Schema as one formatted document. Use the chevrons to fold objects and arrays, follow highlighted objects and <code>$ref</code> values within the schema, and use the book icons to open definition guides. You can also open the <a href="../../{meta['schema_href']}">raw schema file</a>.</p></div>{schema_view_actions()}</div>{note}{schema_html}</section></article></div></section>'''
 
 
 def definition_body(profile: str, schema: dict, name: str, node: dict, previous: str | None, next_name: str | None) -> str:
@@ -480,7 +566,7 @@ def definition_body(profile: str, schema: dict, name: str, node: dict, previous:
     prev_html = f'<a href="../{slug(previous)}/index.html"><span>Previous</span><strong>{escape(schema["$defs"][previous].get("title") or humanize(previous))}</strong></a>' if previous else '<span></span>'
     next_html = f'<a class="next" href="../{slug(next_name)}/index.html"><span>Next</span><strong>{escape(schema["$defs"][next_name].get("title") or humanize(next_name))}</strong></a>' if next_name else '<span></span>'
     fragment = linked_schema_html(node, main_page=False)
-    return f'''<section class="page-hero compact-doc-hero definition-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../../../index.html">Home</a><span>/</span><a href="../../../index.html">Docs</a><span>/</span><a href="../../index.html">{escape(meta['name'])}</a><span>/</span><span>{escape(title)}</span></div><h1>{escape(title)}</h1><p>{escape(desc)}</p><div class="definition-path"><code>$defs.{escape(name)}</code> · {escape(type_label(node))}</div></div></section><section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema, current_def=name)}<article class="reference-browser-main"><section class="reference-simple-section first"><div class="section-title-row"><div><h2>Definition JSON</h2><p>This fragment is shown exactly as published. Linked <code>$ref</code> values return to their targets in the complete schema.</p></div></div>{fragment}</section><section class="reference-simple-section"><h2>Fields</h2>{definition_field_rows(profile, name, node)}</section><nav aria-label="Definition navigation" class="definition-pager">{prev_html}{next_html}</nav></article></div></section>'''
+    return f'''<section class="page-hero compact-doc-hero definition-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../../../index.html">Home</a><span>/</span><a href="../../../index.html">Docs</a><span>/</span><a href="../../index.html">{escape(meta['name'])}</a><span>/</span><span>{escape(title)}</span></div><h1>{escape(title)}</h1><p>{escape(desc)}</p><div class="definition-path"><code>$defs.{escape(name)}</code> · {escape(type_label(node))}</div></div></section><section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema, current_def=name)}<article class="reference-browser-main"><section class="reference-simple-section first"><div class="section-title-row"><div><h2>Definition JSON</h2><p>This fragment is shown exactly as published. Use the chevrons to fold objects and arrays; linked <code>$ref</code> values return to their targets in the complete schema.</p></div>{schema_view_actions()}</div>{fragment}</section><section class="reference-simple-section"><h2>Fields</h2>{definition_field_rows(profile, name, node)}</section><nav aria-label="Definition navigation" class="definition-pager">{prev_html}{next_html}</nav></article></div></section>'''
 
 
 def docs_index_body() -> str:
@@ -660,20 +746,22 @@ def update_sitemap_and_manifest() -> None:
 
 
 def write_release_notes() -> None:
-    notes = ROOT / "docs/REFERENCE_DOCS_V11.md"
-    notes.write_text("""# Reference documentation v11
+    notes = ROOT / "docs/REFERENCE_DOCS_V12.md"
+    notes.write_text("""# Reference documentation v12
 
-This release adopts the Lottie Docs schema presentation pattern and adds hover-open navigation.
+This release keeps the Lottie-style linked schema presentation while adding code folding, documentation-book links, and the restored brand caption.
 
-## Linked schema presentation
+## Collapsible linked schema
 
-Each reference page displays the actual formatted JSON Schema as one continuous document. Object names have stable anchors, internal `$ref` values jump to their target in the same schema, and external schema URLs remain clickable. The main schema page no longer depends on JavaScript, fetch calls, line-number widgets, or nested collapsible boxes.
+The exact JSON Schema remains the primary artifact. Every non-empty object and array now has an accessible chevron control. Expand-all and collapse-all controls are provided, and following a schema anchor or local `$ref` automatically reveals any collapsed ancestor nodes.
 
-Human-readable definition guides remain available from the left navigation. Definition pages show exact schema fragments and link internal references back to the full schema.
+## Definition documentation links
 
-## Navigation
+Reusable definitions in `$defs` show a small book icon beside the definition name. The icon opens the dedicated human-readable definition page, while the definition name itself remains a stable link to that location within the complete schema.
 
-Profiles and Docs dropdowns open on hover for desktop pointer devices while retaining click and keyboard operation. Mobile navigation remains tap-controlled.
+## Header branding
+
+The caption `Material standards, structured for software` is restored below the MatJSON wordmark on desktop. It remains hidden on compact mobile navigation to preserve space.
 
 ## Compatibility
 
@@ -688,4 +776,4 @@ if __name__ == "__main__":
     normalize_local_links()
     update_sitemap_and_manifest()
     write_release_notes()
-    print("Reference documentation v11 generated.")
+    print("Reference documentation v12 generated.")
