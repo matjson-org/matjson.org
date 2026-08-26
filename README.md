@@ -47,7 +47,7 @@ Website/source repository: https://github.com/matjson-org/matjson.org
 
 ## Cache-busting
 
-Static CSS and JavaScript references include a release query version (`v=20260826-12`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
+Static CSS and JavaScript references include a release query version (`v=20260826-13`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
 
 
 ## Search indexing

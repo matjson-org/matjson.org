@@ -23,7 +23,7 @@
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 61337
+      "bytes": 61752
     },
     {
       "path": "assets/img/favicon.svg",
@@ -74,6 +74,10 @@
       "bytes": 1590
     },
     {
+      "path": "docs/IMPLEMENTATION_QA_V13.md",
+      "bytes": 1500
+    },
+    {
       "path": "docs/IMPLEMENTATION_QA_V9.md",
       "bytes": 1544
     },
@@ -95,6 +99,10 @@
     },
     {
       "path": "docs/REFERENCE_DOCS_V12.md",
+      "bytes": 1055
+    },
+    {
+      "path": "docs/REFERENCE_DOCS_V13.md",
       "bytes": 1055
     },
     {
@@ -447,7 +455,7 @@
     }
   ],
   "totals": {
-    "files": 111,
-    "bytes": 4699280
+    "files": 113,
+    "bytes": 4702250
   }
 }

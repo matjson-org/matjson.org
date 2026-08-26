@@ -10,7 +10,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_DATE = "2026-08-26"
-ASSET_VERSION = "20260826-12"
+ASSET_VERSION = "20260826-13"
 
 PROFILES = {
     "matspec": {
@@ -746,8 +746,8 @@ def update_sitemap_and_manifest() -> None:
 
 
 def write_release_notes() -> None:
-    notes = ROOT / "docs/REFERENCE_DOCS_V12.md"
-    notes.write_text("""# Reference documentation v12
+    notes = ROOT / "docs/REFERENCE_DOCS_V13.md"
+    notes.write_text("""# Reference documentation v13
 
 This release keeps the Lottie-style linked schema presentation while adding code folding, documentation-book links, and the restored brand caption.
 
@@ -776,4 +776,4 @@ if __name__ == "__main__":
     normalize_local_links()
     update_sitemap_and_manifest()
     write_release_notes()
-    print("Reference documentation v12 generated.")
+    print("Reference documentation v13 generated.")
