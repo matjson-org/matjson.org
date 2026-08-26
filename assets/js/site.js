@@ -7,13 +7,93 @@
     menuButton.addEventListener('click', () => {
       const open = body.classList.toggle('menu-open');
       menuButton.setAttribute('aria-expanded', String(open));
+      if (!open) nav.querySelectorAll('details[open]').forEach((item) => item.removeAttribute('open'));
     });
     nav.addEventListener('click', (event) => {
       if (event.target.closest('a')) {
         body.classList.remove('menu-open');
         menuButton.setAttribute('aria-expanded', 'false');
+        nav.querySelectorAll('details[open]').forEach((item) => item.removeAttribute('open'));
       }
     });
+  }
+
+  const dropdowns = [...document.querySelectorAll('.nav-dropdown')];
+  const hoverNavigation = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 861px)');
+  const hoverCloseTimers = new WeakMap();
+
+  const clearHoverClose = (dropdown) => {
+    const timer = hoverCloseTimers.get(dropdown);
+    if (timer) window.clearTimeout(timer);
+    hoverCloseTimers.delete(dropdown);
+  };
+
+  const openDropdown = (dropdown) => {
+    clearHoverClose(dropdown);
+    dropdowns.forEach((other) => {
+      if (other !== dropdown) {
+        clearHoverClose(other);
+        other.removeAttribute('open');
+      }
+    });
+    dropdown.setAttribute('open', '');
+  };
+
+  const closeDropdownSoon = (dropdown, delay = 140) => {
+    clearHoverClose(dropdown);
+    const timer = window.setTimeout(() => {
+      if (!dropdown.matches(':hover') && !dropdown.matches(':focus-within')) {
+        dropdown.removeAttribute('open');
+      }
+      hoverCloseTimers.delete(dropdown);
+    }, delay);
+    hoverCloseTimers.set(dropdown, timer);
+  };
+
+  dropdowns.forEach((dropdown) => {
+    dropdown.addEventListener('mouseenter', () => {
+      if (hoverNavigation.matches) openDropdown(dropdown);
+    });
+    dropdown.addEventListener('mouseleave', () => {
+      if (hoverNavigation.matches) closeDropdownSoon(dropdown);
+    });
+    dropdown.addEventListener('toggle', () => {
+      if (!dropdown.open) return;
+      dropdowns.forEach((other) => {
+        if (other !== dropdown) other.removeAttribute('open');
+      });
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('.nav-dropdown')) return;
+    dropdowns.forEach((dropdown) => dropdown.removeAttribute('open'));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      dropdowns.forEach((dropdown) => dropdown.removeAttribute('open'));
+      if (body.classList.contains('menu-open')) {
+        body.classList.remove('menu-open');
+        menuButton?.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.append(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    if (!ok) throw new Error('Copy command unavailable');
   }
 
   document.querySelectorAll('[data-copy]').forEach((button) => {
@@ -29,7 +109,7 @@
           }).join('\n')
         : target.innerText.replace(/^\s*\d+\s?/gm, '');
       try {
-        await navigator.clipboard.writeText(text);
+        await copyText(text);
         const original = button.innerHTML;
         button.textContent = 'Copied';
         window.setTimeout(() => { button.innerHTML = original; }, 1400);
@@ -44,10 +124,10 @@
   const results = document.querySelector('#site-search-results');
   const pages = [
     { title: 'MatJSON home', description: 'Open material data interoperability specification.', href: ROOT + 'index.html' },
-    { title: 'Schema suite', description: 'Core, MatSpec, MatReq, MatRecord, and MatCheck.', href: ROOT + 'schemas/index.html' },
-    { title: 'Schema reference', description: 'Linked, human-readable reference docs with collapsible schema trees.', href: ROOT + 'reference/index.html' },
-    { title: 'MatSpecJSON reference', description: 'Root fields, definitions, and interactive MatSpec schema.', href: ROOT + 'reference/matspec/index.html' },
-    { title: 'MatReqJSON reference', description: 'Root fields, rule definitions, and interactive MatReq schema.', href: ROOT + 'reference/matreq/index.html' },
+    { title: 'Documentation', description: 'Linked JSON Schemas, definition guides, architecture, and examples.', href: ROOT + 'reference/index.html' },
+    { title: 'Schema downloads', description: 'Versioned and latest schema files for each MatJSON profile.', href: ROOT + 'schemas/index.html' },
+    { title: 'MatSpecJSON reference', description: 'Formatted MatSpecJSON schema with stable object anchors and linked $ref values.', href: ROOT + 'reference/matspec/index.html' },
+    { title: 'MatReqJSON reference', description: 'Formatted MatReqJSON schema with stable object anchors and linked $ref values.', href: ROOT + 'reference/matreq/index.html' },
     { title: 'Why MatJSON', description: 'Why materials specifications, MTRs, APIs, automation, and AI need a common JSON format.', href: ROOT + 'why-matjson/index.html' },
     { title: 'Architecture specification', description: 'Profiles, identifiers, conformance, and invocation.', href: ROOT + 'spec/index.html' },
     { title: 'MatSpecJSON', description: 'Intrinsic material and product specification requirements.', href: ROOT + 'profiles/matspec/index.html' },

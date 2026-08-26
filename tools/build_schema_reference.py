@@ -1,534 +1,691 @@
+from __future__ import annotations
+
 from pathlib import Path
 from bs4 import BeautifulSoup
 from html import escape
-import json, re, hashlib
+import ast
+import json
+import re
+import shutil
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1]
+BUILD_DATE = "2026-08-26"
+ASSET_VERSION = "20260826-11"
 
-HINTS={
-'matspec':{
-'root':{
-'matspec':'Format discriminator and MatSpecJSON version. Consumers use it to reject unsupported formats rather than partially interpreting them.',
-'specification':'Identity and scope of the source material specification, including designation, title, edition, product form, and whether the file describes a product specification or a general-requirements specification.',
-'provenance':'Where the extracted requirements came from and how the file was produced. Provenance describes the source, not whether a reviewer has verified the extraction.',
-'references':'Other specifications, general-requirements documents, test methods, or adopted source standards referenced by this specification.',
-'manufacturing':'Specification-wide requirements for manufacture, process route, workmanship, certification, marking, dimensions, and related controls.',
-'grades':'The grade-centric acceptance requirements. Each entry identifies a grade, class, type, condition, or process variant and carries chemistry, mechanical, hardness, impact, heat-treatment, and other requirements.',
-'required_tests':'Tests required at the specification level rather than only for one grade. Frequency, method, and source are preserved where available.',
-'supplementary_requirements':'Optional, purchaser-invoked, or ASME-mandated supplementary requirements associated with the specification.',
-'notes':'Reusable source notes keyed by identifier so individual values can reference explanatory text without duplicating it.',
-'extensions':'Namespaced implementation data outside the MatSpec conformance surface. Conforming readers preserve or ignore extensions they do not understand.'},
-'defs':{
-'notExtracted':'An explicit extraction gap. It means the source may contain a requirement that has not yet been captured; it is not the same as a confirmed absence of a requirement.',
-'unit':'Controlled units permitted for structured acceptance values.',
-'value':'One cited acceptance bound or range, optionally narrowed by applicability selectors.',
-'valueSet':'Sibling values supplied by the source in different unit systems. The values are source statements, not assumed mathematical conversions.',
-'band':'A bounded applicability interval, such as a thickness, diameter, temperature, composition, or size range.',
-'appliesWhen':'Selectors that determine when a value or requirement applies. Every populated selector must match.',
-'grade':'A named material grade, class, type, condition, or process variant and its acceptance criteria.',
-'test':'A required material test, including whether it is mandatory, its method, frequency, and source.',
-'alternatives':'Alternative acceptance values where satisfying any listed member is sufficient, such as equivalent hardness limits on different scales.',
-'valueOrAlternatives':'A union allowing either one acceptance value or a formally identified alternatives block.'}},
-'matreq':{
-'root':{
-'schema_version':'Format discriminator and MatReqJSON schema version.',
-'document':'Identity, edition, type, and publication metadata for the governing code, standard, recommended practice, technical report, or purchaser specification.',
-'invocation_model':'How the governing document or a scoped part of it becomes contractually active through a material requisition or other contract document.',
-'scope':'The equipment, industries, materials, services, and lifecycle stages addressed by the source document.',
-'references':'Referenced external documents and the precise role each reference plays, such as full invocation, test method only, or informative guidance.',
-'requisition_interface':'Purchaser decisions or values that the governing document expects the material requisition to resolve when associated rules are active.',
-'rules':'Atomic material-related rules with targets, activation logic, typed requirements, verification evidence, and source provenance.',
-'provenance':'Source-document and extraction metadata for the MatReq package.',
-'notes':'Supplemental explanatory notes used by rules or the package as a whole.',
-'extensions':'Namespaced implementation data outside the MatReq conformance surface.',
-'coverage':'Declared extraction scope, included sections, exclusions, unresolved gaps, and review status.'},
-'defs':{
-'document':'Identity and publication metadata for the governing document represented by this MatReq file.',
-'edition':'Edition, publication date, addenda, errata, and reaffirmation metadata.',
-'invocationModel':'Rules for whole-document, section, annex, clause, or direct-requirement invocation from a material requisition.',
-'documentScope':'Structured statement of the source document scope.',
-'rule':'One atomic material-related rule that can be independently activated, evaluated, and traced to its source.',
-'normativity':'The source document\'s normative strength and modal wording, kept separate from project activation.',
-'targets':'Materials, grades, product forms, equipment components, weld regions, sides, services, and fabrication states to which a rule can apply.',
-'activation':'How a rule becomes active for a purchase, including always-active, conditionally active, purchaser-invoked, or scoped invocation.',
-'conditionExpr':'A Boolean expression tree built from condition leaves and all/any/not operators.',
-'conditionLeaf':'One comparison against requisition, service, material, component, or fabrication data.',
-'requirement':'The typed behavior imposed by the rule, such as a limit, test, examination, heat treatment, document field, prohibition, or decision procedure.',
-'calculation':'A machine-readable formula, required inputs, units, and result semantics.',
-'effect':'How a MatReq rule supplements, restricts, replaces, selects, prohibits, or otherwise interacts with a base MatSpec requirement.',
-'verification':'Evidence types, checking method, and result behavior used to demonstrate compliance.',
-'dependencies':'Other rules, decisions, or external documents needed before this rule can be evaluated.',
-'referenceTarget':'A structured target for an invoked document, section, annex, clause, table, figure, or requirement.',
-'documentReference':'An external standard reference together with its invocation role.',
-'requisitionInput':'A value or decision the material requisition must provide when an associated rule is active.',
-'sourceRef':'A clause, table, figure, page, or other source location supporting a rule.',
-'provenance':'Package-level source and extraction provenance.',
-'coverage':'Extraction coverage, exclusions, unresolved areas, and review status.'}},
-'core':{'root':{},'defs':{'identifier':'A stable identifier used across MatJSON profiles.','quantity':'A typed numeric quantity with unit and optional source context.','source':'Reusable provenance for a requirement, value, evidence item, or result.','expression':'A machine-readable Boolean or numeric expression.','extensionContainer':'A namespaced container for domain-specific additions.'}},
-'matrecord':{'root':{'matjson':'MatJSON profile and version discriminator for this normalized evidence record.','record':'Identity and issuer information for the source MTR, CMTR, certificate, report, or evidence document.','materials':'Normalized material identities and reported test results.','evidence':'References to source evidence used to create the normalized record.','extensions':'Namespaced implementation data outside the draft conformance surface.'},'defs':{}},
-'matcheck':{'root':{'matjson':'MatJSON profile and version discriminator for this compliance result.','check':'Identity and provenance of the compliance evaluation.','results':'Requirement-by-requirement applicability, evidence, comparison, result, and explanation.','summary':'Machine-readable counts and overall result.','extensions':'Namespaced implementation data outside the draft conformance surface.'},'defs':{}}
-}
-
-
-# Documentation-only field explanations. These do not change the JSON Schema;
-# they make fields whose source schema has no description understandable in the
-# human-readable reference.
-COMMON_FIELD_HINTS = {
-    'id': 'Stable identifier for this object within its containing MatJSON document.',
-    'title': 'Short human-readable name displayed in documentation and review tools.',
-    'description': 'Human-readable explanation of the object, rule, input, or scope.',
-    'type': 'Controlled category used by consumers to determine how the value is interpreted.',
-    'unit': 'Unit associated with the numeric value or limit. Use the unit exactly as published by the applicable profile vocabulary.',
-    'value': 'The value supplied, required, reported, or compared at this location.',
-    'values': 'List of values associated with this requirement or schema construct.',
-    'minimum': 'Lower acceptance bound or minimum required value.',
-    'maximum': 'Upper acceptance bound or maximum permitted value.',
-    'notes': 'Additional explanatory notes that do not replace the structured requirement.',
-    'source': 'Structured source location or provenance supporting this object.',
-    'extensions': 'Namespaced implementation-specific data outside the profile conformance surface.',
-    'method': 'Method, test procedure, examination technique, or process used to satisfy the requirement.',
-    'frequency': 'Sampling or performance frequency for the required activity.',
-    'basis': 'Basis used to select, activate, calculate, or interpret this requirement.',
-    'document': 'Document or evidence record associated with this object.',
-    'fields': 'Specific document fields or reported data elements required by the rule.',
-    'procedure': 'Procedure that must be followed or documented.',
-    'timing': 'Required point in manufacture, fabrication, heat treatment, examination, or review when the activity occurs.',
-    'location': 'Material, component, weld, specimen, or document location to which the requirement applies.',
-    'scope': 'Boundary of the requirement or the items covered by it.',
-    'reporting': 'Information that must be recorded, certified, or included in the evidence package.',
-    'specimen': 'Test-specimen type, orientation, dimensions, or preparation requirements.',
-    'alternatives': 'Alternative ways of satisfying the same requirement. The rule defines whether one or all alternatives are needed.',
-    'lookup': 'Structured reference to a source table, figure, curve, or decision aid that must be consulted.',
-    'subject': 'Material, component, weld, document, or other subject acted on by this requirement.',
-    'operator': 'Comparison operator used when evaluating the required or reported value.',
-    'field': 'Path or named input evaluated by the condition.',
-    'op': 'Boolean or comparison operator applied to the condition field.',
-    'page': 'Printed or electronic source page supporting the requirement.',
-    'table': 'Source table identifier supporting the requirement.',
-    'figure': 'Source figure identifier supporting the requirement.',
-    'clause': 'Clause or paragraph identifier supporting the requirement.',
-    'included': 'Material-related sections or topics included in the extraction.',
-    'excluded': 'Topics deliberately outside the extraction scope.',
-    'limitations': 'Known limitations that affect completeness or automated use.',
-}
-
-PROPERTY_HINTS = {
-    'matspec': {
-        'notExtracted.extracted': 'Always false. The object explicitly records that a potentially applicable source requirement has not yet been extracted.',
-        'notExtracted.note': 'Explanation of what is missing and where a reviewer should look in the source.',
-        'value.min': 'Minimum accepted value. Null means the source states no lower bound for this value.',
-        'value.max': 'Maximum accepted value. Null means the source states no upper bound for this value.',
-        'value.source': 'Clause, table, note, or other locator supporting this individual acceptance value.',
-        'value.basis': 'Whether the limit applies to heat analysis, product analysis, or both.',
-        'value.applies_when': 'Selectors that must match before this acceptance value is used.',
-        'value.notes': 'Identifiers of reusable notes that qualify or explain this value.',
-        'valueSet.values': 'One or more source-stated values, commonly parallel customary and SI requirements.',
-        'band.min': 'Lower endpoint of the applicability interval.',
-        'band.max': 'Upper endpoint of the applicability interval.',
-        'appliesWhen.thickness': 'Thickness interval for which the value or requirement applies.',
-        'appliesWhen.diameter': 'Diameter interval for which the value or requirement applies.',
-        'appliesWhen.temperature': 'Temperature interval or test temperature for which the value or requirement applies.',
-        'appliesWhen.product_form': 'Product form that must match, such as plate, tube, pipe, bar, fitting, or forging.',
-        'appliesWhen.condition': 'Material condition or processing state that must match, such as annealed, normalized, or stress relieved.',
-        'appliesWhen.gauge_length': 'Gauge length or proportional specimen basis used for the stated elongation requirement.',
-        'appliesWhen.specimen_size': 'Specimen-size designation associated with the stated test requirement.',
-        'appliesWhen.orientation': 'Required specimen orientation relative to the principal working direction.',
-        'grade.id': 'Stable normalized identifier for the grade, class, type, condition, or process variant.',
-        'grade.designation': 'Source designation details, such as grade, class, type, UNS number, condition, or process.',
-        'grade.aliases': 'Alternative designations by which the same normalized grade entry may be identified.',
-        'grade.chemistry': 'Heat- and/or product-analysis acceptance requirements for the grade, or an explicit extraction-gap marker.',
-        'grade.mechanical': 'Tensile, yield, elongation, reduction-of-area, or related mechanical acceptance requirements.',
-        'grade.hardness': 'Hardness limits, including formally represented alternatives where the source permits different scales.',
-        'grade.impact': 'Impact energy, test temperature, specimen, orientation, and applicability requirements.',
-        'grade.heat_treatment': 'Required thermal condition, temperature, cooling route, applicability, and source.',
-        'test.test': 'Human-readable name of the required test or examination.',
-        'test.required': 'True when the test is mandatory under the represented specification and stated applicability.',
-        'test.frequency': 'Number of tests and the lot, heat, length, piece, or other population each test represents.',
-        'test.method': 'Test standard, examination technique, or source-described procedure.',
-        'test.source': 'Clause, table, or note that establishes the test requirement.',
-        'alternatives.any_of': 'Acceptance values for which satisfying any one listed alternative is sufficient.',
-        'alternatives.note': 'Explanation of how or why the alternatives are permitted.',
+PROFILES = {
+    "matspec": {
+        "name": "MatSpecJSON",
+        "short": "Material specification requirements",
+        "description": "Intrinsic acceptance criteria from a material or product specification, represented as machine-readable JSON.",
+        "version": "0.2.10",
+        "status": "Working draft",
+        "status_class": "working",
+        "stage_label": "v0.2.10",
+        "extension": ".matspec.json",
+        "schema": ROOT / "schema/matspec/0.2.10/schema.json",
+        "schema_href": "schema/matspec/0.2.10/schema.json",
+        "download_href": "downloads/matspec-v0.2.10.schema.json",
+        "profile_href": "profiles/matspec/index.html",
     },
-    'matreq': {
-        'document.organization': 'Standards body, regulator, owner-user, or purchaser that issued the represented document.',
-        'document.document_type': 'Nature of the governing publication, used to interpret its role and authority.',
-        'document.edition': 'Edition, publication date, addenda, errata, reaffirmation, and related revision metadata for the governing document.',
-        'document.title': 'Published title of the governing document.',
-        'edition.number': 'Published edition number or other edition designation.',
-        'edition.addenda': 'Addenda incorporated into the represented document package, with identifiers and publication dates where known.',
-        'edition.reaffirmed': 'Date or year the edition was reaffirmed without technical revision, or null when not applicable.',
-        'edition.errata': 'Errata incorporated into the represented document package.',
-        'edition.other_revisions': 'Other revision notices not represented as addenda or errata.',
-        'invocationModel.document_reference': 'Wording patterns and behavior for invoking the entire governing document from a requisition.',
-        'invocationModel.scoped_reference': 'Wording patterns and behavior for invoking only a named part, section, annex, appendix, table, figure, or clause.',
-        'invocationModel.direct_rule_reference': 'Behavior when the requisition states a requirement directly, whether or not it cites the source document.',
-        'invocationModel.cross_reference_policy': 'Rules for deciding whether an internal reference imports another document fully, only a method or criterion, or merely guidance.',
-        'documentScope.equipment': 'Equipment classes addressed by the source document.',
-        'documentScope.industries': 'Industries or application sectors within the represented scope.',
-        'documentScope.services': 'Service environments or damage mechanisms addressed by the source.',
-        'documentScope.material_families': 'Broad material families covered by the represented extraction.',
-        'documentScope.product_forms': 'Material product forms covered by the represented extraction.',
-        'documentScope.description': 'Plain-language summary of the document scope relevant to material requirements.',
-        'documentScope.included_sections': 'Sections explicitly included in the MatReq extraction.',
-        'documentScope.excluded_topics': 'Document topics intentionally excluded because they are not material-related or are outside the declared extraction.',
-        'rule.id': 'Stable rule identifier used for invocation, dependencies, checking, and result traceability.',
-        'rule.title': 'Short human-readable statement of the rule.',
-        'rule.category': 'Controlled material-requirement category used for filtering and downstream processing.',
-        'rule.normativity': 'Source authority and modal wording for the rule, kept separate from project-specific activation.',
-        'rule.targets': 'Structured material, product-form, component, region, service, and fabrication selectors for the rule.',
-        'rule.activation': 'Logic establishing when the rule becomes applicable to a particular requisition or material item.',
-        'rule.requirement': 'Typed statement of what must be satisfied when the rule is active.',
-        'rule.effect': 'How the rule interacts with a base MatSpec requirement or another effective requirement.',
-        'rule.verification': 'Evidence and checking instructions used to determine compliance.',
-        'rule.dependencies': 'Other rules or decisions that must resolve before, or are activated by, this rule.',
-        'rule.references': 'External documents invoked or used by this rule, together with the precise reference role.',
-        'rule.source': 'Primary source locator for the rule. Use sources when multiple noncontiguous locations jointly establish it.',
-        'rule.notes': 'Additional interpretation or extraction notes that do not replace the structured rule.',
-        'rule.group_id': 'Identifier linking related atomic rules that originate from one larger source requirement or decision sequence.',
-        'rule.structured_level': 'Degree to which the source requirement has been converted into executable structure rather than preserved text or a lookup.',
-        'rule.sources': 'One or more source locations jointly supporting the rule.',
-        'rule.extensions': 'Namespaced workflow or domain data associated with this rule.',
-        'normativity.source_level': 'Normative strength of the requirement in its source document.',
-        'normativity.source_modal': 'Modal word used by the external source. MatJSON-authored requirements use must/must not, while this field preserves source wording.',
-        'targets.material': 'Material-family, specification, grade, type, class, UNS, or related selectors identifying the affected material.',
-        'targets.product_forms': 'Affected product forms, such as plate, pipe, tube, forging, casting, bar, bolting, fitting, or consumable.',
-        'targets.components': 'Equipment components to which the rule applies.',
-        'targets.regions': 'Material or weld regions to which the rule applies, such as base metal, weld metal, HAZ, overlay, cladding, or bend.',
-        'targets.pressure_retaining': 'Whether the target must be a pressure-retaining item.',
-        'targets.process_wetted': 'Whether the target must contact the process fluid.',
-        'targets.joint_types': 'Weld or joint configurations to which the rule applies.',
-        'targets.weld_processes': 'Welding processes to which the rule applies.',
-        'targets.services': 'Named services or environmental conditions that select the rule.',
-        'targets.service_sides': 'Equipment side or fluid circuit to which the rule applies.',
-        'targets.conditions': 'Additional controlled or source-preserved target conditions.',
-        'activation.basis': 'How document invocation, scoped invocation, and stated conditions combine to activate the rule.',
-        'activation.when': 'Boolean condition expression that must be satisfied for the rule to apply.',
-        'activation.notes': 'Additional explanation of activation behavior.',
-        'conditionLeaf.field': 'Path to the requisition, service, material, component, or fabrication fact being tested.',
-        'conditionLeaf.op': 'Comparison performed against the condition field.',
-        'conditionLeaf.value': 'Comparison value used by the condition.',
-        'conditionLeaf.unit': 'Unit for a numeric comparison value.',
-        'requirement.kind': 'Typed requirement behavior that tells a checker how the remaining requirement fields should be interpreted.',
-        'requirement.property': 'Named material property, document field, condition, or characteristic controlled by the requirement.',
-        'requirement.operator': 'Comparison operator used for the stated value or limit.',
-        'requirement.value': 'Single required value when the requirement is not a range.',
-        'requirement.minimum': 'Minimum required value or lower bound.',
-        'requirement.maximum': 'Maximum permitted value or upper bound.',
-        'requirement.unit': 'Unit for the stated requirement values.',
-        'requirement.values': 'Permitted, prohibited, or otherwise enumerated values associated with the requirement.',
-        'requirement.text': 'Source-preserved or human-readable requirement text when full executable structure is not available or when explanation is needed.',
-        'requirement.fields': 'Fields that must appear in an MTR, CMTR, report, certificate, requisition, or other evidence document.',
-        'requirement.calculation': 'Formula, required inputs, result unit, and source used for a computed requirement.',
-        'requirement.referenced_standard': 'External standard or scoped part with which compliance is required.',
-        'requirement.method': 'Required test, examination, calculation, fabrication, or qualification method.',
-        'requirement.frequency': 'Required testing, examination, sampling, or reporting frequency.',
-        'requirement.sampling': 'Population, lot, heat, piece, weld length, location, or sample-selection rules.',
-        'requirement.acceptance_criteria': 'Criteria used to decide whether the test, examination, qualification, or material is acceptable.',
-        'requirement.procedure': 'Required procedure or procedural controls.',
-        'requirement.timing': 'Point in the manufacturing or fabrication sequence when the requirement must be performed.',
-        'requirement.location': 'Physical or documentary location at which the requirement applies or evidence is taken.',
-        'requirement.scope': 'Extent of items, surfaces, welds, lots, or records covered by the requirement.',
-        'requirement.reporting': 'Results, certifications, traceability, or records that must be provided.',
-        'requirement.specimen': 'Test-specimen preparation, dimensions, orientation, or source location.',
-        'requirement.alternatives': 'Alternative methods or acceptance paths permitted by the source.',
-        'requirement.lookup': 'Table, figure, curve, chart, or decision aid required to resolve the rule.',
-        'requirement.basis': 'Basis for the stated limit, selection, calculation, or source decision.',
-        'requirement.subject': 'Material, component, weld, document, or evidence item controlled by the rule.',
-        'calculation.id': 'Stable identifier for the calculation or formula.',
-        'calculation.expression': 'Machine-readable or source-preserved mathematical expression.',
-        'calculation.inputs': 'Required chemistry, design, service, dimensional, or other input paths.',
-        'calculation.result_unit': 'Unit of the calculated result.',
-        'calculation.source': 'Source location defining the formula and its use.',
-        'effect.relationship': 'How this rule changes or supplements the base MatSpec requirement.',
-        'effect.base_requirement': 'Structured pointer to the base MatSpec requirement affected by the rule.',
-        'effect.conflict_resolution': 'Authorized method for resolving this rule with overlapping requirements. Most-stringent is used only when the source expressly requires it.',
-        'verification.mode': 'How compliance is checked: direct comparison, calculation, record review, cross-document review, or manual engineering review.',
-        'verification.result_if_missing': 'Result returned when the required evidence or requisition input is absent.',
-        'verification.notes': 'Additional evidence-review instructions.',
-        'verification.checkability': 'Where and how the rule can be checked, such as directly from an MTR, from a supporting report, or only by manual evaluation.',
-        'verification.evidence_fields': 'Specific evidence fields needed to evaluate the rule.',
-        'dependencies.requires_rule_ids': 'Rules that must be resolved before this rule can be evaluated.',
-        'dependencies.activates_rule_ids': 'Rules activated when this rule or decision resolves true.',
-        'referenceTarget.designation': 'Designation of the referenced external document.',
-        'referenceTarget.edition': 'Edition of the referenced document when the reference is edition-specific.',
-        'referenceTarget.scope_type': 'Type of scoped source location being referenced.',
-        'referenceTarget.scope_id': 'Identifier of the referenced part, section, clause, annex, appendix, table, or figure.',
-        'documentReference.target': 'Document and optional scoped location being referenced.',
-        'documentReference.effect': 'Role of the reference, such as full invocation, scoped invocation, test method only, acceptance criteria only, or guidance.',
-        'documentReference.activation_when': 'Condition under which the external reference becomes active.',
-        'documentReference.source': 'Location in the current document that makes the external reference.',
-        'documentReference.notes': 'Additional explanation of the external reference role.',
-        'requisitionInput.id': 'Stable identifier used by rules to request the purchaser decision or value.',
-        'requisitionInput.description': 'Plain-language description of the information the requisition must provide.',
-        'requisitionInput.type': 'Expected data or invocation type for the purchaser-supplied input.',
-        'requisitionInput.unit': 'Unit required for the purchaser-supplied numeric value.',
-        'requisitionInput.required_when': 'Condition under which omission of this requisition input is a requisition gap.',
-        'requisitionInput.allowed_values': 'Permitted purchaser selections when the input is constrained.',
-        'requisitionInput.source': 'Source location requiring the purchaser to supply the input.',
-        'sourceRef.clause': 'Clause or paragraph identifier in the source document.',
-        'sourceRef.page': 'Source page number or page label.',
-        'sourceRef.table': 'Table identifier in the source document.',
-        'sourceRef.figure': 'Figure identifier in the source document.',
-        'sourceRef.text_type': 'Normative or informative role of the cited source material.',
-        'sourceRef.notes': 'Additional citation or locator details.',
-        'provenance.source': 'Human-readable identity of the source document represented by the package.',
-        'provenance.extracted_on': 'Date the MatReq extraction was produced.',
-        'provenance.extraction_method': 'Whether extraction was manual, assisted, automated, or mixed.',
-        'provenance.review_status': 'Current technical review maturity of the MatReq package.',
-        'provenance.review_notes': 'Reviewer comments, limitations, or outstanding verification work.',
-        'provenance.rules_generated': 'Count of rules generated in this package.',
-        'provenance.unresolved_items': 'Known requirements or source areas that remain unresolved.',
-        'provenance.source_file': 'Filename or controlled source identifier used for extraction.',
-        'provenance.coverage': 'Brief package-level statement describing the material-related extraction coverage.',
-        'coverage.material_scope_status': 'Whether material-related extraction is full, targeted, or partial.',
-        'coverage.included': 'Material-related sections and topics included in the package.',
-        'coverage.excluded': 'Topics deliberately excluded from the package.',
-        'coverage.lookup_required': 'Source tables, figures, curves, or decision aids that still require lookup during evaluation.',
-        'coverage.limitations': 'Known limitations on completeness, structure, automation, or verification.',
+    "matreq": {
+        "name": "MatReqJSON",
+        "short": "Application material requirements",
+        "description": "Additional requirements imposed by codes, service standards, equipment standards, and purchaser documents.",
+        "version": "0.2",
+        "status": "Working draft",
+        "status_class": "working",
+        "stage_label": "v0.2",
+        "extension": ".matreq.json",
+        "schema": ROOT / "schema/matreq/0.2/schema.json",
+        "schema_href": "schema/matreq/0.2/schema.json",
+        "download_href": "downloads/matreq-v0.2.schema.json",
+        "profile_href": "profiles/matreq/index.html",
     },
-    'core': {
-        'quantity.value': 'Numeric magnitude of the quantity.',
-        'quantity.unit': 'Unit identifier associated with the magnitude.',
-        'quantity.basis': 'Optional basis or measurement context used to interpret the quantity.',
-        'source.document': 'Document designation or stable document identifier.',
-        'source.edition': 'Edition or publication identifier of the source document.',
-        'source.locator': 'Clause, table, field, page range, or other source locator.',
-        'source.page': 'Printed or electronic page supporting the value or statement.',
-        'source.text_role': 'Normative role of the cited source text.',
+    "core": {
+        "name": "MatJSON Core",
+        "short": "Shared primitives",
+        "description": "Shared identifiers, quantities, provenance, expressions, and extension rules used across MatJSON profiles.",
+        "version": "0.1",
+        "status": "Draft",
+        "status_class": "draft",
+        "stage_label": "v0.1",
+        "extension": "common schema",
+        "schema": ROOT / "schema/core/0.1/schema.json",
+        "schema_href": "schema/core/0.1/schema.json",
+        "download_href": "downloads/matjson-core-v0.1-placeholder.schema.json",
+        "profile_href": "profiles/core/index.html",
     },
-    'matrecord': {
-        'root.matjson': 'MatJSON profile and version discriminator for this normalized evidence record.',
-        'root.record': 'Identity, issuer, date, document type, and source-file metadata for the MTR, CMTR, certificate, or report.',
-        'root.materials': 'Normalized materials and their reported specification, grade, heat/lot identity, product form, chemistry, mechanical results, heat treatment, and tests.',
-        'root.evidence': 'Source-document references and extraction-confidence information supporting the normalized record.',
-        'root.extensions': 'Namespaced implementation data outside the future MatRecord conformance surface.',
+    "matrecord": {
+        "name": "MatRecordJSON",
+        "short": "MTR and evidence records",
+        "description": "Normalized MTR, CMTR, test-report, and supporting-evidence data. This profile remains a concept / WIP placeholder.",
+        "version": "0.1 placeholder",
+        "status": "Concept",
+        "status_class": "concept",
+        "stage_label": "WIP · v0.1 placeholder",
+        "extension": ".matrecord.json",
+        "schema": ROOT / "schema/matrecord/0.1/schema.json",
+        "schema_href": "schema/matrecord/0.1/schema.json",
+        "download_href": "downloads/matrecord-v0.1-placeholder.schema.json",
+        "profile_href": "profiles/matrecord/index.html",
     },
-    'matcheck': {
-        'root.matjson': 'MatJSON profile and version discriminator for this compliance result document.',
-        'root.check': 'Identity, time, tool, and reviewer associated with the compliance evaluation.',
-        'root.results': 'Requirement-by-requirement outcomes, evidence, required and reported values, and explanations.',
-        'root.summary': 'Overall status and aggregate result counts for the evaluation.',
-        'root.extensions': 'Namespaced implementation data outside the future MatCheck conformance surface.',
+    "matcheck": {
+        "name": "MatCheckJSON",
+        "short": "Compliance results",
+        "description": "Machine-readable material compliance outcomes. This profile remains a concept / WIP placeholder.",
+        "version": "0.1 placeholder",
+        "status": "Concept",
+        "status_class": "concept",
+        "stage_label": "WIP · v0.1 placeholder",
+        "extension": ".matcheck.json",
+        "schema": ROOT / "schema/matcheck/0.1/schema.json",
+        "schema_href": "schema/matcheck/0.1/schema.json",
+        "download_href": "downloads/matcheck-v0.1-placeholder.schema.json",
+        "profile_href": "profiles/matcheck/index.html",
     },
 }
 
-SCHEMAS={
-'matspec':ROOT/'schema/matspec/0.2.10/schema.json',
-'matreq':ROOT/'schema/matreq/0.2/schema.json',
-'core':ROOT/'schema/core/0.1/schema.json',
-'matrecord':ROOT/'schema/matrecord/0.1/schema.json',
-'matcheck':ROOT/'schema/matcheck/0.1/schema.json',
-}
 
-def humanize(s):
-    s=re.sub(r'([a-z0-9])([A-Z])',r'\1 \2',str(s))
-    s=re.sub(r'[_-]+',' ',s)
-    return s[:1].upper()+s[1:]
+def load_legacy_hints() -> dict:
+    path = ROOT / "tools/schema_reference_hints.py"
+    wanted = {"HINTS", "COMMON_FIELD_HINTS", "PROPERTY_HINTS"}
+    found = {}
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id in wanted:
+                    try:
+                        found[target.id] = ast.literal_eval(node.value)
+                    except Exception:
+                        pass
+    return found
 
-def slug(s):
-    x=re.sub(r'[^a-z0-9]+','-',str(s).lower()).strip('-')
-    return x or 'root'
 
-def pointer_id(pointer):
-    h=hashlib.sha1(pointer.encode()).hexdigest()[:8]
-    return f"schema-{slug(pointer)[:70]}-{h}"
+LEGACY = load_legacy_hints()
+HINTS = LEGACY.get("HINTS", {})
+COMMON_FIELD_HINTS = LEGACY.get("COMMON_FIELD_HINTS", {})
+PROPERTY_HINTS = LEGACY.get("PROPERTY_HINTS", {})
 
-def decode_token(t): return t.replace('~1','/').replace('~0','~')
 
-def resolve_ref(schema,ref):
-    if not isinstance(ref,str) or not ref.startswith('#/'): return None
-    cur=schema
-    for part in ref[2:].split('/'):
-        if not isinstance(cur,dict): return None
-        cur=cur.get(decode_token(part))
-    return cur
+def humanize(value: str) -> str:
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", str(value))
+    value = re.sub(r"[_-]+", " ", value).strip()
+    return value[:1].upper() + value[1:]
 
-def ref_name(ref): return decode_token(str(ref).split('/')[-1])
-def ref_href(ref): return f"#def-{slug(ref_name(ref))}" if str(ref).startswith('#/$defs/') else '#schema-tree'
 
-def desc(profile,node,key,group):
-    return node.get('description') if isinstance(node,dict) and node.get('description') else HINTS.get(profile,{}).get(group,{}).get(key,'')
+def slug(value: str) -> str:
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", str(value))
+    value = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
+    return value or "item"
 
-def property_description(profile, prefix, name, node, group):
-    if isinstance(node, dict) and node.get('description'):
-        return node['description']
-    if group == 'root':
-        root_hint = HINTS.get(profile, {}).get('root', {}).get(name)
-        if root_hint:
-            return root_hint
-    exact = PROPERTY_HINTS.get(profile, {}).get(f'{prefix}.{name}')
+
+def ref_name(ref: str) -> str:
+    return str(ref).split("/")[-1].replace("~1", "/").replace("~0", "~")
+
+
+def type_label(node: dict) -> str:
+    if not isinstance(node, dict):
+        return type(node).__name__
+    if "$ref" in node:
+        return humanize(ref_name(node["$ref"]))
+    if "const" in node:
+        return "constant"
+    if "enum" in node:
+        return "enum"
+    value = node.get("type")
+    if isinstance(value, list):
+        return " or ".join(value)
+    if value:
+        return str(value)
+    if "properties" in node or "additionalProperties" in node:
+        return "object"
+    if "items" in node:
+        return "array"
+    for key in ("oneOf", "anyOf", "allOf"):
+        if isinstance(node.get(key), list):
+            return f"{humanize(key)} ({len(node[key])})"
+    return "schema"
+
+
+def constraint_text(node: dict) -> str:
+    if not isinstance(node, dict):
+        return ""
+    parts = []
+    if "const" in node:
+        parts.append(f"must equal {json.dumps(node['const'])}")
+    if isinstance(node.get("enum"), list):
+        shown = ", ".join(json.dumps(v) for v in node["enum"][:6])
+        if len(node["enum"]) > 6:
+            shown += ", …"
+        parts.append(shown)
+    if "minimum" in node:
+        parts.append(f"minimum {node['minimum']}")
+    if "maximum" in node:
+        parts.append(f"maximum {node['maximum']}")
+    if "minItems" in node:
+        parts.append(f"at least {node['minItems']} item(s)")
+    if "maxItems" in node:
+        parts.append(f"at most {node['maxItems']} item(s)")
+    if "pattern" in node:
+        parts.append(f"pattern {node['pattern']}")
+    return " · ".join(parts)
+
+
+
+def description_for(profile: str, key: str, node: dict, group: str = "root", prefix: str = "root") -> str:
+    if isinstance(node, dict) and node.get("description"):
+        return str(node["description"]).strip()
+    if group in {"root", "defs"}:
+        text = HINTS.get(profile, {}).get(group, {}).get(key)
+        if text:
+            return text
+    exact = PROPERTY_HINTS.get(profile, {}).get(f"{prefix}.{key}")
     if exact:
         return exact
-    return COMMON_FIELD_HINTS.get(name, '')
+    common = COMMON_FIELD_HINTS.get(key)
+    if common:
+        return common
+    return f"{humanize(key)} used by this schema object."
 
-def type_label(node):
-    if not isinstance(node,dict): return 'schema'
-    if '$ref' in node: return humanize(ref_name(node['$ref']))
-    if 'const' in node: return f"constant {json.dumps(node['const'])}"
-    if isinstance(node.get('enum'),list): return f"{node.get('type','value')} enum"
-    t=node.get('type')
-    if isinstance(t,list): return ' | '.join(map(str,t))
-    if t=='array': return f"array of {type_label(node.get('items',{}))}"
-    if t: return str(t)
-    if 'oneOf' in node: return f"one of {len(node['oneOf'])} alternatives"
-    if 'anyOf' in node: return f"any of {len(node['anyOf'])} alternatives"
-    if 'allOf' in node: return f"composition of {len(node['allOf'])} schemas"
-    if 'properties' in node or 'additionalProperties' in node: return 'object'
-    return 'schema'
 
-def constraints(node):
-    if not isinstance(node,dict): return []
-    parts=[]
-    for key,label in [('default','default'),('const','must equal'),('minimum','minimum'),('exclusiveMinimum','greater than'),('maximum','maximum'),('exclusiveMaximum','less than'),('minItems','min items'),('maxItems','max items'),('minLength','min length'),('maxLength','max length'),('format','format')]:
-        if key in node: parts.append(f"{label} {json.dumps(node[key]) if key in ('default','const') else node[key]}")
-    if node.get('pattern'): parts.append(f"pattern {node['pattern']}")
-    if isinstance(node.get('enum'),list): parts.append('allowed: '+', '.join(json.dumps(x) for x in node['enum']))
-    if node.get('additionalProperties') is False: parts.append('no additional properties')
-    return parts
+def root_prefix(path: Path) -> str:
+    rel = path.relative_to(ROOT)
+    return "../" * (len(rel.parts) - 1)
 
-def collect_properties(schema,node,seen=None):
-    seen=set() if seen is None else seen
-    props={}; required=set()
-    def visit(cur):
-        if not isinstance(cur,dict): return
-        ref=cur.get('$ref')
-        if ref and ref not in seen:
-            seen.add(ref); visit(resolve_ref(schema,ref))
-        for k,v in cur.get('properties',{}).items(): props.setdefault(k,v)
-        required.update(cur.get('required',[]))
-        for x in cur.get('allOf',[]): visit(x)
-    visit(node)
-    return props,required
 
-def collect_refs(node,refs=None):
-    refs=set() if refs is None else refs
-    if isinstance(node,dict):
-        if '$ref' in node: refs.add(node['$ref'])
-        for v in node.values(): collect_refs(v,refs)
-    elif isinstance(node,list):
-        for v in node: collect_refs(v,refs)
-    return refs
+def active_group(path: Path) -> str:
+    rel = path.relative_to(ROOT).as_posix()
+    if rel == "index.html":
+        return "home"
+    if rel.startswith("about/") or rel.startswith("why-matjson/"):
+        return "about"
+    if rel.startswith("profiles/"):
+        return "profiles"
+    if rel.startswith(("reference/", "schemas/", "spec/", "guides/", "examples/")):
+        return "docs"
+    if rel.startswith(("resources/", "registry/", "tools/", "governance/", "repository/")):
+        return "resources"
+    return ""
 
-def type_html(node):
-    if isinstance(node,dict) and node.get('$ref'):
-        return f'<a class="schema-type-link" href="{escape(ref_href(node["$ref"]))}">{escape(humanize(ref_name(node["$ref"])))}</a>'
-    return f'<code>{escape(type_label(node))}</code>'
 
-def property_table(profile,schema,node,group='root',prefix='root'):
-    props,req=collect_properties(schema,node)
-    if not props: return ''
-    rows=[]
-    for name,prop in props.items():
-        c=constraints(prop)
-        ctext=f'<small>{escape(" · ".join(c))}</small>' if c else ''
-        description=property_description(profile,prefix,name,prop,group) or 'Description is not yet defined in this draft profile.'
-        badge='is-required' if name in req else ''
-        label='Required' if name in req else 'Optional'
-        rowid=f"{'field' if group=='root' else 'property'}-{slug(prefix)}-{slug(name)}"
-        if group=='root': rowid=f'field-{slug(name)}'
-        rows.append(f'<tr id="{rowid}"><td><code>{escape(name)}</code></td><td>{type_html(prop)}{ctext}</td><td><span class="required-badge {badge}">{label}</span></td><td>{escape(description)}</td></tr>')
-    return '<div class="reference-table-wrap"><table class="reference-table"><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div>'
+def header_html(prefix: str, active: str) -> str:
+    current = lambda key: ' aria-current="page"' if active == key else ''
+    active_class = lambda key: ' is-active' if active == key else ''
+    chevron = '<svg aria-hidden="true" class="nav-chevron" viewBox="0 0 12 12"><path d="m3 4 3 3 3-3"/></svg>'
+    profiles = [
+        ("matspec", "Material specification requirements"),
+        ("matreq", "Application material requirements"),
+        ("core", "Shared semantic primitives"),
+        ("matrecord", "MTR and evidence records"),
+        ("matcheck", "Compliance results"),
+    ]
+    profile_items = []
+    for key, summary in profiles:
+        p = PROFILES[key]
+        profile_items.append(
+            f'<a class="nav-menu-item" href="{prefix}profiles/{key}/index.html">'
+            f'<span><strong>{escape(p["name"])}</strong><small>{escape(summary)}</small></span>'
+            f'<span class="nav-stage nav-stage-{escape(p["status_class"])}">{escape(p["status"])}</span></a>'
+        )
+    profile_menu = ''.join(profile_items)
+    return f'''<header class="site-header"><div class="container header-inner">
+<a aria-label="MatJSON home" class="brand" href="{prefix}index.html"><img alt="" height="42" src="{prefix}assets/img/logo-mark.svg" width="42"/><span class="brand-name">MatJSON</span></a>
+<nav aria-label="Primary navigation" class="nav">
+<a{current("home")} href="{prefix}index.html">Home</a>
+<a{current("about")} href="{prefix}about/index.html">About</a>
+<details class="nav-dropdown{active_class("profiles")}"><summary>Profiles {chevron}</summary><div class="nav-menu nav-menu-wide"><div class="nav-menu-label">Schema profiles</div>{profile_menu}<a class="nav-menu-footer" href="{prefix}reference/index.html">Compare all profiles <span>→</span></a></div></details>
+<details class="nav-dropdown{active_class("docs")}"><summary>Docs {chevron}</summary><div class="nav-menu"><a class="nav-menu-item" href="{prefix}reference/index.html"><span><strong>Schema reference</strong><small>Linked JSON Schemas and definition guides</small></span></a><a class="nav-menu-item" href="{prefix}spec/index.html"><span><strong>Architecture</strong><small>Profiles, identifiers, conformance, and invocation</small></span></a><a class="nav-menu-item" href="{prefix}guides/index.html"><span><strong>Guides & examples</strong><small>Implementation guidance and synthetic files</small></span></a><a class="nav-menu-item" href="{prefix}schemas/index.html"><span><strong>Schema downloads</strong><small>Versioned and latest raw JSON files</small></span></a></div></details>
+<a{current("resources")} href="{prefix}resources/index.html">Resources</a>
+</nav>
+<div class="header-actions"><a aria-label="MatJSON on GitHub" class="icon-button" href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank" title="GitHub"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 22v-3.9c.04-1-.35-1.95-1.1-2.6 3.6-.4 7.4-1.8 7.4-8A6.2 6.2 0 0 0 19.7 3a5.8 5.8 0 0 0-.2-4S18.2-1.4 15 1.1a14.8 14.8 0 0 0-6 0C5.8-1.4 4.5-.9 4.5-.9a5.8 5.8 0 0 0-.2 4A6.2 6.2 0 0 0 2.7 7.5c0 6.2 3.8 7.6 7.4 8-.74.64-1.13 1.58-1.1 2.6V22"></path><path d="M9 19c-3 .9-3-1.5-4.2-2"></path></svg></a>
+<button aria-label="Search the site" class="icon-button search-button" data-search-toggle="" title="Search (Ctrl+K)" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.8-3.8"></path></svg></button>
+<button aria-expanded="false" aria-label="Open navigation" class="icon-button menu-toggle" data-menu-toggle="" type="button"><svg aria-hidden="true" class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
+</div></header>'''
 
-def complex_node(node):
-    return isinstance(node,dict) and any(k in node for k in ('properties','items','$defs','oneOf','anyOf','allOf','if','then','else')) or (isinstance(node,dict) and isinstance(node.get('additionalProperties'),dict))
 
-def node_header(label,node,required=False):
-    req='<span class="schema-required-mini">required</span>' if required else ''
-    return f'<span class="schema-node-main"><code class="schema-node-name">{escape(label)}</code><span class="schema-kind-badge">{escape(type_label(node))}</span>{req}</span>'
+def footer_html(prefix: str) -> str:
+    return f'''<footer class="site-footer"><div class="container footer-grid">
+<div><div class="footer-brand"><img alt="" src="{prefix}assets/img/logo-mark.svg"/><strong>MatJSON</strong></div><p class="footer-copy">An open interoperability specification for material requirements, evidence, and compliance data.</p></div>
+<div class="footer-col"><strong>Docs</strong><a href="{prefix}reference/index.html">Schema reference</a><a href="{prefix}spec/index.html">Architecture</a><a href="{prefix}guides/index.html">Guides</a></div>
+<div class="footer-col"><strong>Resources</strong><a href="{prefix}examples/index.html">Examples</a><a href="{prefix}registry/index.html">Registry</a><a href="{prefix}tools/index.html">Tools</a></div>
+<div class="footer-col"><strong>Project</strong><a href="{prefix}about/index.html">About</a><a href="{prefix}governance/index.html">Governance</a><a href="https://github.com/matjson-org" rel="noopener noreferrer" target="_blank">GitHub</a></div>
+</div><div class="container footer-bottom"><span>© 2026 MatJSON. Draft open interoperability specification.</span><span><a href="{prefix}about/#non-affiliation">Non-affiliation</a></span></div></footer>'''
 
-def node_meta(node,pointer):
-    bits=[f'<code>{escape(pointer)}</code>']
-    if isinstance(node,dict) and node.get('$ref'):
-        bits.append(f'<a href="{escape(ref_href(node["$ref"]))}">Open {escape(humanize(ref_name(node["$ref"])))}</a>')
-    bits.extend(f'<span>{escape(x)}</span>' for x in constraints(node))
-    return '<div class="schema-node-meta">'+''.join(bits)+'</div>' if len(bits)>1 or constraints(node) else ''
 
-def group_html(profile,schema,label,entries,pointer,depth):
-    open_attr=' open' if depth<2 and label!='Definitions' else ''
-    children=''.join(tree_node(profile,schema,*e,depth+1) for e in entries)
-    search=escape((label+' '+pointer).lower(),quote=True)
-    return f'<details class="schema-node schema-node-group" data-search-text="{search}"{open_attr}><summary><span class="schema-node-name">{escape(label)}</span><span class="schema-kind-badge">{len(entries)} {"item" if len(entries)==1 else "items"}</span></summary><div class="schema-tree-children">{children}</div></details>'
+def search_dialog() -> str:
+    return '''<dialog aria-label="Site search" class="search-dialog" id="site-search"><div class="search-shell"><div class="search-head"><input autocomplete="off" id="site-search-input" placeholder="Search MatJSON pages" type="search"/><button aria-label="Close search" class="search-close" data-search-close="" type="button">×</button></div><div class="search-results" id="site-search-results"></div></div></dialog>'''
 
-def tree_node(profile,schema,label,node,pointer='#',required=False,depth=0):
-    d=desc(profile,node,label,'defs' if pointer.startswith('#/$defs/') else 'root')
-    search=escape(f'{label} {pointer} {type_label(node)} {d}'.lower(),quote=True)
-    meta=node_meta(node,pointer)
-    preview=f'<span class="schema-node-preview">{escape(d)}</span>' if d else ''
-    if not complex_node(node):
-        return f'<div class="schema-node schema-node-leaf" id="{pointer_id(pointer)}" data-search-text="{search}"><div class="schema-leaf-row">{node_header(label,node,required)}{preview}</div>{meta}</div>'
-    open_attr=' open' if depth<2 and '/$defs' not in pointer else ''
-    groups=[]
-    if isinstance(node,dict) and node.get('properties'):
-        req=set(node.get('required',[])); entries=[(k,v,f'{pointer}/properties/{k}',k in req) for k,v in node['properties'].items()]
-        groups.append(group_html(profile,schema,'Properties',entries,f'{pointer}/properties',depth+1))
-    if isinstance(node,dict) and node.get('items'):
-        groups.append(group_html(profile,schema,'Items',[('item',node['items'],f'{pointer}/items',False)],f'{pointer}/items',depth+1))
-    if isinstance(node,dict) and node.get('$defs'):
-        entries=[(k,v,f'{pointer}/$defs/{k}',False) for k,v in node['$defs'].items()]
-        groups.append(group_html(profile,schema,'Definitions',entries,f'{pointer}/$defs',depth+1))
-    if isinstance(node,dict):
-        for keyword in ('allOf','oneOf','anyOf'):
-            if isinstance(node.get(keyword),list):
-                entries=[(f'{humanize(keyword)} {i+1}',v,f'{pointer}/{keyword}/{i}',False) for i,v in enumerate(node[keyword])]
-                groups.append(group_html(profile,schema,humanize(keyword),entries,f'{pointer}/{keyword}',depth+1))
-        for keyword in ('if','then','else'):
-            if node.get(keyword): groups.append(group_html(profile,schema,humanize(keyword),[(humanize(keyword),node[keyword],f'{pointer}/{keyword}',False)],f'{pointer}/{keyword}',depth+1))
-        if isinstance(node.get('additionalProperties'),dict): groups.append(group_html(profile,schema,'Additional properties',[('value',node['additionalProperties'],f'{pointer}/additionalProperties',False)],f'{pointer}/additionalProperties',depth+1))
-    return f'<details class="schema-node" id="{pointer_id(pointer)}" data-search-text="{search}"{open_attr}><summary>{node_header(label,node,required)}{preview}</summary>{meta}<div class="schema-tree-children">{"".join(groups)}</div></details>'
 
-def definition_card(profile,schema,name,node):
-    description=desc(profile,node,name,'defs')
-    search=escape(f'{name} {humanize(name)} {description} {type_label(node)}'.lower(),quote=True)
-    meta=[f'<span><strong>Type</strong> {escape(type_label(node))}</span>']+[f'<span>{escape(x)}</span>' for x in constraints(node)]
-    refs=[r for r in sorted(collect_refs(node)) if r.startswith('#/$defs/') and ref_name(r)!=name]
-    related=''
-    if refs:
-        related='<div class="definition-related"><strong>Related definitions</strong>'+''.join(f'<a href="{escape(ref_href(r))}">{escape(humanize(ref_name(r)))}</a>' for r in refs)+'</div>'
-    composition=[]
-    for keyword in ('allOf','oneOf','anyOf'):
-        if isinstance(node.get(keyword),list):
-            items=[]
-            for i,alt in enumerate(node[keyword]):
-                if isinstance(alt,dict) and alt.get('$ref'): items.append(f'<span><a href="{escape(ref_href(alt["$ref"]))}">{escape(humanize(ref_name(alt["$ref"])))}</a></span>')
-                else: items.append(f'<span>{escape((alt.get("title") if isinstance(alt,dict) else None) or f"{type_label(alt)} {i+1}")}</span>')
-            composition.append(f'<div><strong>{escape(humanize(keyword))}</strong>{"".join(items)}</div>')
-    comp=f'<div class="definition-composition">{"".join(composition)}</div>' if composition else ''
-    table=property_table(profile,schema,node,'defs',name)
-    raw=escape(json.dumps(node,indent=2))
-    return f'''<section class="definition-card" id="def-{slug(name)}" data-search-text="{search}"><div class="definition-header"><div><span class="definition-label">Definition</span><h3>{escape(node.get('title') or humanize(name))}</h3><code>$defs.{escape(name)}</code></div><button class="definition-copy-link" type="button" data-copy-anchor="def-{slug(name)}">Copy link</button></div>{f'<p class="definition-description">{escape(description)}</p>' if description else ''}<div class="definition-meta">{"".join(meta)}</div>{related}{comp}{table}<details class="definition-raw"><summary>View definition JSON</summary><pre><code>{raw}</code></pre></details></section>'''
+def jsonld(title: str, description: str, canonical: str, article: bool = True) -> str:
+    graph = [
+        {"@type": "WebSite", "@id": "https://matjson.org/#website", "url": "https://matjson.org/", "name": "MatJSON", "description": "Open, vendor-neutral JSON schemas for engineering materials data.", "inLanguage": "en"},
+        {"@type": "Organization", "@id": "https://matjson.org/#organization", "name": "MatJSON", "url": "https://matjson.org/", "sameAs": ["https://github.com/matjson-org"]},
+        {"@type": "WebPage", "@id": canonical + "#webpage", "url": canonical, "name": title, "description": description, "isPartOf": {"@id": "https://matjson.org/#website"}, "about": {"@id": "https://matjson.org/#organization"}, "inLanguage": "en"},
+    ]
+    if article:
+        graph.append({"@type": "TechArticle", "headline": title, "description": description, "url": canonical, "author": {"@id": "https://matjson.org/about/#uzair-syed-ahmed"}, "publisher": {"@id": "https://matjson.org/#organization"}, "inLanguage": "en"})
+    return json.dumps({"@context": "https://schema.org", "@graph": graph}, separators=(",", ":"))
 
-for profile,schema_path in SCHEMAS.items():
-    schema=json.loads(schema_path.read_text())
-    path=ROOT/f'reference/{profile}/index.html'
-    soup=BeautifulSoup(path.read_text(),'html.parser')
-    root_container=soup.select_one('[data-root-fields]')
-    if root_container:
-        root_container.clear()
-        fragment=BeautifulSoup(f'<p class="reference-intro">{escape(schema.get("description") or "Top-level fields in this profile.")}</p>'+property_table(profile,schema,schema,'root','root'),'html.parser')
-        root_container.extend(list(fragment.contents))
-    field_nav=soup.select_one('[data-field-nav]')
-    if field_nav:
-        field_nav.clear()
-        for name,node in schema.get('properties',{}).items():
-            a=soup.new_tag('a',href=f'#field-{slug(name)}'); a.string=name; a['data-search-text']=f'{name} {desc(profile,node,name,"root")}'.lower(); field_nav.append(a)
-    def_nav=soup.select_one('[data-definition-nav]')
-    if def_nav:
-        def_nav.clear()
-        if schema.get('$defs'):
-            for name,node in schema['$defs'].items():
-                a=soup.new_tag('a',href=f'#def-{slug(name)}'); a.string=humanize(name); a['data-search-text']=f'{name} {humanize(name)} {desc(profile,node,name,"defs")}'.lower(); def_nav.append(a)
+
+def page_shell(path: Path, title: str, description: str, canonical: str, body: str, *, active: str = "docs", schema_script: bool = False) -> str:
+    prefix = root_prefix(path)
+    scripts = f'<script>const ROOT = "{prefix}";</script><script src="{prefix}assets/js/site.js?v={ASSET_VERSION}"></script>'
+    if schema_script:
+        scripts += f'<script src="{prefix}assets/js/schema-reference.js?v={ASSET_VERSION}"></script>'
+    return f'''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>{escape(title)}</title><meta content="{escape(description, quote=True)}" name="description"/><meta content="#061321" name="theme-color"/><link href="{prefix}assets/img/favicon.svg" rel="icon" type="image/svg+xml"/><link href="{prefix}assets/css/styles.css?v={ASSET_VERSION}" rel="stylesheet"/><link href="{canonical}" rel="canonical"/><meta content="index, follow, max-image-preview:large" name="robots"/><meta content="MatJSON" property="og:site_name"/><meta content="article" property="og:type"/><meta content="{escape(title, quote=True)}" property="og:title"/><meta content="{escape(description, quote=True)}" property="og:description"/><meta content="{canonical}" property="og:url"/><meta content="https://matjson.org/design/matjson-homepage-implementation-preview.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><script type="application/ld+json">{jsonld(title, description, canonical)}</script></head><body><a class="skip-link" href="#main">Skip to content</a>{header_html(prefix, active)}<main id="main">{body}</main>{footer_html(prefix)}{search_dialog()}{scripts}</body></html>'''
+
+
+def decode_json_pointer(pointer: str) -> tuple[str, ...]:
+    value = str(pointer)
+    if value.startswith("#"):
+        value = value[1:]
+    if value.startswith("/"):
+        value = value[1:]
+    if not value:
+        return ()
+    return tuple(part.replace("~1", "/").replace("~0", "~") for part in value.split("/"))
+
+
+def schema_anchor_path(path: tuple[object, ...]) -> str:
+    if not path:
+        return "schema-root"
+    return "schema-" + "-".join(slug(str(part)) for part in path)
+
+
+def schema_scalar_html(value, *, key: str | None = None, main_page: bool = True) -> str:
+    if value is None:
+        return '<span class="schema-null">null</span>'
+    if value is True:
+        return '<span class="schema-boolean">true</span>'
+    if value is False:
+        return '<span class="schema-boolean">false</span>'
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return f'<span class="schema-number">{escape(json.dumps(value))}</span>'
+
+    rendered = json.dumps(value, ensure_ascii=False)
+    label = escape(rendered)
+    if isinstance(value, str):
+        href = None
+        css = 'schema-string'
+        attrs = ''
+        if key == '$ref' and value.startswith('#/'):
+            target = schema_anchor_path(decode_json_pointer(value))
+            href = f'#{target}' if main_page else f'../../index.html#{target}'
+            css += ' schema-ref-value'
+        elif key in {'$schema', '$id'} and value.startswith(('https://', 'http://')):
+            href = value
+            attrs = ' target="_blank" rel="noopener noreferrer"'
+            css += ' schema-url-value'
+        if href:
+            return f'<a class="{css}" href="{escape(href, quote=True)}"{attrs}>{label}</a>'
+        return f'<span class="{css}">{label}</span>'
+    return f'<span class="schema-string">{escape(json.dumps(value, ensure_ascii=False))}</span>'
+
+
+def linked_schema_html(value, *, main_page: bool = True) -> str:
+    """Render exact JSON using the linked-schema method used by Lottie Docs."""
+    lines: list[str] = []
+
+    def add_line(depth: int, body: str, *, line_id: str | None = None, classes: str = '') -> None:
+        attrs = f' id="{escape(line_id, quote=True)}"' if line_id else ''
+        class_value = 'schema-code-line' + (f' {classes}' if classes else '')
+        lines.append(f'<span class="{class_value}"{attrs}>{"    " * depth}{body}</span>')
+
+    def key_html(key: str, child_path: tuple[object, ...], linked: bool) -> str:
+        encoded = escape(json.dumps(key, ensure_ascii=False))
+        if not linked:
+            return f'<span class="schema-key">{encoded}</span>'
+        target = schema_anchor_path(child_path)
+        pointer = '#/' + '/'.join(
+            str(part).replace('~', '~0').replace('/', '~1') for part in child_path
+        )
+        return (
+            f'<a class="schema-key schema-object-link" href="#{target}" '
+            f'title="Link to {escape(pointer, quote=True)}">{encoded}</a>'
+        )
+
+    def add_comma() -> None:
+        if lines:
+            lines[-1] = lines[-1][:-7] + '<span class="schema-punctuation">,</span></span>'
+
+    def render(node, depth: int, path: tuple[object, ...], prefix: str = '', *, line_id: str | None = None, classes: str = '') -> None:
+        if isinstance(node, dict):
+            if not node:
+                add_line(depth, prefix + '<span class="schema-punctuation">{}</span>', line_id=line_id)
+                return
+            add_line(depth, prefix + '<span class="schema-punctuation">{</span>', line_id=line_id, classes=classes)
+            items = list(node.items())
+            for index, (key, child) in enumerate(items):
+                child_path = path + (key,)
+                linked = isinstance(child, dict)
+                child_prefix = key_html(str(key), child_path, linked) + '<span class="schema-punctuation">: </span>'
+                child_id = schema_anchor_path(child_path) if linked else None
+                child_classes = ''
+                if child_path == ('$defs',):
+                    child_classes = 'schema-defs-line'
+                elif len(child_path) == 2 and child_path[0] == '$defs':
+                    child_classes = 'schema-definition-line'
+                render(child, depth + 1, child_path, child_prefix, line_id=child_id, classes=child_classes)
+                if index < len(items) - 1:
+                    add_comma()
+            add_line(depth, '<span class="schema-punctuation">}</span>')
+            return
+
+        if isinstance(node, list):
+            if not node:
+                add_line(depth, prefix + '<span class="schema-punctuation">[]</span>', line_id=line_id)
+                return
+            add_line(depth, prefix + '<span class="schema-punctuation">[</span>', line_id=line_id, classes=classes)
+            for index, child in enumerate(node):
+                child_path = path + (index,)
+                child_id = schema_anchor_path(child_path) if isinstance(child, dict) else None
+                render(child, depth + 1, child_path, line_id=child_id)
+                if index < len(node) - 1:
+                    add_comma()
+            add_line(depth, '<span class="schema-punctuation">]</span>')
+            return
+
+        current_key = str(path[-1]) if path else None
+        add_line(depth, prefix + schema_scalar_html(node, key=current_key, main_page=main_page), line_id=line_id, classes=classes)
+
+    render(value, 0, tuple(), line_id='schema-root')
+    return '<div class="schema-code-shell"><pre class="linked-schema"><code>' + '\n'.join(lines) + '</code></pre></div>'
+
+
+def root_field_rows(profile: str, schema: dict) -> str:
+    required = set(schema.get("required", []))
+    rows = []
+    for name, node in schema.get("properties", {}).items():
+        desc = description_for(profile, name, node, "root", "root")
+        status = "Required" if name in required else "Optional"
+        detail = constraint_text(node)
+        type_text = type_label(node)
+        if detail:
+            type_text += f" — {detail}"
+        rows.append(
+            f'<tr id="field-{slug(name)}"><td><code>{escape(name)}</code></td><td>{escape(type_text)}</td><td>{status}</td><td>{escape(desc)}</td></tr>'
+        )
+    if not rows:
+        return '<p class="reference-empty-note">This draft profile does not define top-level properties yet.</p>'
+    return '<div class="simple-table-wrap"><table class="simple-doc-table"><thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Meaning</th></tr></thead><tbody>' + "".join(rows) + '</tbody></table></div>'
+
+
+def definition_field_rows(profile: str, name: str, node: dict) -> str:
+    properties = node.get("properties", {}) if isinstance(node, dict) else {}
+    required = set(node.get("required", [])) if isinstance(node, dict) else set()
+    if not properties:
+        return '<p class="reference-empty-note">This definition has no named object fields.</p>'
+    rows = []
+    for field, child in properties.items():
+        desc = description_for(profile, field, child, "defs", name)
+        status = "Required" if field in required else "Optional"
+        detail = constraint_text(child)
+        label = type_label(child)
+        if detail:
+            label += f" — {detail}"
+        rows.append(f'<tr id="property-{slug(field)}"><td><code>{escape(field)}</code></td><td>{escape(label)}</td><td>{status}</td><td>{escape(desc)}</td></tr>')
+    return '<div class="simple-table-wrap"><table class="simple-doc-table"><thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Meaning</th></tr></thead><tbody>' + "".join(rows) + '</tbody></table></div>'
+
+
+def outline_html(profile: str, schema: dict, prefix: str = "", current_def: str | None = None) -> str:
+    defs = schema.get("$defs", {})
+    rows = []
+    for name, node in defs.items():
+        if current_def:
+            route = f'../../index.html#{schema_anchor_path(("$defs", name))}'
         else:
-            span=soup.new_tag('span'); span['class']=['reference-nav-empty']; span.string='No reusable definitions'; def_nav.append(span)
-    tree=soup.select_one('[data-schema-tree]')
-    if tree:
-        tree.clear(); fragment=BeautifulSoup(tree_node(profile,schema,schema.get('title') or humanize(profile),schema,'#',True,0),'html.parser'); tree.extend(list(fragment.contents))
-    status=soup.select_one('[data-schema-status]')
-    if status: status.string=f"{len(schema.get('properties',{}))} root fields · {len(schema.get('$defs',{}))} reusable definitions"
-    defs_container=soup.select_one('[data-definitions]')
-    if defs_container:
-        defs_container.clear()
-        if schema.get('$defs'):
-            fragment=BeautifulSoup(''.join(definition_card(profile,schema,n,d) for n,d in schema['$defs'].items()),'html.parser'); defs_container.extend(list(fragment.contents))
+            route = f'#{schema_anchor_path(("$defs", name))}'
+        current = ' aria-current="page"' if current_def == name else ""
+        rows.append(f'<a{current} href="{route}">{escape(node.get("title") or humanize(name))}</a>')
+    defs_html = "".join(rows) if rows else '<span class="outline-empty">No reusable definitions</span>'
+    if current_def:
+        profile_href = '../../index.html'
+        schema_href = '../../index.html#schema'
+        defs_href = '../../index.html#schema-defs'
+    else:
+        profile_href = 'index.html'
+        schema_href = '#schema'
+        defs_href = '#schema-defs'
+    defs_nav = f'<a href="{defs_href}">Definitions</a>' if defs else ''
+    defs_section = f'<div class="outline-heading">Schema definitions</div><div class="outline-definitions">{defs_html}</div>' if defs else ''
+    return f'''<aside class="reference-outline"><a class="outline-profile" href="{profile_href}">{escape(PROFILES[profile]['name'])}</a><nav><a href="{schema_href}">JSON Schema</a>{defs_nav}</nav>{defs_section}</aside>'''
+
+
+def definition_list(profile: str, schema: dict) -> str:
+    defs = schema.get("$defs", {})
+    if not defs:
+        return '<p class="reference-empty-note">This draft profile does not publish reusable definitions yet.</p>'
+    rows = []
+    for name, node in defs.items():
+        desc = description_for(profile, name, node, "defs", name)
+        rows.append(f'<a class="definition-row" href="definitions/{slug(name)}/index.html"><div><code>{escape(name)}</code><strong>{escape(node.get("title") or humanize(name))}</strong></div><p>{escape(desc)}</p><span aria-hidden="true">→</span></a>')
+    return '<div class="definition-directory">' + "".join(rows) + '</div>'
+
+
+def main_reference_body(profile: str, schema: dict) -> str:
+    meta = PROFILES[profile]
+    note = ""
+    if profile == "matspec":
+        note = '''<p class="schema-design-note"><strong>Version naming:</strong> the published v0.2 schema retains <code>matspec</code> for compatibility. The proposed v0.3 direction is <code>"matjson": {"profile": "matspec", "version": "0.3"}</code>, so profile identity and version remain explicit.</p>'''
+    schema_html = linked_schema_html(schema, main_page=True)
+    return f'''<section class="page-hero compact-doc-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../index.html">Home</a><span>/</span><a href="../index.html">Docs</a><span>/</span><span>{escape(meta['name'])}</span></div><h1>{escape(meta['name'])}</h1><p>{escape(meta['description'])}</p><div class="doc-subline"><span class="profile-status status-{escape(meta['status_class'])}">{escape(meta['status'])}</span><span>{escape(meta['stage_label'])}</span><span>{escape(meta['extension'])}</span></div><div class="doc-link-row"><a href="../../{meta['schema_href']}">Raw schema</a><a download href="../../{meta['download_href']}">Download</a><a href="../../{meta['profile_href']}">Profile overview</a></div></div></section>
+<section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema)}<article class="reference-browser-main"><section id="schema" class="reference-simple-section first"><div class="section-title-row"><div><h2>JSON Schema</h2><p>This page shows the published JSON Schema as one formatted document. Highlighted objects provide direct section links, and each <code>$ref</code> value jumps to its target. You can also open the <a href="../../{meta['schema_href']}">raw schema file</a>.</p></div></div>{note}{schema_html}</section></article></div></section>'''
+
+
+def definition_body(profile: str, schema: dict, name: str, node: dict, previous: str | None, next_name: str | None) -> str:
+    meta = PROFILES[profile]
+    title = node.get("title") or humanize(name)
+    desc = description_for(profile, name, node, "defs", name)
+    prev_html = f'<a href="../{slug(previous)}/index.html"><span>Previous</span><strong>{escape(schema["$defs"][previous].get("title") or humanize(previous))}</strong></a>' if previous else '<span></span>'
+    next_html = f'<a class="next" href="../{slug(next_name)}/index.html"><span>Next</span><strong>{escape(schema["$defs"][next_name].get("title") or humanize(next_name))}</strong></a>' if next_name else '<span></span>'
+    fragment = linked_schema_html(node, main_page=False)
+    return f'''<section class="page-hero compact-doc-hero definition-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../../../../index.html">Home</a><span>/</span><a href="../../../index.html">Docs</a><span>/</span><a href="../../index.html">{escape(meta['name'])}</a><span>/</span><span>{escape(title)}</span></div><h1>{escape(title)}</h1><p>{escape(desc)}</p><div class="definition-path"><code>$defs.{escape(name)}</code> · {escape(type_label(node))}</div></div></section><section class="reference-browser-section"><div class="container reference-browser-layout">{outline_html(profile, schema, current_def=name)}<article class="reference-browser-main"><section class="reference-simple-section first"><div class="section-title-row"><div><h2>Definition JSON</h2><p>This fragment is shown exactly as published. Linked <code>$ref</code> values return to their targets in the complete schema.</p></div></div>{fragment}</section><section class="reference-simple-section"><h2>Fields</h2>{definition_field_rows(profile, name, node)}</section><nav aria-label="Definition navigation" class="definition-pager">{prev_html}{next_html}</nav></article></div></section>'''
+
+
+def docs_index_body() -> str:
+    rows = []
+    for key in ("matspec", "matreq", "core", "matrecord", "matcheck"):
+        p = PROFILES[key]
+        rows.append(f'<a class="docs-profile-row" href="{key}/index.html"><div><strong>{escape(p["name"])}</strong><span>{escape(p["short"])}</span></div><p>{escape(p["description"])}</p><span class="docs-profile-stage"><span class="profile-status status-{escape(p["status_class"])}">{escape(p["status"])}</span><span class="docs-version">{escape(p["stage_label"])}</span></span><span aria-hidden="true">→</span></a>')
+    return f'''<section class="page-hero docs-hub-hero"><div class="container page-hero-inner"><div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><span>Docs</span></div><h1>Documentation</h1><p>Browse the formatted JSON schemas, follow linked references, or read the architecture and implementation guides.</p></div></section><section class="section-tight"><div class="container docs-hub-layout"><main><h2>Schema profiles</h2><div class="docs-profile-directory">{"".join(rows)}</div></main><aside class="docs-hub-links"><strong>More documentation</strong><a href="../spec/index.html">Architecture specification<span>→</span></a><a href="../guides/index.html">Guides and examples<span>→</span></a><a href="../schemas/index.html">Schema downloads<span>→</span></a></aside></div></section>'''
+
+
+def generate_reference_pages() -> None:
+    index_path = ROOT / "reference/index.html"
+    index_path.write_text(page_shell(index_path, "MatJSON Documentation", "Linked JSON Schema documentation for MatSpecJSON, MatReqJSON, MatRecordJSON, MatCheckJSON, and MatJSON Core.", "https://matjson.org/reference/", docs_index_body()), encoding="utf-8")
+
+    for profile, meta in PROFILES.items():
+        schema = json.loads(meta["schema"].read_text(encoding="utf-8"))
+        profile_dir = ROOT / "reference" / profile
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        definitions_dir = profile_dir / "definitions"
+        shutil.rmtree(definitions_dir, ignore_errors=True)
+        definitions_dir.mkdir(parents=True, exist_ok=True)
+
+        page = profile_dir / "index.html"
+        page.write_text(page_shell(page, f"{meta['name']} Reference — MatJSON", meta["description"], f"https://matjson.org/reference/{profile}/", main_reference_body(profile, schema)), encoding="utf-8")
+
+        names = list(schema.get("$defs", {}).keys())
+        for i, name in enumerate(names):
+            node = schema["$defs"][name]
+            path = definitions_dir / slug(name) / "index.html"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            title = node.get("title") or humanize(name)
+            desc = description_for(profile, name, node, "defs", name)
+            body = definition_body(profile, schema, name, node, names[i - 1] if i else None, names[i + 1] if i + 1 < len(names) else None)
+            path.write_text(page_shell(path, f"{title} — {meta['name']} Reference", desc, f"https://matjson.org/reference/{profile}/definitions/{slug(name)}/", body, schema_script=False), encoding="utf-8")
+
+
+def update_existing_navigation() -> None:
+    generated_roots = {ROOT / "reference"}
+    for path in ROOT.rglob("*.html"):
+        # Generated reference pages already use the new shell, but replacing the
+        # common chrome again is harmless and keeps future regeneration uniform.
+        soup = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+        prefix = root_prefix(path)
+        header = soup.select_one("header.site-header")
+        if header:
+            fragment = BeautifulSoup(header_html(prefix, active_group(path)), "html.parser").header
+            header.replace_with(fragment)
+        footer = soup.select_one("footer.site-footer")
+        if footer:
+            fragment = BeautifulSoup(footer_html(prefix), "html.parser").footer
+            footer.replace_with(fragment)
+        for link in soup.select('link[rel="stylesheet"]'):
+            href = link.get("href", "")
+            if "assets/css/styles.css" in href:
+                link["href"] = href.split("?")[0] + f"?v={ASSET_VERSION}"
+        for script in soup.select('script[src]'):
+            src = script.get("src", "")
+            if "assets/js/" in src:
+                script["src"] = src.split("?")[0] + f"?v={ASSET_VERSION}"
+        path.write_text(str(soup), encoding="utf-8")
+
+
+def update_content_links() -> None:
+    # Home: one clear documentation CTA instead of splitting discovery between
+    # Schemas and Reference.
+    home = ROOT / "index.html"
+    soup = BeautifulSoup(home.read_text(encoding="utf-8"), "html.parser")
+    primary = soup.select_one(".hero-actions .button-primary")
+    if primary:
+        primary["href"] = "reference/index.html"
+        text = primary.find(string=re.compile("Explore schemas|Browse docs"))
+        if text:
+            text.replace_with("Browse docs ")
+    home.write_text(str(soup), encoding="utf-8")
+
+    for path in (ROOT / "profiles").glob("*/index.html"):
+        soup = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+        promo = soup.select_one(".reference-promo")
+        if promo:
+            h = promo.find(["h3", "strong"])
+            if h:
+                h.string = "Open the linked schema"
+            p = promo.find("p")
+            if p:
+                p.string = "Read the actual JSON Schema with stable object anchors, linked $ref values, and human-readable definition guides."
+            a = promo.find("a")
+            if a:
+                a.string = "Open linked schema"
+        path.write_text(str(soup), encoding="utf-8")
+
+
+def normalize_local_links() -> None:
+    """Make local file previews behave like hosted directory routes."""
+    for path in ROOT.rglob("*.html"):
+        soup = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+        changed = False
+        for anchor in soup.select("a[href]"):
+            href = anchor.get("href", "")
+            if not href or href.startswith(("http://", "https://", "mailto:", "tel:", "#", "javascript:")):
+                continue
+            base, sep, fragment = href.partition("#")
+            if base.endswith("/"):
+                anchor["href"] = base + "index.html" + (sep + fragment if sep else "")
+                changed = True
+        if changed:
+            path.write_text(str(soup), encoding="utf-8")
+
+
+def update_profile_status_surfaces() -> None:
+    status_text = {
+        "matspec": "Working draft · v0.2.10",
+        "matreq": "Working draft · v0.2",
+        "core": "Draft · v0.1",
+        "matrecord": "Concept / WIP · v0.1 placeholder",
+        "matcheck": "Concept / WIP · v0.1 placeholder",
+    }
+    for key, label in status_text.items():
+        path = ROOT / "profiles" / key / "index.html"
+        if not path.exists():
+            continue
+        soup = BeautifulSoup(path.read_text(encoding="utf-8"), "html.parser")
+        first_chip = soup.select_one(".page-meta .meta-chip")
+        if first_chip:
+            first_chip.string = label
+            first_chip["class"] = ["meta-chip", "meta-chip-status", f"status-{PROFILES[key]['status_class']}"]
+        path.write_text(str(soup), encoding="utf-8")
+
+    schemas = ROOT / "schemas/index.html"
+    if schemas.exists():
+        soup = BeautifulSoup(schemas.read_text(encoding="utf-8"), "html.parser")
+        mapping = {
+            "MatJSON Core": ("v0.1", "Draft", "draft"),
+            "MatSpecJSON": ("v0.2.10", "Working draft", "working"),
+            "MatReqJSON": ("v0.2", "Working draft", "working"),
+            "MatRecordJSON": ("v0.1 placeholder", "Concept / WIP", "concept"),
+            "MatCheckJSON": ("v0.1 placeholder", "Concept / WIP", "concept"),
+        }
+        for row in soup.select(".schema-row"):
+            strong = row.find("strong")
+            if not strong or strong.get_text(strip=True) not in mapping:
+                continue
+            version, status, cls = mapping[strong.get_text(strip=True)]
+            direct_spans = [child for child in row.children if getattr(child, "name", None) == "span"]
+            if len(direct_spans) >= 2:
+                direct_spans[0].string = version
+                direct_spans[0]["class"] = ["schema-version"]
+                direct_spans[1].string = status
+                direct_spans[1]["class"] = ["profile-status", f"status-{cls}"]
+        schemas.write_text(str(soup), encoding="utf-8")
+
+def update_sitemap_and_manifest() -> None:
+    urls = []
+    for path in sorted(ROOT.rglob("index.html")):
+        rel = path.relative_to(ROOT).as_posix()
+        if rel == "index.html":
+            url = "https://matjson.org/"
         else:
-            fragment=BeautifulSoup('<div class="reference-empty">This placeholder schema does not yet publish reusable definitions.</div>','html.parser'); defs_container.extend(list(fragment.contents))
-    path.write_text(str(soup))
+            url = "https://matjson.org/" + rel[:-10]
+        urls.append(url)
+    sitemap = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        sitemap.append(f'  <url><loc>{url}</loc><lastmod>{BUILD_DATE}</lastmod></url>')
+    sitemap.append('</urlset>')
+    (ROOT / "sitemap.xml").write_text("\n".join(sitemap) + "\n", encoding="utf-8")
+
+    manifest_path = ROOT / "site-manifest.json"
+    files = []
+    total = 0
+    for path in sorted(ROOT.rglob("*")):
+        if not path.is_file() or path == manifest_path or "__pycache__" in path.parts:
+            continue
+        size = path.stat().st_size
+        total += size
+        files.append({"path": path.relative_to(ROOT).as_posix(), "bytes": size})
+    manifest = {"generated": BUILD_DATE, "files": files, "totals": {"files": len(files), "bytes": total}}
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def write_release_notes() -> None:
+    notes = ROOT / "docs/REFERENCE_DOCS_V11.md"
+    notes.write_text("""# Reference documentation v11
+
+This release adopts the Lottie Docs schema presentation pattern and adds hover-open navigation.
+
+## Linked schema presentation
+
+Each reference page displays the actual formatted JSON Schema as one continuous document. Object names have stable anchors, internal `$ref` values jump to their target in the same schema, and external schema URLs remain clickable. The main schema page no longer depends on JavaScript, fetch calls, line-number widgets, or nested collapsible boxes.
+
+Human-readable definition guides remain available from the left navigation. Definition pages show exact schema fragments and link internal references back to the full schema.
+
+## Navigation
+
+Profiles and Docs dropdowns open on hover for desktop pointer devices while retaining click and keyboard operation. Mobile navigation remains tap-controlled.
+
+## Compatibility
+
+The published MatSpecJSON v0.2.10 and MatReqJSON v0.2 schemas are unchanged.
+""", encoding="utf-8")
+
+if __name__ == "__main__":
+    generate_reference_pages()
+    update_existing_navigation()
+    update_content_links()
+    update_profile_status_surfaces()
+    normalize_local_links()
+    update_sitemap_and_manifest()
+    write_release_notes()
+    print("Reference documentation v11 generated.")

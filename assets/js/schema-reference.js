@@ -1,131 +1,240 @@
 (() => {
-  const app = document.querySelector('[data-schema-reference]');
-  if (!app) return;
+  const viewers = [...document.querySelectorAll('[data-json-schema]')];
+  if (!viewers.length) return;
 
-  const filters = [...document.querySelectorAll('[data-schema-filter]')];
-  const tree = document.querySelector('[data-schema-tree]');
-  const expandButton = document.querySelector('[data-expand-schema]');
-  const collapseButton = document.querySelector('[data-collapse-schema]');
-  const status = document.querySelector('[data-schema-status]');
-  const initialStatus = status?.textContent || '';
+  const slug = (value) => String(value || '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || 'item';
 
-  const searchable = [
-    ...document.querySelectorAll('.reference-sidebar [data-search-text]'),
-    ...document.querySelectorAll('.definition-card[data-search-text]'),
-    ...document.querySelectorAll('.schema-node[data-search-text]')
-  ];
+  const token = (className, text) => {
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+    return span;
+  };
 
-  const normalize = (value) => String(value || '').trim().toLowerCase();
-
-  function openAncestors(element) {
-    let parent = element?.parentElement;
-    while (parent) {
-      if (parent.tagName === 'DETAILS') parent.open = true;
-      parent = parent.parentElement;
-    }
-  }
-
-  function showSchemaMatch(node) {
-    node.hidden = false;
-    openAncestors(node);
-
-    // A parent match is most useful when its immediate structure remains visible.
-    if (node.matches('details.schema-node')) {
-      node.open = true;
-      node.querySelectorAll(':scope > .schema-tree-children > .schema-node').forEach((child) => {
-        child.hidden = false;
-      });
-    }
-  }
-
-  function applyFilter(rawQuery) {
-    const query = normalize(rawQuery);
-    filters.forEach((input) => {
-      if (input.value !== rawQuery) input.value = rawQuery;
-    });
-
-    if (!query) {
-      searchable.forEach((element) => { element.hidden = false; });
-      if (status) status.textContent = initialStatus;
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
       return;
     }
-
-    const navItems = [...document.querySelectorAll('.reference-sidebar [data-search-text]')];
-    const cards = [...document.querySelectorAll('.definition-card[data-search-text]')];
-    const nodes = [...document.querySelectorAll('.schema-node[data-search-text]')];
-
-    navItems.forEach((item) => {
-      item.hidden = !normalize(item.dataset.searchText).includes(query);
-    });
-
-    cards.forEach((card) => {
-      card.hidden = !normalize(card.dataset.searchText).includes(query);
-    });
-
-    nodes.forEach((node) => { node.hidden = true; });
-    const matchedNodes = nodes.filter((node) => normalize(node.dataset.searchText).includes(query));
-    matchedNodes.forEach(showSchemaMatch);
-
-    if (status) {
-      const definitionCount = cards.filter((card) => !card.hidden).length;
-      status.textContent = `${matchedNodes.length} schema match${matchedNodes.length === 1 ? '' : 'es'} · ${definitionCount} definition match${definitionCount === 1 ? '' : 'es'}`;
-    }
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.append(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    if (!ok) throw new Error('Copy command unavailable');
   }
 
-  filters.forEach((input) => {
-    input.addEventListener('input', (event) => applyFilter(event.target.value));
-  });
+  const makeLine = (depth, content, extraClass = '') => {
+    const line = document.createElement('div');
+    line.className = `json-line${extraClass ? ` ${extraClass}` : ''}`;
+    line.style.setProperty('--depth', String(depth));
 
-  expandButton?.addEventListener('click', () => {
-    tree?.querySelectorAll('details').forEach((detail) => { detail.open = true; });
-  });
+    const number = document.createElement('span');
+    number.className = 'json-line-number';
+    number.setAttribute('aria-hidden', 'true');
 
-  collapseButton?.addEventListener('click', () => {
-    const allDetails = [...(tree?.querySelectorAll('details') || [])];
-    allDetails.forEach((detail) => { detail.open = false; });
-    const root = tree?.querySelector(':scope > details');
-    if (root) root.open = true;
-  });
+    const gutter = document.createElement('span');
+    gutter.className = 'json-line-gutter';
 
-  document.querySelectorAll('[data-copy-anchor]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const anchor = button.dataset.copyAnchor;
-      const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        const original = button.textContent;
-        button.textContent = 'Copied';
-        setTimeout(() => { button.textContent = original; }, 1300);
-      } catch {
-        window.location.hash = anchor;
+    const code = document.createElement('code');
+    code.className = 'json-line-code';
+    if (content instanceof Node) code.append(content);
+    else code.textContent = content;
+
+    line.append(number, gutter, code);
+    return { line, number, gutter, code };
+  };
+
+  const keyFragment = (key) => {
+    const fragment = document.createDocumentFragment();
+    fragment.append(token('json-key', JSON.stringify(key)), token('json-punctuation', ': '));
+    return fragment;
+  };
+
+  const primitiveFragment = (value, key, refBase) => {
+    const fragment = document.createDocumentFragment();
+    if (typeof value === 'string') {
+      if (key === '$ref' && value.startsWith('#/$defs/')) {
+        const name = value.split('/').pop().replace(/~1/g, '/').replace(/~0/g, '~');
+        const link = document.createElement('a');
+        link.className = 'json-ref-link';
+        link.href = `${refBase}${slug(name)}/index.html`;
+        link.textContent = JSON.stringify(value);
+        link.title = `Open ${name} documentation`;
+        fragment.append(link);
+      } else {
+        fragment.append(token('json-string', JSON.stringify(value)));
       }
-    });
-  });
-
-  function revealHash() {
-    const hash = window.location.hash;
-    if (!hash || hash.length < 2) return;
-    let target;
-    try {
-      target = document.querySelector(hash);
-    } catch {
-      return;
+    } else if (typeof value === 'number') {
+      fragment.append(token('json-number', String(value)));
+    } else if (typeof value === 'boolean') {
+      fragment.append(token('json-boolean', String(value)));
+    } else if (value === null) {
+      fragment.append(token('json-null', 'null'));
     }
-    if (!target) return;
-    target.hidden = false;
-    openAncestors(target);
+    return fragment;
+  };
+
+  function renderJson(viewer, data) {
+    const refBase = viewer.dataset.refBase || 'definitions/';
+    const root = document.createElement('div');
+    root.className = 'json-document';
+    viewer.replaceChildren(root);
+
+    const state = { source: data };
+
+    function renderNode(value, key, depth, last, isRoot = false) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'json-node';
+      wrapper.dataset.depth = String(depth);
+      if (key !== null) wrapper.dataset.key = key;
+
+      const isArray = Array.isArray(value);
+      const isObject = value && typeof value === 'object' && !isArray;
+
+      if (!isArray && !isObject) {
+        const content = document.createDocumentFragment();
+        if (!isRoot && key !== null) content.append(keyFragment(key));
+        content.append(primitiveFragment(value, key, refBase));
+        if (!last) content.append(token('json-punctuation', ','));
+        const row = makeLine(depth, content);
+        wrapper.append(row.line);
+        return wrapper;
+      }
+
+      const open = isArray ? '[' : '{';
+      const close = isArray ? ']' : '}';
+      const entries = isArray ? value.map((child, index) => [String(index), child]) : Object.entries(value);
+
+      const openContent = document.createDocumentFragment();
+      if (!isRoot && key !== null) openContent.append(keyFragment(key));
+      openContent.append(token('json-punctuation', open));
+      const foldSummary = token('json-fold-summary', ` … ${entries.length} ${entries.length === 1 ? 'item' : 'items'} ${close}${last ? '' : ','}`);
+      openContent.append(foldSummary);
+      const openRow = makeLine(depth, openContent, 'json-open-line');
+
+      const toggle = document.createElement('button');
+      toggle.className = 'json-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', `Collapse ${key ?? 'root'}`);
+      toggle.innerHTML = '<svg aria-hidden="true" viewBox="0 0 12 12"><path d="m3 4 3 3 3-3"/></svg>';
+      openRow.gutter.append(toggle);
+
+      const children = document.createElement('div');
+      children.className = 'json-children';
+      entries.forEach(([childKey, childValue], index) => {
+        const actualKey = isArray ? null : childKey;
+        children.append(renderNode(childValue, actualKey, depth + 1, index === entries.length - 1));
+      });
+
+      const closeContent = document.createDocumentFragment();
+      closeContent.append(token('json-punctuation', close));
+      if (!last) closeContent.append(token('json-punctuation', ','));
+      const closeRow = makeLine(depth, closeContent, 'json-close-line');
+
+      wrapper.append(openRow.line, children, closeRow.line);
+
+      const setCollapsed = (collapsed) => {
+        wrapper.classList.toggle('is-collapsed', collapsed);
+        children.hidden = collapsed;
+        closeRow.line.hidden = collapsed;
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.setAttribute('aria-label', `${collapsed ? 'Expand' : 'Collapse'} ${key ?? 'root'}`);
+        updateLineNumbers(viewer);
+      };
+
+      toggle.addEventListener('click', () => setCollapsed(!wrapper.classList.contains('is-collapsed')));
+      wrapper._setCollapsed = setCollapsed;
+      return wrapper;
+    }
+
+    root.append(renderNode(data, null, 0, true, true));
+    // Open the document structure, but fold deeper objects by default so the
+    // first view reads like JSON rather than a wall of hundreds of lines.
+    viewer.querySelectorAll('.json-node').forEach((node) => {
+      const depth = Number(node.dataset.depth || '0');
+      if (depth >= 2 && node._setCollapsed) node._setCollapsed(true);
+    });
+    viewer._jsonState = state;
+    updateLineNumbers(viewer);
   }
 
-  document.addEventListener('click', (event) => {
-    const link = event.target.closest('a[href^="#"]');
-    if (!link) return;
-    const target = document.querySelector(link.getAttribute('href'));
-    if (target) {
-      target.hidden = false;
-      openAncestors(target);
+  function updateLineNumbers(viewer) {
+    let index = 1;
+    viewer.querySelectorAll('.json-line').forEach((line) => {
+      const hidden = line.hidden || line.closest('.json-children[hidden]');
+      const number = line.querySelector('.json-line-number');
+      if (!number) return;
+      number.textContent = hidden ? '' : String(index++);
+    });
+  }
+
+  async function loadViewer(viewer) {
+    const inlineId = viewer.dataset.jsonInline;
+    if (inlineId) {
+      const script = document.getElementById(inlineId);
+      if (!script) throw new Error(`Missing inline JSON source: ${inlineId}`);
+      return JSON.parse(script.textContent);
+    }
+    const url = viewer.dataset.schemaUrl;
+    if (!url) throw new Error('Missing schema URL');
+    const response = await fetch(url, { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`Unable to load schema (${response.status})`);
+    return response.json();
+  }
+
+  const controlsFor = (viewer) => {
+    const section = viewer.closest('.reference-simple-section') || viewer.parentElement;
+    return {
+      expand: section.querySelector('[data-expand-json]'),
+      collapse: section.querySelector('[data-collapse-json]'),
+      copy: section.querySelector('[data-copy-json]'),
+      status: section.querySelector('[data-schema-status]')
+    };
+  };
+
+  viewers.forEach(async (viewer) => {
+    const controls = controlsFor(viewer);
+    try {
+      const data = await loadViewer(viewer);
+      renderJson(viewer, data);
+      if (controls.status) controls.status.textContent = `${Object.keys(data).length} top-level schema keywords`;
+
+      controls.expand?.addEventListener('click', () => {
+        viewer.querySelectorAll('.json-node').forEach((node) => node._setCollapsed?.(false));
+        updateLineNumbers(viewer);
+      });
+
+      controls.collapse?.addEventListener('click', () => {
+        const nodes = [...viewer.querySelectorAll('.json-node')];
+        nodes.forEach((node, index) => {
+          if (node._setCollapsed) node._setCollapsed(index !== 0);
+        });
+        updateLineNumbers(viewer);
+      });
+
+      controls.copy?.addEventListener('click', async () => {
+        try {
+          await copyText(JSON.stringify(data, null, 2));
+          const original = controls.copy.textContent;
+          controls.copy.textContent = 'Copied';
+          setTimeout(() => { controls.copy.textContent = original; }, 1300);
+        } catch {
+          controls.copy.textContent = 'Copy failed';
+        }
+      });
+    } catch (error) {
+      viewer.innerHTML = `<div class="json-error">${String(error.message || error)}</div>`;
+      if (controls.status) controls.status.textContent = 'Schema unavailable';
     }
   });
-
-  window.addEventListener('hashchange', revealHash);
-  revealHash();
 })();
