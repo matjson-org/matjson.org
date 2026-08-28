@@ -1,14 +1,14 @@
 {
   "matjson_registry": "0.1",
-  "status": "draft",
-  "generated": "2026-08-25",
+  "status": "working_draft",
+  "generated": "2026-08-28",
   "profiles": [
     {
       "profile": "core",
       "version": "0.1",
       "schema": "https://matjson.org/schema/core/0.1/schema.json",
       "local_path": "/schema/core/0.1/schema.json",
-      "status": "tbc",
+      "status": "working_draft",
       "reference": "https://matjson.org/reference/core/"
     },
     {
@@ -16,7 +16,7 @@
       "version": "0.2.10",
       "schema": "https://matjson.org/schema/matspec/0.2.10/schema.json",
       "local_path": "/schema/matspec/0.2.10/schema.json",
-      "status": "draft",
+      "status": "working_draft",
       "reference": "https://matjson.org/reference/matspec/"
     },
     {
@@ -24,7 +24,7 @@
       "version": "0.2",
       "schema": "https://matjson.org/schema/matreq/0.2/schema.json",
       "local_path": "/schema/matreq/0.2/schema.json",
-      "status": "draft",
+      "status": "working_draft",
       "reference": "https://matjson.org/reference/matreq/"
     },
     {
@@ -32,7 +32,7 @@
       "version": "0.1",
       "schema": "https://matjson.org/schema/matrecord/0.1/schema.json",
       "local_path": "/schema/matrecord/0.1/schema.json",
-      "status": "tbc",
+      "status": "working_draft",
       "reference": "https://matjson.org/reference/matrecord/"
     },
     {
@@ -40,7 +40,7 @@
       "version": "0.1",
       "schema": "https://matjson.org/schema/matcheck/0.1/schema.json",
       "local_path": "/schema/matcheck/0.1/schema.json",
-      "status": "tbc",
+      "status": "working_draft",
       "reference": "https://matjson.org/reference/matcheck/"
     }
   ]

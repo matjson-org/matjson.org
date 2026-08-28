@@ -4,36 +4,856 @@
     "version": "0.1"
   },
   "record": {
-    "id": "MJR-2026-0001",
-    "document_type": "CMTR",
-    "issuer": "Example Mill",
-    "issued": "2026-08-24",
-    "source_file": "synthetic-cmtr.pdf"
+    "id": "record-syn-plate-001",
+    "record_type": "material_evidence_package",
+    "title": "Synthetic plate MTR and third-party impact report",
+    "status": "reviewed",
+    "created_at": "2026-08-26T12:00:00Z",
+    "source_package_label": "Synthetic example only",
+    "languages": [
+      "en"
+    ]
   },
+  "files": [
+    {
+      "id": "file-plate-mtr",
+      "filename": "synthetic-plate-mtr.pdf",
+      "media_type": "application/pdf",
+      "page_count": 2
+    },
+    {
+      "id": "file-impact",
+      "filename": "synthetic-impact-report.pdf",
+      "media_type": "application/pdf",
+      "page_count": 1
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-plate-mtr",
+      "file_ref": "file-plate-mtr",
+      "document_type": "mill_test_certificate",
+      "title": "Synthetic Plate Test Certificate",
+      "document_number": "MTC-SYN-1001",
+      "issue_date": "2026-01-15",
+      "issuer_party_ref": "party-example-mill",
+      "page_ranges": [
+        {
+          "start": 1,
+          "end": 2
+        }
+      ],
+      "subject_material_refs": [
+        "mat-heat-h100",
+        "mat-plate-p100"
+      ],
+      "evidence_refs": [
+        "ev-plate-header"
+      ]
+    },
+    {
+      "id": "doc-impact",
+      "file_ref": "file-impact",
+      "document_type": "impact_test_report",
+      "title": "Synthetic Charpy V-Notch Report",
+      "document_number": "LAB-SYN-220",
+      "issue_date": "2026-01-18",
+      "issuer_party_ref": "party-example-lab",
+      "page_ranges": [
+        {
+          "start": 1,
+          "end": 1
+        }
+      ],
+      "subject_material_refs": [
+        "mat-coupon-c100"
+      ],
+      "evidence_refs": [
+        "ev-impact-header"
+      ]
+    }
+  ],
+  "parties": [
+    {
+      "id": "party-example-mill",
+      "name": "Example Plate Mill",
+      "roles": [
+        "mill",
+        "material_manufacturer",
+        "document_submitter"
+      ],
+      "evidence_refs": [
+        "ev-plate-header"
+      ]
+    },
+    {
+      "id": "party-example-lab",
+      "name": "Example Independent Laboratory",
+      "roles": [
+        "laboratory",
+        "document_submitter"
+      ],
+      "evidence_refs": [
+        "ev-impact-header"
+      ]
+    },
+    {
+      "id": "party-example-purchaser",
+      "name": "Example Purchaser",
+      "roles": [
+        "purchaser",
+        "reviewer"
+      ],
+      "evidence_refs": [
+        "ev-review-stamp"
+      ]
+    }
+  ],
+  "business_references": [
+    {
+      "id": "br-po-100",
+      "type": "purchase_order",
+      "value": "PO-SYN-100",
+      "issuer_party_ref": "party-example-purchaser",
+      "evidence_refs": [
+        "ev-plate-header"
+      ]
+    }
+  ],
+  "document_relations": [
+    {
+      "id": "dr-impact-supports",
+      "subject_document_ref": "doc-impact",
+      "relation": "supplements",
+      "object_document_ref": "doc-plate-mtr",
+      "evidence_refs": [
+        "ev-impact-header"
+      ]
+    }
+  ],
   "materials": [
     {
-      "specification": "MJ-100",
-      "grade": "A",
-      "heat": "H-EXAMPLE",
-      "lot": "L-01",
-      "product_form": "plate",
-      "chemistry": {
-        "X": {
-          "value": 1.5,
-          "unit": "wt%"
+      "id": "mat-heat-h100",
+      "entity_type": "heat",
+      "description": "Synthetic steel heat",
+      "identifiers": [
+        {
+          "type": "heat",
+          "value": "H-SYN-100",
+          "evidence_refs": [
+            "ev-heat-id"
+          ]
         }
+      ],
+      "manufacturer_party_refs": [
+        "party-example-mill"
+      ],
+      "evidence_refs": [
+        "ev-heat-id"
+      ]
+    },
+    {
+      "id": "mat-plate-p100",
+      "entity_type": "plate",
+      "description": "Synthetic normalized carbon-steel plate",
+      "identifiers": [
+        {
+          "type": "plate",
+          "value": "P-SYN-100",
+          "evidence_refs": [
+            "ev-plate-id"
+          ]
+        }
+      ],
+      "manufacturer_party_refs": [
+        "party-example-mill"
+      ],
+      "product_form": {
+        "code": "plate",
+        "label": "Plate"
       },
-      "mechanical": {},
-      "heat_treatment": [],
-      "tests": []
+      "dimensions": [
+        {
+          "name": {
+            "code": "thickness"
+          },
+          "nominal": {
+            "kind": "quantity",
+            "value": 25.0,
+            "unit": "mm"
+          },
+          "evidence_refs": [
+            "ev-plate-dims"
+          ]
+        },
+        {
+          "name": {
+            "code": "width"
+          },
+          "nominal": {
+            "kind": "quantity",
+            "value": 2000.0,
+            "unit": "mm"
+          },
+          "evidence_refs": [
+            "ev-plate-dims"
+          ]
+        },
+        {
+          "name": {
+            "code": "length"
+          },
+          "nominal": {
+            "kind": "quantity",
+            "value": 6000.0,
+            "unit": "mm"
+          },
+          "evidence_refs": [
+            "ev-plate-dims"
+          ]
+        }
+      ],
+      "condition": {
+        "terms": [
+          {
+            "code": "normalized"
+          }
+        ],
+        "raw": "Normalized",
+        "evidence_refs": [
+          "ev-ht"
+        ]
+      },
+      "specification_claim_refs": [
+        "spec-sa516-70"
+      ],
+      "process_refs": [
+        "proc-normalize"
+      ],
+      "business_reference_refs": [
+        "br-po-100"
+      ],
+      "evidence_refs": [
+        "ev-plate-id",
+        "ev-plate-dims"
+      ]
+    },
+    {
+      "id": "mat-coupon-c100",
+      "entity_type": "coupon",
+      "description": "Impact test coupon from synthetic plate",
+      "identifiers": [
+        {
+          "type": "coupon",
+          "value": "C-SYN-100",
+          "evidence_refs": [
+            "ev-impact-header"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "ev-impact-header"
+      ]
+    }
+  ],
+  "material_relations": [
+    {
+      "id": "mr-plate-heat",
+      "subject_material_ref": "mat-plate-p100",
+      "relation": "derived_from",
+      "object_material_ref": "mat-heat-h100",
+      "evidence_refs": [
+        "ev-heat-id"
+      ]
+    },
+    {
+      "id": "mr-coupon-plate",
+      "subject_material_ref": "mat-coupon-c100",
+      "relation": "sampled_from",
+      "object_material_ref": "mat-plate-p100",
+      "evidence_refs": [
+        "ev-impact-header"
+      ]
+    }
+  ],
+  "specification_claims": [
+    {
+      "id": "spec-sa516-70",
+      "material_refs": [
+        "mat-plate-p100"
+      ],
+      "issuer_party_ref": "party-example-mill",
+      "claim_type": "material_specification",
+      "specification": {
+        "organization": "ASME",
+        "designation": "SA-516/SA-516M",
+        "edition": "2025"
+      },
+      "grade": "70",
+      "product_form": "plate",
+      "raw_text": "ASME SA-516/SA-516M Grade 70",
+      "matspec_uri": "https://example.invalid/matspec/asme-bpvc-2025-sa516.matspec.json",
+      "evidence_refs": [
+        "ev-spec"
+      ]
+    }
+  ],
+  "processes": [
+    {
+      "id": "proc-normalize",
+      "process_type": "normalizing",
+      "role": "final",
+      "subject_material_refs": [
+        "mat-plate-p100"
+      ],
+      "performed_by_party_ref": "party-example-mill",
+      "stages": [
+        {
+          "id": "stage-normalize-hold",
+          "action": "hold",
+          "temperature": {
+            "kind": "quantity",
+            "value": 900,
+            "unit": "degC"
+          },
+          "duration": {
+            "kind": "quantity",
+            "value": 30,
+            "unit": "min"
+          },
+          "evidence_refs": [
+            "ev-ht"
+          ]
+        },
+        {
+          "id": "stage-normalize-cool",
+          "action": "air_cool",
+          "evidence_refs": [
+            "ev-ht"
+          ]
+        }
+      ],
+      "raw_description": "Normalized at 900 degC for 30 min, air cooled",
+      "evidence_refs": [
+        "ev-ht"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "test-chem-h100",
+      "category": "chemical",
+      "test_type": {
+        "code": "chemical_analysis",
+        "label": "Heat analysis"
+      },
+      "subject_material_refs": [
+        "mat-heat-h100"
+      ],
+      "performed_by_party_ref": "party-example-mill",
+      "analysis_basis": "heat",
+      "sampling": {
+        "basis": "heat",
+        "frequency": "one analysis for the heat",
+        "evidence_refs": [
+          "ev-chem"
+        ]
+      },
+      "results": [
+        {
+          "id": "res-c",
+          "property": {
+            "code": "mass_fraction"
+          },
+          "analyte": {
+            "code": "C",
+            "label": "Carbon"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 0.18,
+            "unit": "wt%"
+          },
+          "evidence_refs": [
+            "ev-chem"
+          ]
+        },
+        {
+          "id": "res-mn",
+          "property": {
+            "code": "mass_fraction"
+          },
+          "analyte": {
+            "code": "Mn",
+            "label": "Manganese"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 1.05,
+            "unit": "wt%"
+          },
+          "evidence_refs": [
+            "ev-chem"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "ev-chem"
+      ]
+    },
+    {
+      "id": "test-tension-p100",
+      "category": "mechanical",
+      "test_type": {
+        "code": "tension",
+        "label": "Tension test"
+      },
+      "subject_material_refs": [
+        "mat-plate-p100"
+      ],
+      "performed_by_party_ref": "party-example-mill",
+      "sampling": {
+        "basis": "lot",
+        "frequency": "one transverse specimen",
+        "orientation": "transverse",
+        "evidence_refs": [
+          "ev-tension"
+        ]
+      },
+      "results": [
+        {
+          "id": "res-yield-p100",
+          "property": {
+            "code": "yield_strength_0.2_percent_offset"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 320,
+            "unit": "MPa"
+          },
+          "orientation": "transverse",
+          "evidence_refs": [
+            "ev-tension"
+          ]
+        },
+        {
+          "id": "res-tensile-p100",
+          "property": {
+            "code": "tensile_strength"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 520,
+            "unit": "MPa"
+          },
+          "orientation": "transverse",
+          "evidence_refs": [
+            "ev-tension"
+          ]
+        },
+        {
+          "id": "res-elong-p100",
+          "property": {
+            "code": "elongation"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 24,
+            "unit": "%",
+            "basis": "50 mm gauge length"
+          },
+          "orientation": "transverse",
+          "evidence_refs": [
+            "ev-tension"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "ev-tension"
+      ]
+    },
+    {
+      "id": "test-charpy-c100",
+      "category": "impact",
+      "test_type": {
+        "code": "charpy_v_notch",
+        "label": "Charpy V-notch"
+      },
+      "method_refs": [
+        {
+          "organization": "ASTM",
+          "designation": "A370"
+        }
+      ],
+      "subject_material_refs": [
+        "mat-coupon-c100"
+      ],
+      "performed_by_party_ref": "party-example-lab",
+      "conditions": [
+        {
+          "parameter": {
+            "code": "test_temperature"
+          },
+          "value": {
+            "kind": "quantity",
+            "value": -29,
+            "unit": "degC"
+          },
+          "evidence_refs": [
+            "ev-impact-results"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "id": "res-cvn-1",
+          "property": {
+            "code": "absorbed_energy"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 42,
+            "unit": "J"
+          },
+          "statistic": "individual",
+          "evidence_refs": [
+            "ev-impact-results"
+          ]
+        },
+        {
+          "id": "res-cvn-2",
+          "property": {
+            "code": "absorbed_energy"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 47,
+            "unit": "J"
+          },
+          "statistic": "individual",
+          "evidence_refs": [
+            "ev-impact-results"
+          ]
+        },
+        {
+          "id": "res-cvn-3",
+          "property": {
+            "code": "absorbed_energy"
+          },
+          "result_role": "measured",
+          "value": {
+            "kind": "quantity",
+            "value": 45,
+            "unit": "J"
+          },
+          "statistic": "individual",
+          "evidence_refs": [
+            "ev-impact-results"
+          ]
+        },
+        {
+          "id": "res-cvn-avg",
+          "property": {
+            "code": "absorbed_energy"
+          },
+          "result_role": "calculated",
+          "value": {
+            "kind": "quantity",
+            "value": 44.7,
+            "unit": "J"
+          },
+          "statistic": "average",
+          "calculation": {
+            "formula": "mean(res-cvn-1,res-cvn-2,res-cvn-3)"
+          },
+          "evidence_refs": [
+            "ev-impact-results"
+          ]
+        }
+      ],
+      "reported_disposition": {
+        "status": "satisfactory",
+        "raw": "ACCEPTABLE",
+        "evidence_refs": [
+          "ev-impact-results"
+        ]
+      },
+      "evidence_refs": [
+        "ev-impact-results"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-fine-grain",
+      "claim_type": {
+        "code": "fine_grain_practice"
+      },
+      "subject_material_refs": [
+        "mat-heat-h100"
+      ],
+      "issuer_party_ref": "party-example-mill",
+      "statement": "Fine grain practice",
+      "value": {
+        "kind": "boolean",
+        "value": true
+      },
+      "evidence_refs": [
+        "ev-claim"
+      ]
+    }
+  ],
+  "attestations": [
+    {
+      "id": "att-mill-cert",
+      "document_ref": "doc-plate-mtr",
+      "issuer_party_ref": "party-example-mill",
+      "attestation_type": "test_report_certification",
+      "statement": "The reported material was manufactured and tested in accordance with the stated specification.",
+      "authentication": {
+        "method": "wet_signature",
+        "status": "present"
+      },
+      "evidence_refs": [
+        "ev-signature"
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "id": "ann-review",
+      "document_ref": "doc-impact",
+      "annotator_party_ref": "party-example-purchaser",
+      "annotation_type": "review_stamp",
+      "text": "Reviewed",
+      "date": "2026-01-20",
+      "targets": [
+        {
+          "kind": "document",
+          "ref": "doc-impact"
+        }
+      ],
+      "evidence_refs": [
+        "ev-review-stamp"
+      ]
     }
   ],
   "evidence": [
     {
-      "type": "CMTR",
-      "reference": "MJR-2026-0001",
-      "extraction_confidence": 1.0
+      "id": "ev-plate-header",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "document_metadata",
+      "page": 1,
+      "locator": {
+        "label": "certificate header"
+      },
+      "raw_text": "Synthetic Plate Test Certificate MTC-SYN-1001",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-impact-header",
+      "document_ref": "doc-impact",
+      "evidence_type": "document_metadata",
+      "page": 1,
+      "locator": {
+        "label": "report header"
+      },
+      "raw_text": "Synthetic Charpy V-Notch Report",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-heat-id",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_cell",
+      "page": 1,
+      "locator": {
+        "label": "heat number"
+      },
+      "raw_text": "H-SYN-100",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-plate-id",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_cell",
+      "page": 1,
+      "locator": {
+        "label": "plate number"
+      },
+      "raw_text": "P-SYN-100",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-plate-dims",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_row",
+      "page": 1,
+      "locator": {
+        "table": "dimensions"
+      },
+      "raw_text": "25 x 2000 x 6000 mm",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-spec",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "source_text",
+      "page": 1,
+      "locator": {
+        "label": "specification"
+      },
+      "raw_text": "ASME SA-516/SA-516M Grade 70",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-ht",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_row",
+      "page": 2,
+      "locator": {
+        "table": "heat treatment"
+      },
+      "raw_text": "Normalized 900 degC 30 min air cool",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-chem",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_row",
+      "page": 1,
+      "locator": {
+        "table": "chemical composition"
+      },
+      "raw_text": "C 0.18 Mn 1.05",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-tension",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "table_row",
+      "page": 2,
+      "locator": {
+        "table": "tensile properties"
+      },
+      "raw_text": "YS 320 MPa TS 520 MPa El 24%",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-impact-results",
+      "document_ref": "doc-impact",
+      "evidence_type": "table_row",
+      "page": 1,
+      "locator": {
+        "table": "Charpy results"
+      },
+      "raw_text": "-29 degC: 42, 47, 45 J; acceptable",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-claim",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "source_text",
+      "page": 1,
+      "locator": {
+        "label": "manufacture statement"
+      },
+      "raw_text": "Fine grain practice",
+      "extraction": {
+        "method": "manual_transcription",
+        "confidence": 1.0,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-signature",
+      "document_ref": "doc-plate-mtr",
+      "evidence_type": "signature",
+      "page": 2,
+      "locator": {
+        "label": "authorized signature"
+      },
+      "extraction": {
+        "method": "assisted_vision",
+        "confidence": 0.99,
+        "reviewed": true
+      }
+    },
+    {
+      "id": "ev-review-stamp",
+      "document_ref": "doc-impact",
+      "evidence_type": "stamp",
+      "page": 1,
+      "locator": {
+        "label": "purchaser review stamp"
+      },
+      "raw_text": "Reviewed",
+      "extraction": {
+        "method": "assisted_vision",
+        "confidence": 0.99,
+        "reviewed": true
+      }
     }
+  ],
+  "provenance": {
+    "normalized_at": "2026-08-26T12:00:00Z",
+    "normalization_method": "assisted",
+    "tool": "MatJSON synthetic example generator",
+    "tool_version": "0.1",
+    "source_file_refs": [
+      "file-plate-mtr",
+      "file-impact"
+    ],
+    "review_status": "checked"
+  },
+  "notes": [
+    "Synthetic public example. It does not reproduce any proprietary or copyrighted certificate."
   ],
   "extensions": {}
 }

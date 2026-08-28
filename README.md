@@ -22,12 +22,15 @@ The folder can be deployed directly to GitHub Pages, Cloudflare Pages, Netlify, 
 
 - Full responsive website and documentation pages
 - Lottie-style formatted JSON Schema documentation with stable definition anchors, clickable `$ref` targets, and dedicated definition field guides
-- Current MatSpecJSON v0.2.10 schema
-- Current MatReqJSON v0.2 schema
-- Draft Core plus concept/WIP MatRecord and MatCheck placeholder schemas
+- Working-draft MatSpecJSON v0.2.10 schema
+- Working-draft MatReqJSON v0.2 schema
+- Working-draft MatJSON Core v0.1 schema
+- Working-draft MatRecordJSON v0.1 schema
+- Working-draft MatCheckJSON v0.1 schema
+- Lowercase `snake_case` MatJSON-controlled structural names across all five published schemas
 - Synthetic examples
 - Project-context Markdown
-- Sitemap, robots file, CNAME placeholder, Netlify and Vercel configuration
+- Sitemap, robots file, CNAME, Netlify and Vercel configuration
 
 ## Intentionally excluded
 
@@ -47,7 +50,7 @@ Website/source repository: https://github.com/matjson-org/matjson.org
 
 ## Cache-busting
 
-Static CSS and JavaScript references include a release query version (`v=20260826-13`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
+Static CSS and JavaScript references include a release query version (`v=20260828-14`) so Cloudflare/browser caches do not serve stale assets after deployment. Bump this value when shared CSS/JS changes.
 
 
 ## Search indexing
@@ -57,4 +60,4 @@ The deployed site includes canonical URLs, Open Graph/Twitter metadata, Schema.o
 
 ## Schema reference
 
-Human-readable reference pages are published under `/reference/`. They show the actual JSON Schema as one formatted document. Highlighted definition names create stable anchors, and internal `$ref` values jump directly to their targets in the same schema. The pages are generated from the canonical versioned schema files. After changing a published schema, run `python tools/build_schema_reference.py` before committing the website. MatSpecJSON v0.2.10 remains unchanged in this release.
+Human-readable reference pages are published under `/reference/`. They show the actual JSON Schema as one formatted document. Highlighted definition names create stable anchors, and internal `$ref` values jump directly to their targets in the same schema. The pages are generated from the canonical versioned schema files. After changing a published schema, run `python tools/build_schema_reference.py` before committing the website. All five published profiles are substantive working drafts in this release. MatCheckJSON v0.1 already consumes MatJSON Core v0.1; the next major revisions of MatSpecJSON, MatReqJSON, MatRecordJSON, and MatCheckJSON will progressively migrate genuinely shared primitives into Core without retroactively changing the current draft documents.

@@ -133,7 +133,7 @@
     "required_tests": {
       "oneOf": [
         {
-          "$ref": "#/$defs/notExtracted"
+          "$ref": "#/$defs/not_extracted"
         },
         {
           "type": "array",
@@ -146,7 +146,7 @@
     "supplementary_requirements": {
       "oneOf": [
         {
-          "$ref": "#/$defs/notExtracted"
+          "$ref": "#/$defs/not_extracted"
         },
         {
           "type": "array",
@@ -161,16 +161,24 @@
       "description": "Note id to text. Values reference these by id.",
       "additionalProperties": {
         "type": "string"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+        "description": "MatSpecJSON note identifiers use lowercase snake_case."
       }
     },
     "extensions": {
       "type": "object",
-      "description": "Implementation-specific data. NOT part of the conformance surface - a conforming reader ignores it. Use this for workflow state that belongs to your process rather than to the specification: review status, internal ids, routing. Verification of a file's accuracy lives here or outside the file entirely, because it is an assertion about an instance by a party in a workflow, not a property of the specification being described.",
-      "additionalProperties": true
+      "description": "Implementation-specific data. NOT part of the conformance surface - a conforming reader ignores it. Use this for workflow state that belongs to your process rather than to the specification: review status, internal ids, routing. Verification of a file's accuracy lives here or outside the file entirely, because it is an assertion about an instance by a party in a workflow, not a property of the specification being described. MatJSON-controlled extension keys use lowercase snake_case; exact external/domain identifiers may retain their published notation inside extension payloads.",
+      "additionalProperties": true,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+        "description": "Extension namespace keys use lowercase snake_case."
+      }
     }
   },
   "$defs": {
-    "notExtracted": {
+    "not_extracted": {
       "type": "object",
       "required": [
         "extracted",
@@ -243,7 +251,7 @@
           ]
         },
         "applies_when": {
-          "$ref": "#/$defs/appliesWhen"
+          "$ref": "#/$defs/applies_when"
         },
         "notes": {
           "type": "array",
@@ -281,7 +289,7 @@
         }
       ]
     },
-    "valueSet": {
+    "value_set": {
       "type": "object",
       "description": "Sibling values in different unit systems. Not conversions - both are specified in the source.",
       "required": [
@@ -320,7 +328,7 @@
         }
       }
     },
-    "appliesWhen": {
+    "applies_when": {
       "type": "object",
       "description": "Selector. Every present key must match for the value to apply.",
       "additionalProperties": false,
@@ -465,7 +473,7 @@
         "chemistry": {
           "oneOf": [
             {
-              "$ref": "#/$defs/notExtracted"
+              "$ref": "#/$defs/not_extracted"
             },
             {
               "type": "object",
@@ -480,7 +488,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                      "$ref": "#/$defs/valueOrAlternatives"
+                      "$ref": "#/$defs/value_or_alternatives"
                     },
                     "description": "Element symbol to an ARRAY of bounds. A member may be a value or an {'any_of': [...]} alternatives object - SA-516 Grade 60 manganese is a real case: Table 1 footnote C permits either of two ranges, and modelling them as two array members would make a checker demand both and reject conforming material."
                   }
@@ -506,7 +514,7 @@
               "description": "The specification imposes no mechanical property requirement. SA-179 is a real example: its tensile figures are EXPLANATORY NOTE design assumptions, not acceptance criteria."
             },
             {
-              "$ref": "#/$defs/notExtracted"
+              "$ref": "#/$defs/not_extracted"
             },
             {
               "type": "object",
@@ -518,10 +526,10 @@
                       "description": "The specification imposes no requirement for this property."
                     },
                     {
-                      "$ref": "#/$defs/notExtracted"
+                      "$ref": "#/$defs/not_extracted"
                     },
                     {
-                      "$ref": "#/$defs/valueSet"
+                      "$ref": "#/$defs/value_set"
                     }
                   ]
                 },
@@ -532,10 +540,10 @@
                       "description": "The specification imposes no requirement for this property."
                     },
                     {
-                      "$ref": "#/$defs/notExtracted"
+                      "$ref": "#/$defs/not_extracted"
                     },
                     {
-                      "$ref": "#/$defs/valueSet"
+                      "$ref": "#/$defs/value_set"
                     }
                   ]
                 },
@@ -546,7 +554,7 @@
                       "description": "The specification imposes no requirement for this property."
                     },
                     {
-                      "$ref": "#/$defs/notExtracted"
+                      "$ref": "#/$defs/not_extracted"
                     },
                     {
                       "type": "array",
@@ -563,7 +571,7 @@
                       "description": "The specification imposes no requirement for this property."
                     },
                     {
-                      "$ref": "#/$defs/notExtracted"
+                      "$ref": "#/$defs/not_extracted"
                     },
                     {
                       "type": "array",
@@ -575,7 +583,7 @@
                 }
               },
               "additionalProperties": false,
-              "description": "Mechanical property requirements. additionalProperties is false so that a notExtracted object {extracted:false, note:...} matches exactly one branch of the oneOf. Without it the two branches are both satisfied and the oneOf fails - the object is ambiguous, not invalid. SB-366 is the case: it states no mechanical table of its own and sends properties to the source material specification."
+              "description": "Mechanical property requirements. additionalProperties is false so that a not_extracted object {extracted:false, note:...} matches exactly one branch of the oneOf. Without it the two branches are both satisfied and the oneOf fails - the object is ambiguous, not invalid. SB-366 is the case: it states no mechanical table of its own and sends properties to the source material specification."
             }
           ]
         },
@@ -586,12 +594,12 @@
               "description": "The specification imposes no hardness requirement."
             },
             {
-              "$ref": "#/$defs/notExtracted"
+              "$ref": "#/$defs/not_extracted"
             },
             {
               "type": "array",
               "items": {
-                "$ref": "#/$defs/valueOrAlternatives"
+                "$ref": "#/$defs/value_or_alternatives"
               }
             }
           ]
@@ -603,7 +611,7 @@
               "description": "The specification imposes no impact requirement."
             },
             {
-              "$ref": "#/$defs/notExtracted"
+              "$ref": "#/$defs/not_extracted"
             },
             {
               "type": "object",
@@ -622,7 +630,7 @@
                 "test_temperature": {
                   "oneOf": [
                     {
-                      "$ref": "#/$defs/valueSet"
+                      "$ref": "#/$defs/value_set"
                     },
                     {
                       "type": "object",
@@ -667,7 +675,7 @@
               "type": "null"
             },
             {
-              "$ref": "#/$defs/notExtracted"
+              "$ref": "#/$defs/not_extracted"
             },
             {
               "type": "array",
@@ -686,11 +694,11 @@
                   "temperature": {
                     "oneOf": [
                       {
-                        "$ref": "#/$defs/notExtracted",
+                        "$ref": "#/$defs/not_extracted",
                         "description": "The specification states no temperature for this grade - SA-182 Table 1 gives 'not specified' for F 6a - or the value was not captured."
                       },
                       {
-                        "$ref": "#/$defs/valueSet"
+                        "$ref": "#/$defs/value_set"
                       }
                     ]
                   },
@@ -698,7 +706,7 @@
                     "type": "string"
                   },
                   "applies_when": {
-                    "$ref": "#/$defs/appliesWhen"
+                    "$ref": "#/$defs/applies_when"
                   },
                   "source": {
                     "type": "string"
@@ -771,12 +779,12 @@
           "type": "string"
         },
         "applies_when": {
-          "$ref": "#/$defs/appliesWhen",
+          "$ref": "#/$defs/applies_when",
           "description": "Selector for the alternatives block as a whole. SA-193 Table 2 is the case: hardness is banded by diameter AND offered on two scales, so the any_of needs its own applies_when. Without it, banded alternatives are indistinguishable to a checker."
         }
       }
     },
-    "valueOrAlternatives": {
+    "value_or_alternatives": {
       "oneOf": [
         {
           "$ref": "#/$defs/value"
@@ -787,7 +795,7 @@
       ]
     }
   },
-  "x-matjson-profile": "matspec",
-  "x-matjson-status": "draft",
-  "x-matjson-source": "MatJSON working schema; canonicalized for the matjson.org starter site."
+  "x_matjson_profile": "matspec",
+  "x_matjson_status": "working_draft",
+  "x_matjson_naming_convention": "snake_case"
 }

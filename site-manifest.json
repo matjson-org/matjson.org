@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-26",
+  "generated": "2026-08-28",
   "files": [
     {
       "path": ".nojekyll",
@@ -15,11 +15,11 @@
     },
     {
       "path": "README.md",
-      "bytes": 2923
+      "bytes": 3354
     },
     {
       "path": "about/index.html",
-      "bytes": 11611
+      "bytes": 11633
     },
     {
       "path": "assets/css/styles.css",
@@ -47,7 +47,7 @@
     },
     {
       "path": "assets/js/site.js",
-      "bytes": 11296
+      "bytes": 11376
     },
     {
       "path": "design/matjson-homepage-concept.png",
@@ -78,6 +78,10 @@
       "bytes": 1500
     },
     {
+      "path": "docs/IMPLEMENTATION_QA_V14.md",
+      "bytes": 3797
+    },
+    {
       "path": "docs/IMPLEMENTATION_QA_V9.md",
       "bytes": 1544
     },
@@ -87,7 +91,7 @@
     },
     {
       "path": "docs/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
-      "bytes": 22977
+      "bytes": 23312
     },
     {
       "path": "docs/REFERENCE_DOCS_V10.md",
@@ -106,6 +110,10 @@
       "bytes": 1055
     },
     {
+      "path": "docs/REFERENCE_DOCS_V14.md",
+      "bytes": 947
+    },
+    {
       "path": "docs/REFERENCE_DOCS_V7.md",
       "bytes": 956
     },
@@ -115,31 +123,31 @@
     },
     {
       "path": "downloads/MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md",
-      "bytes": 22977
+      "bytes": 23312
     },
     {
-      "path": "downloads/matcheck-v0.1-placeholder.schema.json",
-      "bytes": 2374
+      "path": "downloads/matcheck-v0.1.schema.json",
+      "bytes": 36674
     },
     {
-      "path": "downloads/matjson-core-v0.1-placeholder.schema.json",
-      "bytes": 1953
+      "path": "downloads/matjson-core-v0.1.schema.json",
+      "bytes": 23157
     },
     {
-      "path": "downloads/matrecord-v0.1-placeholder.schema.json",
-      "bytes": 2786
+      "path": "downloads/matrecord-v0.1.schema.json",
+      "bytes": 64189
     },
     {
       "path": "downloads/matreq-v0.2.schema.json",
-      "bytes": 32808
+      "bytes": 33463
     },
     {
       "path": "downloads/matspec-v0.2.10.schema.json",
-      "bytes": 23523
+      "bytes": 23999
     },
     {
       "path": "examples/index.html",
-      "bytes": 10040
+      "bytes": 10165
     },
     {
       "path": "examples/synthetic-alloy.matspec.json",
@@ -147,11 +155,11 @@
     },
     {
       "path": "examples/synthetic-compliance.matcheck.json",
-      "bytes": 762
+      "bytes": 4601
     },
     {
       "path": "examples/synthetic-mill-report.matrecord.json",
-      "bytes": 730
+      "bytes": 19992
     },
     {
       "path": "examples/synthetic-service.matreq.json",
@@ -159,15 +167,15 @@
     },
     {
       "path": "governance/index.html",
-      "bytes": 11029
+      "bytes": 11051
     },
     {
       "path": "guides/index.html",
-      "bytes": 10251
+      "bytes": 10273
     },
     {
       "path": "index.html",
-      "bytes": 22836
+      "bytes": 22942
     },
     {
       "path": "netlify.toml",
@@ -175,203 +183,587 @@
     },
     {
       "path": "profiles/core/index.html",
-      "bytes": 11307
+      "bytes": 11747
     },
     {
       "path": "profiles/matcheck/index.html",
-      "bytes": 11226
+      "bytes": 12223
     },
     {
       "path": "profiles/matrecord/index.html",
-      "bytes": 11402
+      "bytes": 12347
     },
     {
       "path": "profiles/matreq/index.html",
-      "bytes": 11684
+      "bytes": 12035
     },
     {
       "path": "profiles/matspec/index.html",
-      "bytes": 11571
+      "bytes": 11915
     },
     {
-      "path": "reference/core/definitions/expression/index.html",
-      "bytes": 12021
+      "path": "reference/core/definitions/actor/index.html",
+      "bytes": 22096
     },
     {
-      "path": "reference/core/definitions/extension-container/index.html",
-      "bytes": 12881
+      "path": "reference/core/definitions/array-value/index.html",
+      "bytes": 20962
     },
     {
-      "path": "reference/core/definitions/identifier/index.html",
-      "bytes": 11918
+      "path": "reference/core/definitions/boolean-value/index.html",
+      "bytes": 19529
     },
     {
-      "path": "reference/core/definitions/quantity/index.html",
-      "bytes": 19095
+      "path": "reference/core/definitions/calculation-spec/index.html",
+      "bytes": 27284
     },
     {
-      "path": "reference/core/definitions/source/index.html",
-      "bytes": 22710
+      "path": "reference/core/definitions/coded-term/index.html",
+      "bytes": 21846
+    },
+    {
+      "path": "reference/core/definitions/coded-value/index.html",
+      "bytes": 19570
+    },
+    {
+      "path": "reference/core/definitions/comparison-operator/index.html",
+      "bytes": 16181
+    },
+    {
+      "path": "reference/core/definitions/condition-expr/index.html",
+      "bytes": 31088
+    },
+    {
+      "path": "reference/core/definitions/condition-leaf/index.html",
+      "bytes": 20604
+    },
+    {
+      "path": "reference/core/definitions/content-hash/index.html",
+      "bytes": 32380
+    },
+    {
+      "path": "reference/core/definitions/document-identity/index.html",
+      "bytes": 29793
+    },
+    {
+      "path": "reference/core/definitions/evidence-locator/index.html",
+      "bytes": 24268
+    },
+    {
+      "path": "reference/core/definitions/extensions/index.html",
+      "bytes": 15154
+    },
+    {
+      "path": "reference/core/definitions/extraction/index.html",
+      "bytes": 28377
+    },
+    {
+      "path": "reference/core/definitions/local-id/index.html",
+      "bytes": 14208
+    },
+    {
+      "path": "reference/core/definitions/profile-envelope/index.html",
+      "bytes": 20666
+    },
+    {
+      "path": "reference/core/definitions/profile-name/index.html",
+      "bytes": 14932
+    },
+    {
+      "path": "reference/core/definitions/provenance/index.html",
+      "bytes": 36125
+    },
+    {
+      "path": "reference/core/definitions/quantity-value/index.html",
+      "bytes": 25727
+    },
+    {
+      "path": "reference/core/definitions/range-value/index.html",
+      "bytes": 27262
+    },
+    {
+      "path": "reference/core/definitions/record-object-ref/index.html",
+      "bytes": 29381
+    },
+    {
+      "path": "reference/core/definitions/region/index.html",
+      "bytes": 25125
+    },
+    {
+      "path": "reference/core/definitions/requirement-ref/index.html",
+      "bytes": 34992
+    },
+    {
+      "path": "reference/core/definitions/result-value/index.html",
+      "bytes": 15959
+    },
+    {
+      "path": "reference/core/definitions/rounding-rule/index.html",
+      "bytes": 24114
+    },
+    {
+      "path": "reference/core/definitions/scalar-value/index.html",
+      "bytes": 20148
+    },
+    {
+      "path": "reference/core/definitions/standard-reference/index.html",
+      "bytes": 39196
+    },
+    {
+      "path": "reference/core/definitions/text-value/index.html",
+      "bytes": 19476
+    },
+    {
+      "path": "reference/core/definitions/typed-identifier/index.html",
+      "bytes": 22677
+    },
+    {
+      "path": "reference/core/definitions/unavailable-value/index.html",
+      "bytes": 23461
+    },
+    {
+      "path": "reference/core/definitions/unit-conversion/index.html",
+      "bytes": 26509
     },
     {
       "path": "reference/core/index.html",
-      "bytes": 42328
+      "bytes": 398684
     },
     {
       "path": "reference/index.html",
-      "bytes": 10966
+      "bytes": 11081
+    },
+    {
+      "path": "reference/matcheck/definitions/activation-basis/index.html",
+      "bytes": 26791
+    },
+    {
+      "path": "reference/matcheck/definitions/aggregation-policy/index.html",
+      "bytes": 23058
+    },
+    {
+      "path": "reference/matcheck/definitions/calculation-input/index.html",
+      "bytes": 24805
+    },
+    {
+      "path": "reference/matcheck/definitions/calculation-record/index.html",
+      "bytes": 33309
+    },
+    {
+      "path": "reference/matcheck/definitions/check-metadata/index.html",
+      "bytes": 47094
+    },
+    {
+      "path": "reference/matcheck/definitions/comparison/index.html",
+      "bytes": 31160
+    },
+    {
+      "path": "reference/matcheck/definitions/effective-requirement/index.html",
+      "bytes": 63829
+    },
+    {
+      "path": "reference/matcheck/definitions/finding/index.html",
+      "bytes": 48296
+    },
+    {
+      "path": "reference/matcheck/definitions/finding-counts/index.html",
+      "bytes": 36310
+    },
+    {
+      "path": "reference/matcheck/definitions/input-document/index.html",
+      "bytes": 67082
+    },
+    {
+      "path": "reference/matcheck/definitions/mandatory-counts/index.html",
+      "bytes": 23395
+    },
+    {
+      "path": "reference/matcheck/definitions/observed-value/index.html",
+      "bytes": 27635
+    },
+    {
+      "path": "reference/matcheck/definitions/precedence/index.html",
+      "bytes": 26232
+    },
+    {
+      "path": "reference/matcheck/definitions/project-input/index.html",
+      "bytes": 37330
+    },
+    {
+      "path": "reference/matcheck/definitions/requirement-counts/index.html",
+      "bytes": 23487
+    },
+    {
+      "path": "reference/matcheck/definitions/requirement-resolution/index.html",
+      "bytes": 55767
+    },
+    {
+      "path": "reference/matcheck/definitions/review/index.html",
+      "bytes": 29692
+    },
+    {
+      "path": "reference/matcheck/definitions/review-override/index.html",
+      "bytes": 29664
+    },
+    {
+      "path": "reference/matcheck/definitions/selector-context/index.html",
+      "bytes": 30999
+    },
+    {
+      "path": "reference/matcheck/definitions/subject/index.html",
+      "bytes": 29576
+    },
+    {
+      "path": "reference/matcheck/definitions/summary/index.html",
+      "bytes": 34328
+    },
+    {
+      "path": "reference/matcheck/definitions/verification-plan/index.html",
+      "bytes": 33042
     },
     {
       "path": "reference/matcheck/index.html",
-      "bytes": 50530
+      "bytes": 586104
+    },
+    {
+      "path": "reference/matrecord/definitions/address/index.html",
+      "bytes": 23821
+    },
+    {
+      "path": "reference/matrecord/definitions/annotation/index.html",
+      "bytes": 36106
+    },
+    {
+      "path": "reference/matrecord/definitions/array-value/index.html",
+      "bytes": 24961
+    },
+    {
+      "path": "reference/matrecord/definitions/attestation/index.html",
+      "bytes": 35447
+    },
+    {
+      "path": "reference/matrecord/definitions/authentication/index.html",
+      "bytes": 25925
+    },
+    {
+      "path": "reference/matrecord/definitions/boolean-value/index.html",
+      "bytes": 20656
+    },
+    {
+      "path": "reference/matrecord/definitions/business-reference/index.html",
+      "bytes": 35307
+    },
+    {
+      "path": "reference/matrecord/definitions/calculation/index.html",
+      "bytes": 27333
+    },
+    {
+      "path": "reference/matrecord/definitions/certificate-classification/index.html",
+      "bytes": 21389
+    },
+    {
+      "path": "reference/matrecord/definitions/claim/index.html",
+      "bytes": 34506
+    },
+    {
+      "path": "reference/matrecord/definitions/coded-term/index.html",
+      "bytes": 23211
+    },
+    {
+      "path": "reference/matrecord/definitions/condition-parameter/index.html",
+      "bytes": 23129
+    },
+    {
+      "path": "reference/matrecord/definitions/dimension/index.html",
+      "bytes": 31294
+    },
+    {
+      "path": "reference/matrecord/definitions/document/index.html",
+      "bytes": 57370
+    },
+    {
+      "path": "reference/matrecord/definitions/document-relation/index.html",
+      "bytes": 31027
+    },
+    {
+      "path": "reference/matrecord/definitions/evidence/index.html",
+      "bytes": 39575
+    },
+    {
+      "path": "reference/matrecord/definitions/evidence-locator/index.html",
+      "bytes": 25370
+    },
+    {
+      "path": "reference/matrecord/definitions/extensions/index.html",
+      "bytes": 16821
+    },
+    {
+      "path": "reference/matrecord/definitions/extraction/index.html",
+      "bytes": 29176
+    },
+    {
+      "path": "reference/matrecord/definitions/marking/index.html",
+      "bytes": 24217
+    },
+    {
+      "path": "reference/matrecord/definitions/material/index.html",
+      "bytes": 80279
+    },
+    {
+      "path": "reference/matrecord/definitions/material-condition/index.html",
+      "bytes": 24224
+    },
+    {
+      "path": "reference/matrecord/definitions/material-relation/index.html",
+      "bytes": 33338
+    },
+    {
+      "path": "reference/matrecord/definitions/page-range/index.html",
+      "bytes": 21381
+    },
+    {
+      "path": "reference/matrecord/definitions/party/index.html",
+      "bytes": 43255
+    },
+    {
+      "path": "reference/matrecord/definitions/party-identifier/index.html",
+      "bytes": 22495
+    },
+    {
+      "path": "reference/matrecord/definitions/process/index.html",
+      "bytes": 57741
+    },
+    {
+      "path": "reference/matrecord/definitions/process-stage/index.html",
+      "bytes": 33885
+    },
+    {
+      "path": "reference/matrecord/definitions/property-result/index.html",
+      "bytes": 51580
+    },
+    {
+      "path": "reference/matrecord/definitions/provenance/index.html",
+      "bytes": 38302
+    },
+    {
+      "path": "reference/matrecord/definitions/quantity-value/index.html",
+      "bytes": 26852
+    },
+    {
+      "path": "reference/matrecord/definitions/range-value/index.html",
+      "bytes": 28389
+    },
+    {
+      "path": "reference/matrecord/definitions/record/index.html",
+      "bytes": 38800
+    },
+    {
+      "path": "reference/matrecord/definitions/region/index.html",
+      "bytes": 25707
+    },
+    {
+      "path": "reference/matrecord/definitions/reported-disposition/index.html",
+      "bytes": 27155
+    },
+    {
+      "path": "reference/matrecord/definitions/reported-limit/index.html",
+      "bytes": 31658
+    },
+    {
+      "path": "reference/matrecord/definitions/result-value/index.html",
+      "bytes": 21375
+    },
+    {
+      "path": "reference/matrecord/definitions/sampling/index.html",
+      "bytes": 30648
+    },
+    {
+      "path": "reference/matrecord/definitions/signer/index.html",
+      "bytes": 19661
+    },
+    {
+      "path": "reference/matrecord/definitions/source-file/index.html",
+      "bytes": 32888
+    },
+    {
+      "path": "reference/matrecord/definitions/specification-claim/index.html",
+      "bytes": 54720
+    },
+    {
+      "path": "reference/matrecord/definitions/standard-reference/index.html",
+      "bytes": 27587
+    },
+    {
+      "path": "reference/matrecord/definitions/test/index.html",
+      "bytes": 66944
+    },
+    {
+      "path": "reference/matrecord/definitions/test-extent/index.html",
+      "bytes": 24720
+    },
+    {
+      "path": "reference/matrecord/definitions/text-value/index.html",
+      "bytes": 20603
+    },
+    {
+      "path": "reference/matrecord/definitions/typed-identifier/index.html",
+      "bytes": 30632
+    },
+    {
+      "path": "reference/matrecord/definitions/typed-target/index.html",
+      "bytes": 22330
+    },
+    {
+      "path": "reference/matrecord/definitions/unavailable-value/index.html",
+      "bytes": 24846
     },
     {
       "path": "reference/matrecord/index.html",
-      "bytes": 60560
+      "bytes": 979685
     },
     {
       "path": "reference/matreq/definitions/activation/index.html",
-      "bytes": 25506
+      "bytes": 25529
     },
     {
       "path": "reference/matreq/definitions/calculation/index.html",
-      "bytes": 22916
+      "bytes": 22939
     },
     {
       "path": "reference/matreq/definitions/condition-expr/index.html",
-      "bytes": 30535
+      "bytes": 30372
     },
     {
       "path": "reference/matreq/definitions/condition-leaf/index.html",
-      "bytes": 21763
+      "bytes": 22339
     },
     {
       "path": "reference/matreq/definitions/coverage/index.html",
-      "bytes": 27382
+      "bytes": 27404
     },
     {
       "path": "reference/matreq/definitions/dependencies/index.html",
-      "bytes": 19600
+      "bytes": 19622
     },
     {
       "path": "reference/matreq/definitions/document/index.html",
-      "bytes": 28236
+      "bytes": 28258
     },
     {
       "path": "reference/matreq/definitions/document-reference/index.html",
-      "bytes": 25144
+      "bytes": 25056
     },
     {
       "path": "reference/matreq/definitions/document-scope/index.html",
-      "bytes": 32773
+      "bytes": 32553
     },
     {
       "path": "reference/matreq/definitions/edition/index.html",
-      "bytes": 45817
+      "bytes": 45839
     },
     {
       "path": "reference/matreq/definitions/effect/index.html",
-      "bytes": 28612
+      "bytes": 28634
     },
     {
       "path": "reference/matreq/definitions/invocation-model/index.html",
-      "bytes": 73991
+      "bytes": 73432
     },
     {
       "path": "reference/matreq/definitions/normativity/index.html",
-      "bytes": 23452
+      "bytes": 23474
     },
     {
       "path": "reference/matreq/definitions/provenance/index.html",
-      "bytes": 33480
+      "bytes": 33502
     },
     {
       "path": "reference/matreq/definitions/reference-target/index.html",
-      "bytes": 23608
+      "bytes": 23287
     },
     {
       "path": "reference/matreq/definitions/requirement/index.html",
-      "bytes": 71560
+      "bytes": 71583
     },
     {
       "path": "reference/matreq/definitions/requisition-input/index.html",
-      "bytes": 27017
+      "bytes": 26821
     },
     {
       "path": "reference/matreq/definitions/rule/index.html",
-      "bytes": 49868
+      "bytes": 51413
     },
     {
       "path": "reference/matreq/definitions/source-ref/index.html",
-      "bytes": 32229
+      "bytes": 32141
     },
     {
       "path": "reference/matreq/definitions/targets/index.html",
-      "bytes": 49311
+      "bytes": 49333
     },
     {
       "path": "reference/matreq/definitions/verification/index.html",
-      "bytes": 33270
+      "bytes": 33292
     },
     {
       "path": "reference/matreq/index.html",
-      "bytes": 523878
+      "bytes": 528141
     },
     {
       "path": "reference/matspec/definitions/alternatives/index.html",
-      "bytes": 21068
+      "bytes": 21091
     },
     {
       "path": "reference/matspec/definitions/applies-when/index.html",
-      "bytes": 49762
+      "bytes": 49469
     },
     {
       "path": "reference/matspec/definitions/band/index.html",
-      "bytes": 19835
+      "bytes": 19857
     },
     {
       "path": "reference/matspec/definitions/grade/index.html",
-      "bytes": 137482
+      "bytes": 137524
     },
     {
       "path": "reference/matspec/definitions/not-extracted/index.html",
-      "bytes": 16928
+      "bytes": 16822
     },
     {
       "path": "reference/matspec/definitions/test/index.html",
-      "bytes": 25436
+      "bytes": 25458
     },
     {
       "path": "reference/matspec/definitions/unit/index.html",
-      "bytes": 14916
+      "bytes": 14938
     },
     {
       "path": "reference/matspec/definitions/value/index.html",
-      "bytes": 39845
+      "bytes": 39868
     },
     {
       "path": "reference/matspec/definitions/value-or-alternatives/index.html",
-      "bytes": 14665
+      "bytes": 14489
     },
     {
       "path": "reference/matspec/definitions/value-set/index.html",
-      "bytes": 16998
+      "bytes": 17007
     },
     {
       "path": "reference/matspec/index.html",
-      "bytes": 333617
+      "bytes": 336894
     },
     {
       "path": "registry/index.html",
-      "bytes": 10168
+      "bytes": 10190
     },
     {
       "path": "repository/index.html",
-      "bytes": 10188
+      "bytes": 10210
     },
     {
       "path": "resources/index.html",
-      "bytes": 10169
+      "bytes": 10191
     },
     {
       "path": "robots.txt",
@@ -379,67 +771,67 @@
     },
     {
       "path": "schema/core/0.1/schema.json",
-      "bytes": 1953
+      "bytes": 23157
     },
     {
       "path": "schema/core/latest/schema.json",
-      "bytes": 1953
+      "bytes": 23157
     },
     {
       "path": "schema/index.json",
-      "bytes": 1476
+      "bytes": 1530
     },
     {
       "path": "schema/matcheck/0.1/schema.json",
-      "bytes": 2374
+      "bytes": 36674
     },
     {
       "path": "schema/matcheck/latest/schema.json",
-      "bytes": 2374
+      "bytes": 36674
     },
     {
       "path": "schema/matrecord/0.1/schema.json",
-      "bytes": 2786
+      "bytes": 64189
     },
     {
       "path": "schema/matrecord/latest/schema.json",
-      "bytes": 2786
+      "bytes": 64189
     },
     {
       "path": "schema/matreq/0.2/schema.json",
-      "bytes": 32808
+      "bytes": 33463
     },
     {
       "path": "schema/matreq/latest/schema.json",
-      "bytes": 32808
+      "bytes": 33463
     },
     {
       "path": "schema/matspec/0.2.10/schema.json",
-      "bytes": 23523
+      "bytes": 23999
     },
     {
       "path": "schema/matspec/latest/schema.json",
-      "bytes": 23523
+      "bytes": 23999
     },
     {
       "path": "schemas/index.html",
-      "bytes": 12679
+      "bytes": 12627
     },
     {
       "path": "sitemap.xml",
-      "bytes": 6211
+      "bytes": 17562
     },
     {
       "path": "spec/index.html",
-      "bytes": 13918
+      "bytes": 15130
     },
     {
       "path": "tools/build_schema_reference.py",
-      "bytes": 43476
+      "bytes": 43371
     },
     {
       "path": "tools/index.html",
-      "bytes": 10022
+      "bytes": 10044
     },
     {
       "path": "tools/schema_reference_hints.py",
@@ -451,11 +843,11 @@
     },
     {
       "path": "why-matjson/index.html",
-      "bytes": 14647
+      "bytes": 14669
     }
   ],
   "totals": {
-    "files": 113,
-    "bytes": 4702250
+    "files": 211,
+    "bytes": 9922367
   }
 }

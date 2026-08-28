@@ -9,8 +9,8 @@ import re
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-BUILD_DATE = "2026-08-26"
-ASSET_VERSION = "20260826-13"
+BUILD_DATE = "2026-08-28"
+ASSET_VERSION = "20260828-14"
 
 PROFILES = {
     "matspec": {
@@ -44,43 +44,43 @@ PROFILES = {
     "core": {
         "name": "MatJSON Core",
         "short": "Shared primitives",
-        "description": "Shared identifiers, quantities, provenance, expressions, and extension rules used across MatJSON profiles.",
+        "description": "Reusable identifiers, values, quantities, provenance, expressions, references, evidence locators, and extension rules shared across MatJSON profiles.",
         "version": "0.1",
-        "status": "Draft",
-        "status_class": "draft",
+        "status": "Working draft",
+        "status_class": "working",
         "stage_label": "v0.1",
         "extension": "common schema",
         "schema": ROOT / "schema/core/0.1/schema.json",
         "schema_href": "schema/core/0.1/schema.json",
-        "download_href": "downloads/matjson-core-v0.1-placeholder.schema.json",
+        "download_href": "downloads/matjson-core-v0.1.schema.json",
         "profile_href": "profiles/core/index.html",
     },
     "matrecord": {
         "name": "MatRecordJSON",
         "short": "MTR and evidence records",
-        "description": "Normalized MTR, CMTR, test-report, and supporting-evidence data. This profile remains a concept / WIP placeholder.",
-        "version": "0.1 placeholder",
-        "status": "Concept",
-        "status_class": "concept",
-        "stage_label": "WIP · v0.1 placeholder",
+        "description": "Normalized MTR, CMTR, certificate, laboratory, process, NDE, inspection, traceability, and supporting-evidence data.",
+        "version": "0.1",
+        "status": "Working draft",
+        "status_class": "working",
+        "stage_label": "v0.1",
         "extension": ".matrecord.json",
         "schema": ROOT / "schema/matrecord/0.1/schema.json",
         "schema_href": "schema/matrecord/0.1/schema.json",
-        "download_href": "downloads/matrecord-v0.1-placeholder.schema.json",
+        "download_href": "downloads/matrecord-v0.1.schema.json",
         "profile_href": "profiles/matrecord/index.html",
     },
     "matcheck": {
         "name": "MatCheckJSON",
         "short": "Compliance results",
-        "description": "Machine-readable material compliance outcomes. This profile remains a concept / WIP placeholder.",
-        "version": "0.1 placeholder",
-        "status": "Concept",
-        "status_class": "concept",
-        "stage_label": "WIP · v0.1 placeholder",
+        "description": "Auditable requirement-resolution and compliance results produced by evaluating MatRecordJSON evidence against MatSpecJSON and activated MatReqJSON requirements.",
+        "version": "0.1",
+        "status": "Working draft",
+        "status_class": "working",
+        "stage_label": "v0.1",
         "extension": ".matcheck.json",
         "schema": ROOT / "schema/matcheck/0.1/schema.json",
         "schema_href": "schema/matcheck/0.1/schema.json",
-        "download_href": "downloads/matcheck-v0.1-placeholder.schema.json",
+        "download_href": "downloads/matcheck-v0.1.schema.json",
         "profile_href": "profiles/matcheck/index.html",
     },
 }
@@ -679,9 +679,9 @@ def update_profile_status_surfaces() -> None:
     status_text = {
         "matspec": "Working draft · v0.2.10",
         "matreq": "Working draft · v0.2",
-        "core": "Draft · v0.1",
-        "matrecord": "Concept / WIP · v0.1 placeholder",
-        "matcheck": "Concept / WIP · v0.1 placeholder",
+        "core": "Working draft · v0.1",
+        "matrecord": "Working draft · v0.1",
+        "matcheck": "Working draft · v0.1",
     }
     for key, label in status_text.items():
         path = ROOT / "profiles" / key / "index.html"
@@ -698,11 +698,11 @@ def update_profile_status_surfaces() -> None:
     if schemas.exists():
         soup = BeautifulSoup(schemas.read_text(encoding="utf-8"), "html.parser")
         mapping = {
-            "MatJSON Core": ("v0.1", "Draft", "draft"),
+            "MatJSON Core": ("v0.1", "Working draft", "working"),
             "MatSpecJSON": ("v0.2.10", "Working draft", "working"),
             "MatReqJSON": ("v0.2", "Working draft", "working"),
-            "MatRecordJSON": ("v0.1 placeholder", "Concept / WIP", "concept"),
-            "MatCheckJSON": ("v0.1 placeholder", "Concept / WIP", "concept"),
+            "MatRecordJSON": ("v0.1", "Working draft", "working"),
+            "MatCheckJSON": ("v0.1", "Working draft", "working"),
         }
         for row in soup.select(".schema-row"):
             strong = row.find("strong")
@@ -746,26 +746,28 @@ def update_sitemap_and_manifest() -> None:
 
 
 def write_release_notes() -> None:
-    notes = ROOT / "docs/REFERENCE_DOCS_V13.md"
-    notes.write_text("""# Reference documentation v13
+    notes = ROOT / "docs/REFERENCE_DOCS_V14.md"
+    notes.write_text("""# Reference documentation v14
 
-This release keeps the Lottie-style linked schema presentation while adding code folding, documentation-book links, and the restored brand caption.
+This release publishes all five MatJSON profiles as working drafts and replaces the Core, MatRecordJSON, and MatCheckJSON placeholders with substantive schemas.
 
-## Collapsible linked schema
+## Published working drafts
 
-The exact JSON Schema remains the primary artifact. Every non-empty object and array now has an accessible chevron control. Expand-all and collapse-all controls are provided, and following a schema anchor or local `$ref` automatically reveals any collapsed ancestor nodes.
+- MatSpecJSON v0.2.10
+- MatReqJSON v0.2
+- MatJSON Core v0.1
+- MatRecordJSON v0.1
+- MatCheckJSON v0.1
 
-## Definition documentation links
+All MatJSON-defined structural names use lowercase snake_case.
 
-Reusable definitions in `$defs` show a small book icon beside the definition name. The icon opens the dedicated human-readable definition page, while the definition name itself remains a stable link to that location within the complete schema.
+## Core convergence
 
-## Header branding
+Core v0.1 is now the shared semantic module. Current MatSpecJSON v0.2.10, MatReqJSON v0.2, and MatRecordJSON v0.1 remain independently valid working drafts. The next profile revisions will migrate genuinely shared primitives into Core after the semantics are proven across real workflows. MatCheckJSON v0.1 already consumes Core v0.1 and serves as the first integration proving ground.
 
-The caption `Material standards, structured for software` is restored below the MatJSON wordmark on desktop. It remains hidden on compact mobile navigation to preserve space.
+## Reference UI
 
-## Compatibility
-
-The published MatSpecJSON v0.2.10 and MatReqJSON v0.2 schemas are unchanged.
+The linked, collapsible JSON Schema presentation, definition book links, hover navigation, and VS Code-like density remain unchanged.
 """, encoding="utf-8")
 
 if __name__ == "__main__":
@@ -776,4 +778,4 @@ if __name__ == "__main__":
     normalize_local_links()
     update_sitemap_and_manifest()
     write_release_notes()
-    print("Reference documentation v13 generated.")
+    print("Reference documentation v14 generated.")

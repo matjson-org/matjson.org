@@ -1,40 +1,156 @@
 {
   "matjson": {
     "profile": "matcheck",
-    "version": "0.1"
+    "version": "0.1",
+    "schema_uri": "https://matjson.org/schema/matcheck/0.1/schema.json"
   },
   "check": {
-    "id": "MJC-2026-0001",
-    "performed_at": "2026-08-24T20:00:00Z",
-    "tool": "MatJSON example checker",
-    "reviewer": null
+    "id": "check-template",
+    "title": "MatCheckJSON v0.1 starter template",
+    "status": "completed",
+    "created_at": "2026-08-27T20:00:00Z",
+    "completed_at": "2026-08-27T20:00:00Z",
+    "engine": {
+      "name": "MatJSON reference evaluator",
+      "version": "0.1",
+      "vendor": "MatJSON",
+      "mode": "assisted"
+    },
+    "evaluation_policy": {
+      "id": "matjson.default_evaluation",
+      "version": "0.1",
+      "description": "Reference policy for working-draft examples."
+    }
   },
-  "results": [
+  "inputs": [
     {
-      "requirement_id": "MJ-SMR-1-4.1",
-      "origin": {
-        "type": "matreq",
-        "document": "MJ-SMR-1"
+      "id": "input-matspec",
+      "role": "matspec",
+      "profile": "matspec",
+      "profile_version": "0.2.10",
+      "uri": "https://example.invalid/example.matspec.json",
+      "content_hash": {
+        "algorithm": "sha256",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
       },
-      "status": "pass",
-      "required": {
-        "report_field": "chemistry.X"
+      "title": "Replace with selected MatSpecJSON"
+    },
+    {
+      "id": "input-matrecord",
+      "role": "matrecord",
+      "profile": "matrecord",
+      "profile_version": "0.1",
+      "uri": "https://example.invalid/example.matrecord.json",
+      "content_hash": {
+        "algorithm": "sha256",
+        "value": "1111111111111111111111111111111111111111111111111111111111111111"
       },
-      "reported": {
-        "value": 1.5,
-        "unit": "wt%"
-      },
-      "evidence": [
-        "MJR-2026-0001"
-      ],
-      "explanation": "The synthetic CMTR reports element X."
+      "title": "Replace with normalized MatRecordJSON"
     }
   ],
-  "summary": {
-    "overall_status": "pass",
-    "counts": {
-      "pass": 1
+  "subjects": [
+    {
+      "id": "subject-1",
+      "matrecord_input_ref": "input-matrecord",
+      "material_refs": [
+        "replace-with-matrecord-material-id"
+      ],
+      "description": "Replace with evaluated material subject",
+      "role": "primary"
     }
+  ],
+  "requirement_resolutions": [
+    {
+      "id": "resolution-1",
+      "source_requirement_refs": [
+        {
+          "input_ref": "input-matspec",
+          "profile": "matspec",
+          "json_pointer": "/replace/with/atomic/requirement"
+        }
+      ],
+      "subject_refs": [
+        "subject-1"
+      ],
+      "title": "Replace with resolved requirement",
+      "category": "other",
+      "normativity": "informative",
+      "resolution_status": "not_applicable",
+      "activation_basis": {
+        "basis": "other",
+        "explanation": "Template placeholder only."
+      },
+      "notes": [
+        "Replace or remove this placeholder before use."
+      ]
+    }
+  ],
+  "findings": [],
+  "summary": {
+    "overall_status": "not_evaluated",
+    "finding_counts": {
+      "pass": 0,
+      "fail": 0,
+      "not_applicable": 0,
+      "missing_evidence": 0,
+      "missing_project_input": 0,
+      "requisition_gap": 0,
+      "ambiguous_material_selector": 0,
+      "conflicting_requirements": 0,
+      "manual_review_required": 0,
+      "external_evidence_required": 0,
+      "unsupported_evaluation": 0,
+      "not_evaluated": 0
+    },
+    "requirement_counts": {
+      "total": 1,
+      "active": 0,
+      "inactive": 0,
+      "not_applicable": 1,
+      "unresolved": 0
+    },
+    "mandatory_counts": {
+      "active": 0,
+      "evaluated": 0,
+      "passed": 0,
+      "failed": 0,
+      "unresolved": 0
+    },
+    "aggregation_policy": {
+      "id": "matjson.default_aggregation",
+      "version": "0.1",
+      "description": "No known failure is not sufficient for pass. Every active mandatory requirement must be evaluated or validly resolved.",
+      "rules": [
+        "fail when any active mandatory requirement has a fail finding of severity error",
+        "incomplete when no fail exists but active mandatory requirements have unresolved evidence, project input, selector, or manual-review outcomes",
+        "pass_with_warnings when all active mandatory requirements pass and only nonblocking warnings remain",
+        "pass when every active mandatory requirement is evaluated and passed or validly resolved not applicable"
+      ]
+    },
+    "rationale": "The template contains no completed evaluation."
   },
-  "extensions": {}
+  "review": {
+    "status": "unreviewed",
+    "comments": [
+      "Synthetic example; not an engineering acceptance decision."
+    ]
+  },
+  "provenance": {
+    "created_at": "2026-08-27T20:00:00Z",
+    "method": "assisted",
+    "tool": "MatJSON Core/MatCheck working-draft builder",
+    "tool_version": "0.1",
+    "review_status": "checked",
+    "input_refs": [
+      "input-matspec",
+      "input-matrecord"
+    ],
+    "notes": [
+      "All data in the public examples is synthetic."
+    ]
+  },
+  "extensions": {},
+  "notes": [
+    "This is a structurally valid starter. It is not a completed material evaluation."
+  ]
 }

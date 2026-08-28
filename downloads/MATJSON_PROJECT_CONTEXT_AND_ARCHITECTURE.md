@@ -36,13 +36,13 @@ The long-term objective is that owner-users, manufacturers, EPCs, mills, inspect
 
 | Profile | Purpose | File extension | Current status |
 | --- | --- | --- | --- |
-| **MatJSON Core** | Shared values, units, provenance, expressions, selectors, citations, identifiers, vocabularies, and extension rules | Internal/common schema | Architecture defined; schema draft/TBC |
+| **MatJSON Core** | Shared values, units, provenance, expressions, selectors, citations, identifiers, vocabularies, and extension rules | Internal/common schema | Working draft v0.1 |
 | **MatSpecJSON** | Intrinsic requirements of a material or product specification | `.matspec.json` | Working schema and draft data library exist |
 | **MatReqJSON** | Additional material requirements imposed by codes, service standards, equipment standards, recommended practices, and purchaser specifications | `.matreq.json` | Working schema and draft data library exist |
-| **MatRecordJSON** | Normalized representation of actual MTRs, CMTRs, test reports, and other evidence | `.matrecord.json` | Concept accepted; detailed schema TBC |
-| **MatCheckJSON** | Machine-readable compliance results | `.matcheck.json` | Concept accepted; detailed schema TBC |
+| **MatRecordJSON** | Normalized representation of actual MTRs, CMTRs, test reports, and other evidence | `.matrecord.json` | Working draft v0.1 |
+| **MatCheckJSON** | Machine-readable compliance results | `.matcheck.json` | Working draft v0.1 |
 
-Only MatSpecJSON and MatReqJSON are mature enough to contain substantive engineering data today. MatJSON Core, MatRecordJSON, and MatCheckJSON are included in the website and architecture so the ecosystem has a coherent direction, but their current website schemas are placeholders and must not be treated as production standards.
+All five profiles now have substantive working-draft schemas. They remain draft interoperability specifications rather than production standards. Current MatSpecJSON, MatReqJSON, and MatRecordJSON remain independently valid; their next major revisions will migrate shared semantics into MatJSON Core after end-to-end validation.
 
 ## 4. Fundamental separation of responsibilities
 
@@ -352,7 +352,7 @@ MatRecordJSON will normalize the evidence supplied for one material or component
 
 The goal is to convert many different mill and inspection document layouts into one common evidence representation before checking.
 
-The detailed MatRecord schema remains TBC.
+MatRecordJSON v0.1 is now a substantive working draft based on representative MTR, CMTR, certificate, laboratory, process, NDE, inspection, and traceability packages.
 
 ## 14. MatCheckJSON concept
 
@@ -370,7 +370,7 @@ MatCheckJSON will store the output of comparing effective requirements with norm
 - reviewer and tool metadata;
 - overall summary without hiding individual failures.
 
-The detailed MatCheck schema remains TBC.
+MatCheckJSON v0.1 is now a substantive working draft for requirement resolution, evidence mapping, calculations, findings, summaries, and review state.
 
 ## 15. Versioning
 
@@ -639,7 +639,7 @@ Existing work includes:
 - draft MatSpec and MatReq libraries;
 - audit reports identifying numeric, provenance, completeness, and schema issues;
 - this MatJSON website starter;
-- placeholder Core, MatRecord, and MatCheck schemas for architectural continuity.
+- working-draft Core, MatRecord, and MatCheck schemas for implementation and interoperability testing.
 
 All current standards-derived data files should remain marked draft until independently audited and publication rights are resolved.
 
@@ -656,13 +656,13 @@ All current standards-derived data files should remain marked draft until indepe
 9. Verification evidence is first-class.
 10. Schema validation does not equal technical verification.
 11. Proprietary standards data and open MatJSON schemas must be treated separately.
-12. MatRecord and MatCheck are part of the architecture but remain TBC.
+12. MatRecord v0.1 and MatCheck v0.1 are substantive working drafts; the next major profile revisions will converge shared semantics into MatJSON Core.
 
 ## 28. Copy-paste context for a new ChatGPT conversation
 
 Use the following prompt to resume the project:
 
-> I am developing MatJSON at matjson.org, an open, vendor-neutral family of JSON schemas for machine-readable materials data. MatSpecJSON (`.matspec.json`) captures intrinsic requirements of material/product specifications. MatReqJSON (`.matreq.json`) captures additional material requirements imposed by equipment codes, service standards, fabrication practices, and purchaser specifications. The material requisition is the project-specific source of truth; we deliberately do not use a separate MatCtx schema. MatRecordJSON (`.matrecord.json`) will normalize MTRs, CMTRs, and test evidence, and MatCheckJSON (`.matcheck.json`) will store machine-readable compliance results; both are currently TBC. MatJSON Core will provide shared units, provenance, identifiers, selectors, expressions, vocabularies, and extension rules. MatJSON is intended as an open interoperability protocol, not just a database. Requirements must preserve source provenance, normativity, activation, applicability, evidence, and review status. Public schemas and synthetic examples must be separated from rights-controlled standards-derived data. Please use the attached `MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md` and website package as the governing project context.
+> I am developing MatJSON at matjson.org, an open, vendor-neutral family of JSON schemas for machine-readable materials data. MatSpecJSON (`.matspec.json`) captures intrinsic requirements of material/product specifications. MatReqJSON (`.matreq.json`) captures additional material requirements imposed by equipment codes, service standards, fabrication practices, and purchaser specifications. The material requisition is the project-specific source of truth; we deliberately do not use a separate MatCtx schema. MatRecordJSON (`.matrecord.json`) normalizes MTRs, CMTRs, certificates, test evidence, process records, and traceability, while MatCheckJSON (`.matcheck.json`) stores auditable requirement-resolution and compliance results; both are working drafts. MatJSON Core will provide shared units, provenance, identifiers, selectors, expressions, vocabularies, and extension rules. MatJSON is intended as an open interoperability protocol, not just a database. Requirements must preserve source provenance, normativity, activation, applicability, evidence, and review status. Public schemas and synthetic examples must be separated from rights-controlled standards-derived data. Please use the attached `MATJSON_PROJECT_CONTEXT_AND_ARCHITECTURE.md` and website package as the governing project context.
 
 ---
 

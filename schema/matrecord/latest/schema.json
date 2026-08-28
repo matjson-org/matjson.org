@@ -1,25 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://matjson.org/schema/matrecord/0.1/schema.json",
-  "title": "MatRecordJSON v0.1 — Concept Placeholder",
-  "description": "Proposed normalized representation of MTRs, CMTRs, material certificates, test reports, and related evidence. Detailed semantics are TBC.",
-  "x-matjson-profile": "matrecord",
-  "x-matjson-status": "tbc",
+  "title": "MatRecordJSON v0.1 — Working Draft",
+  "description": "Normalized representation of MTRs, CMTRs, mill certificates, certificates of compliance, inspection certificates, laboratory reports, heat-treatment records, NDE reports, traceability records, reviewer annotations, and related evidence. MatRecordJSON records what the evidence package reports. It does not determine compliance. MatCheckJSON compares normalized MatRecordJSON evidence against applicable MatSpecJSON and MatReqJSON requirements.",
+  "x_matjson_profile": "matrecord",
+  "x_matjson_status": "working_draft",
+  "x_matjson_naming_convention": "snake_case",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "matjson",
     "record",
+    "files",
+    "documents",
+    "parties",
     "materials",
-    "evidence"
+    "evidence",
+    "provenance"
   ],
-  "additionalProperties": false,
   "properties": {
     "matjson": {
       "type": "object",
-      "required": [
-        "profile",
-        "version"
-      ],
       "additionalProperties": false,
       "properties": {
         "profile": {
@@ -28,105 +29,2642 @@
         "version": {
           "const": "0.1"
         }
-      }
+      },
+      "required": [
+        "profile",
+        "version"
+      ]
     },
     "record": {
-      "type": "object",
-      "required": [
-        "id",
-        "document_type"
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "document_type": {
-          "type": "string"
-        },
-        "issuer": {
-          "type": "string"
-        },
-        "issued": {
-          "type": "string",
-          "format": "date"
-        },
-        "source_file": {
-          "type": "string"
-        }
+      "$ref": "#/$defs/record"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_file"
+      },
+      "minItems": 1
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/document"
+      },
+      "minItems": 1
+    },
+    "parties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/party"
+      },
+      "minItems": 1
+    },
+    "business_references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/business_reference"
+      }
+    },
+    "document_relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/document_relation"
       }
     },
     "materials": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "specification": {
-            "type": "string"
-          },
-          "grade": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "heat": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "lot": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "product_form": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "chemistry": {
-            "type": "object"
-          },
-          "mechanical": {
-            "type": "object"
-          },
-          "heat_treatment": {
-            "type": "array"
-          },
-          "tests": {
-            "type": "array"
-          }
-        }
+        "$ref": "#/$defs/material"
+      },
+      "minItems": 1
+    },
+    "material_relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/material_relation"
+      }
+    },
+    "specification_claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/specification_claim"
+      }
+    },
+    "processes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/process"
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/test"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "attestations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attestation"
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/annotation"
       }
     },
     "evidence": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": [
-          "type",
-          "reference"
-        ],
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "reference": {
-            "type": "string"
-          },
-          "extraction_confidence": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
-          }
-        }
+        "$ref": "#/$defs/evidence"
+      },
+      "minItems": 1
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
     "extensions": {
-      "type": "object"
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "record_type": {
+          "enum": [
+            "material_evidence_package",
+            "normalized_material_record"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "extracted",
+            "reviewed",
+            "approved",
+            "superseded"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_package_label": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "supersedes_record_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "record_type",
+        "title",
+        "status"
+      ]
+    },
+    "source_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "page_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "received_filename": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "filename",
+        "media_type"
+      ],
+      "description": "Physical source file. One file can contain several logical certificates or reports."
+    },
+    "page_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "description": "Inclusive page range within a source file."
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "file_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "document_type": {
+          "enum": [
+            "material_test_report",
+            "certified_material_test_report",
+            "mill_test_certificate",
+            "material_certificate",
+            "certificate_of_compliance",
+            "inspection_certificate",
+            "test_certificate",
+            "laboratory_report",
+            "mechanical_test_report",
+            "impact_test_report",
+            "heat_treatment_report",
+            "heat_treatment_chart",
+            "nde_report",
+            "pressure_test_report",
+            "dimensional_report",
+            "u_bend_report",
+            "traceability_record",
+            "third_party_inspection_report",
+            "supplier_certificate",
+            "processor_certificate",
+            "review_copy",
+            "drawing",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_number": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "issue_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "submitter_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "page_ranges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/page_range"
+          },
+          "minItems": 1
+        },
+        "certificate_classification": {
+          "$ref": "#/$defs/certificate_classification"
+        },
+        "copy_status": {
+          "enum": [
+            "original",
+            "certified_true_copy",
+            "copy",
+            "revised",
+            "superseded",
+            "electronic_original",
+            "unknown"
+          ]
+        },
+        "language": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "subject_material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "statement": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "file_ref",
+        "document_type",
+        "title",
+        "issuer_party_ref",
+        "page_ranges",
+        "evidence_refs"
+      ],
+      "description": "Logical document within a physical file. A package can contain source mill certificates, processor certificates, laboratory reports, and reviewer copies."
+    },
+    "certificate_classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "type": "string",
+          "description": "For example EN 10204 or ISO 10474."
+        },
+        "designation": {
+          "type": "string",
+          "description": "For example 3.1 or 3.2."
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "scheme",
+        "designation"
+      ]
+    },
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "material_manufacturer",
+              "mill",
+              "melt_shop",
+              "processor",
+              "fabricator",
+              "forger",
+              "caster",
+              "tube_mill",
+              "supplier",
+              "distributor",
+              "seller",
+              "shipper",
+              "purchaser",
+              "customer",
+              "consignee",
+              "laboratory",
+              "inspection_agency",
+              "third_party_inspector",
+              "certifier",
+              "reviewer",
+              "document_submitter",
+              "other"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "address": {
+          "$ref": "#/$defs/address"
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/party_identifier"
+          },
+          "uniqueItems": true
+        },
+        "contact": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "phone": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "roles",
+        "evidence_refs"
+      ]
+    },
+    "party_identifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "supplier_number",
+            "customer_number",
+            "accreditation",
+            "quality_certificate",
+            "tax_id",
+            "other"
+          ]
+        },
+        "value": {
+          "type": "string"
+        },
+        "scheme": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ]
+    },
+    "address": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "city": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      },
+      "description": "Postal or physical address as reported on a document."
+    },
+    "business_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "type": {
+          "enum": [
+            "purchase_order",
+            "sales_order",
+            "customer_order",
+            "mill_order",
+            "work_order",
+            "job",
+            "project",
+            "requisition",
+            "bom_item",
+            "customer_item",
+            "supplier_item",
+            "line_item",
+            "delivery",
+            "shipment",
+            "invoice",
+            "drawing",
+            "equipment_item",
+            "commodity",
+            "other"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "value",
+        "evidence_refs"
+      ]
+    },
+    "document_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "subject_document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "relation": {
+          "enum": [
+            "supplements",
+            "source_for",
+            "certifies",
+            "revises",
+            "supersedes",
+            "attaches",
+            "includes",
+            "certified_copy_of",
+            "derived_from",
+            "review_copy_of",
+            "other"
+          ]
+        },
+        "object_document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "note": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "subject_document_ref",
+        "relation",
+        "object_document_ref"
+      ]
+    },
+    "coded_term": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scheme": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "description": "A controlled or locally defined term. The code is machine-oriented; label preserves human-readable source terminology."
+    },
+    "typed_identifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "heat",
+            "melt",
+            "cast",
+            "lot",
+            "batch",
+            "slab",
+            "plate",
+            "coil",
+            "bundle",
+            "piece",
+            "serial",
+            "tag",
+            "material_number",
+            "item",
+            "coupon",
+            "specimen",
+            "certificate",
+            "document",
+            "trace_code",
+            "work_order",
+            "other"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "label": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "description": "A reported identifier associated with a physical material entity or document."
+    },
+    "quantity_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "quantity"
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualifier": {
+          "enum": [
+            "exact",
+            "less_than",
+            "less_than_or_equal",
+            "greater_than",
+            "greater_than_or_equal",
+            "approximate"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ]
+    },
+    "range_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "range"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum_inclusive": {
+          "type": "boolean",
+          "default": true
+        },
+        "maximum_inclusive": {
+          "type": "boolean",
+          "default": true
+        },
+        "basis": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "minimum",
+        "maximum",
+        "unit"
+      ]
+    },
+    "text_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "text"
+        },
+        "value": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ]
+    },
+    "boolean_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "boolean"
+        },
+        "value": {
+          "type": "boolean"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ]
+    },
+    "array_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "array"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/quantity_value"
+              },
+              {
+                "$ref": "#/$defs/text_value"
+              }
+            ]
+          },
+          "minItems": 1
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ]
+    },
+    "unavailable_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "unavailable"
+        },
+        "reason": {
+          "enum": [
+            "not_reported",
+            "not_applicable",
+            "not_performed",
+            "illegible",
+            "not_extracted",
+            "blank_on_source",
+            "not_required",
+            "unknown"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "description": "Explicitly records why a value is unavailable. This is not equivalent to a zero value or to absence of a requirement."
+    },
+    "result_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/quantity_value"
+        },
+        {
+          "$ref": "#/$defs/range_value"
+        },
+        {
+          "$ref": "#/$defs/text_value"
+        },
+        {
+          "$ref": "#/$defs/boolean_value"
+        },
+        {
+          "$ref": "#/$defs/array_value"
+        },
+        {
+          "$ref": "#/$defs/unavailable_value"
+        }
+      ]
+    },
+    "reported_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "satisfactory",
+            "not_satisfactory",
+            "accepted",
+            "rejected",
+            "not_reported",
+            "not_applicable",
+            "unknown",
+            "other"
+          ]
+        },
+        "raw": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "status",
+        "evidence_refs"
+      ],
+      "description": "Disposition printed or stated by the issuer. It is evidence, not an independent MatCheckJSON compliance result."
+    },
+    "reported_limit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operator": {
+          "enum": [
+            "minimum",
+            "maximum",
+            "range",
+            "exact",
+            "formula",
+            "informational",
+            "other"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/result_value"
+        },
+        "source_role": {
+          "enum": [
+            "record_printed_limit",
+            "issuer_declared_limit",
+            "purchase_order_excerpt",
+            "unknown_record_context"
+          ]
+        },
+        "authority": {
+          "const": "reported_only"
+        },
+        "raw": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "operator",
+        "value",
+        "source_role",
+        "authority",
+        "evidence_refs"
+      ],
+      "description": "A limit printed on or quoted within the source record. It is preserved for audit but must not replace authoritative MatSpecJSON or MatReqJSON requirements."
+    },
+    "calculation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "formula": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "method_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/standard_reference"
+          }
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "formula"
+      ]
+    },
+    "property_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "property": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "analyte": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "result_role": {
+          "enum": [
+            "measured",
+            "calculated",
+            "declared",
+            "converted",
+            "observed",
+            "count"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/result_value"
+        },
+        "normalized_value": {
+          "$ref": "#/$defs/result_value"
+        },
+        "raw_reported": {
+          "type": "string"
+        },
+        "reported_limits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reported_limit"
+          }
+        },
+        "specimen_material_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "location": {
+          "type": "string"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "gauge_length": {
+          "$ref": "#/$defs/quantity_value"
+        },
+        "statistic": {
+          "enum": [
+            "individual",
+            "average",
+            "minimum",
+            "maximum",
+            "range",
+            "set",
+            "other"
+          ]
+        },
+        "calculation": {
+          "$ref": "#/$defs/calculation"
+        },
+        "reported_disposition": {
+          "$ref": "#/$defs/reported_disposition"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "property",
+        "value",
+        "evidence_refs"
+      ],
+      "description": "One reported result. Replicates, averages, and converted values should have separate stable IDs."
+    },
+    "standard_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edition": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "clause": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "designation"
+      ]
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "nominal": {
+          "$ref": "#/$defs/result_value"
+        },
+        "measured": {
+          "$ref": "#/$defs/result_value"
+        },
+        "tolerance": {
+          "$ref": "#/$defs/result_value"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "evidence_refs"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "nominal"
+          ]
+        },
+        {
+          "required": [
+            "measured"
+          ]
+        }
+      ]
+    },
+    "material_condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coded_term"
+          },
+          "minItems": 1
+        },
+        "raw": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "terms",
+        "evidence_refs"
+      ]
+    },
+    "marking": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "text",
+        "evidence_refs"
+      ]
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "entity_type": {
+          "enum": [
+            "heat",
+            "melt",
+            "cast",
+            "lot",
+            "batch",
+            "slab",
+            "plate",
+            "sheet",
+            "strip",
+            "coil",
+            "pipe",
+            "tube",
+            "u_bend",
+            "fitting",
+            "flange",
+            "forging",
+            "casting",
+            "bar",
+            "rod",
+            "wire",
+            "fastener",
+            "bolt",
+            "stud",
+            "nut",
+            "washer",
+            "weld_consumable",
+            "coupon",
+            "specimen",
+            "piece",
+            "bundle",
+            "shipment_item",
+            "product",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "enum": [
+            "individual",
+            "lot",
+            "heat",
+            "batch",
+            "bundle",
+            "shipment",
+            "sample",
+            "specimen",
+            "unknown"
+          ]
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typed_identifier"
+          },
+          "minItems": 1
+        },
+        "manufacturer_party_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "processor_party_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "supplier_party_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "product_form": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dimension"
+          }
+        },
+        "quantity": {
+          "$ref": "#/$defs/quantity_value"
+        },
+        "mass": {
+          "$ref": "#/$defs/quantity_value"
+        },
+        "condition": {
+          "$ref": "#/$defs/material_condition"
+        },
+        "origin": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "melt_country": {
+              "type": "string"
+            },
+            "manufacture_country": {
+              "type": "string"
+            },
+            "raw": {
+              "type": "string"
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "evidence_refs"
+          ]
+        },
+        "specification_claim_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "process_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "business_reference_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "markings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/marking"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "entity_type",
+        "description",
+        "identifiers",
+        "evidence_refs"
+      ],
+      "description": "A physical material population, product, coupon, or specimen represented in the evidence package."
+    },
+    "material_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "subject_material_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "relation": {
+          "enum": [
+            "derived_from",
+            "cut_from",
+            "formed_from",
+            "bent_from",
+            "forged_from",
+            "machined_from",
+            "welded_from",
+            "sampled_from",
+            "specimen_of",
+            "coupon_for",
+            "part_of",
+            "split_from",
+            "combined_from",
+            "traceable_to",
+            "retest_of",
+            "heat_treated_from",
+            "represented_by",
+            "other"
+          ]
+        },
+        "object_material_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "note": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "subject_material_ref",
+        "relation",
+        "object_material_ref",
+        "evidence_refs"
+      ],
+      "description": "A directed traceability statement: subject relation object. Example: a U-bend derived_from a straight tube."
+    },
+    "specification_claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "claim_type": {
+          "enum": [
+            "material_specification",
+            "conforms_to",
+            "dual_certified_to",
+            "source_material_specification",
+            "purchase_order_requirement",
+            "referenced_only",
+            "other"
+          ]
+        },
+        "specification": {
+          "$ref": "#/$defs/standard_reference"
+        },
+        "grade": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uns": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "product_form": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "condition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "matspec_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "matreq_uris": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "uniqueItems": true
+        },
+        "raw_text": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "material_refs",
+        "issuer_party_ref",
+        "claim_type",
+        "specification",
+        "evidence_refs"
+      ],
+      "description": "A specification or conformance claim reported by an issuer. This is evidence of what the record claims, not proof of compliance."
+    },
+    "process_stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "action": {
+          "enum": [
+            "heat",
+            "hold",
+            "cool",
+            "quench",
+            "air_cool",
+            "furnace_cool",
+            "water_quench",
+            "other"
+          ]
+        },
+        "temperature": {
+          "$ref": "#/$defs/result_value"
+        },
+        "duration": {
+          "$ref": "#/$defs/result_value"
+        },
+        "rate": {
+          "$ref": "#/$defs/result_value"
+        },
+        "cooling_medium": {
+          "type": "string"
+        },
+        "atmosphere": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "action",
+        "evidence_refs"
+      ]
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "process_type": {
+          "enum": [
+            "melting",
+            "vacuum_degassing",
+            "casting",
+            "rolling",
+            "forging",
+            "extrusion",
+            "welding",
+            "cold_working",
+            "hot_working",
+            "forming",
+            "bending",
+            "machining",
+            "normalizing",
+            "annealing",
+            "solution_annealing",
+            "quenching",
+            "tempering",
+            "aging",
+            "stress_relieving",
+            "pwht",
+            "simulated_pwht",
+            "step_cooling",
+            "coating",
+            "pickling",
+            "descaling",
+            "other"
+          ]
+        },
+        "role": {
+          "enum": [
+            "production",
+            "final",
+            "intermediate",
+            "repair",
+            "post_forming",
+            "test_coupon_simulation",
+            "test_preconditioning",
+            "other"
+          ]
+        },
+        "subject_material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "performed_by_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "performed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "location": {
+          "type": "string"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/process_stage"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/property_result"
+          }
+        },
+        "chart_document_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "related_process_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "reported_disposition": {
+          "$ref": "#/$defs/reported_disposition"
+        },
+        "raw_description": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "process_type",
+        "role",
+        "subject_material_refs",
+        "evidence_refs"
+      ]
+    },
+    "condition_parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameter": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "value": {
+          "$ref": "#/$defs/result_value"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "parameter",
+        "value",
+        "evidence_refs"
+      ]
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "heat",
+            "lot",
+            "batch",
+            "piece",
+            "end",
+            "coupon",
+            "specimen",
+            "shipment",
+            "unknown",
+            "other"
+          ]
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lot_definition": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "basis",
+        "evidence_refs"
+      ]
+    },
+    "test_extent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "each_piece",
+            "each_length",
+            "sampled",
+            "percentage",
+            "quantity",
+            "lot",
+            "heat",
+            "unknown",
+            "other"
+          ]
+        },
+        "percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "basis"
+      ]
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "category": {
+          "enum": [
+            "chemical",
+            "mechanical",
+            "hardness",
+            "impact",
+            "nde",
+            "pressure",
+            "metallurgical",
+            "dimensional",
+            "corrosion",
+            "process",
+            "other"
+          ]
+        },
+        "test_type": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "name": {
+          "type": "string"
+        },
+        "method_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/standard_reference"
+          }
+        },
+        "subject_material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "specimen_material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "performed_by_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "performed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "analysis_basis": {
+          "enum": [
+            "heat",
+            "ladle",
+            "product",
+            "check",
+            "cast",
+            "residual",
+            "not_applicable",
+            "unknown",
+            "other"
+          ]
+        },
+        "sampling": {
+          "$ref": "#/$defs/sampling"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition_parameter"
+          }
+        },
+        "extent": {
+          "$ref": "#/$defs/test_extent"
+        },
+        "preconditioning_process_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/property_result"
+          },
+          "minItems": 1
+        },
+        "reported_disposition": {
+          "$ref": "#/$defs/reported_disposition"
+        },
+        "related_test_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "uniqueItems": true
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "test_type",
+        "subject_material_refs",
+        "evidence_refs"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "results"
+          ]
+        },
+        {
+          "required": [
+            "reported_disposition"
+          ]
+        }
+      ]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "claim_type": {
+          "$ref": "#/$defs/coded_term"
+        },
+        "subject_material_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "$ref": "#/$defs/result_value"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "required": [
+        "id",
+        "claim_type",
+        "subject_material_refs",
+        "issuer_party_ref",
+        "statement",
+        "evidence_refs"
+      ],
+      "description": "An issuer-reported statement such as fully killed, fine-grain practice, vacuum degassed, country of melt, or no weld repair."
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "wet_signature",
+            "digital_signature",
+            "stamp",
+            "qr_code",
+            "barcode",
+            "edi",
+            "certified_copy",
+            "organization_identified_no_signature",
+            "other"
+          ]
+        },
+        "status": {
+          "enum": [
+            "present",
+            "absent",
+            "not_required",
+            "unknown"
+          ]
+        },
+        "verification_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "status"
+      ]
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "issuer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "attestation_type": {
+          "enum": [
+            "certificate_of_compliance",
+            "test_report_certification",
+            "inspection_release",
+            "third_party_review",
+            "witness",
+            "approval",
+            "certified_true_copy",
+            "authenticity_verification",
+            "other"
+          ]
+        },
+        "statement": {
+          "type": "string"
+        },
+        "signer": {
+          "$ref": "#/$defs/signer"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "authentication": {
+          "$ref": "#/$defs/authentication"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "document_ref",
+        "issuer_party_ref",
+        "attestation_type",
+        "evidence_refs"
+      ]
+    },
+    "typed_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "file",
+            "document",
+            "party",
+            "business_reference",
+            "material",
+            "specification_claim",
+            "process",
+            "test",
+            "result",
+            "claim",
+            "attestation",
+            "evidence"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        }
+      },
+      "required": [
+        "kind",
+        "ref"
+      ]
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "annotator_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "annotation_type": {
+          "enum": [
+            "reviewer_comment",
+            "highlight",
+            "redline",
+            "handwritten_note",
+            "review_stamp",
+            "witness_stamp",
+            "approval",
+            "rejection",
+            "other"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typed_target"
+          },
+          "minItems": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "document_ref",
+        "annotation_type",
+        "targets",
+        "evidence_refs"
+      ],
+      "description": "A downstream purchaser, inspector, or reviewer markup. It is deliberately separated from issuer-reported source data."
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "unit": {
+          "enum": [
+            "relative",
+            "pixels",
+            "points"
+          ]
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height",
+        "unit"
+      ]
+    },
+    "evidence_locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "row": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "column": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "region": {
+          "$ref": "#/$defs/region"
+        }
+      }
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "native_text",
+            "manual_transcription",
+            "assisted_vision",
+            "ocr",
+            "barcode",
+            "qr_code",
+            "edi",
+            "imported_structured_data"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reviewed": {
+          "type": "boolean"
+        },
+        "reviewer_party_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "method",
+        "confidence",
+        "reviewed"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Record-local stable identifier. IDs are intended to be unique across the complete MatRecordJSON package."
+        },
+        "document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+        },
+        "evidence_type": {
+          "enum": [
+            "document_metadata",
+            "source_text",
+            "table_cell",
+            "table_row",
+            "image_region",
+            "chart",
+            "signature",
+            "stamp",
+            "handwritten_annotation",
+            "highlight",
+            "qr_code",
+            "barcode",
+            "other"
+          ]
+        },
+        "page": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "page_label": {
+          "type": "string"
+        },
+        "locator": {
+          "$ref": "#/$defs/evidence_locator"
+        },
+        "raw_text": {
+          "type": "string"
+        },
+        "asset_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "extraction": {
+          "$ref": "#/$defs/extraction"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "document_ref",
+        "evidence_type",
+        "page",
+        "extraction"
+      ],
+      "description": "Source-addressable evidence used by normalized fields and later MatCheckJSON evaluations."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "normalized_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "normalization_method": {
+          "enum": [
+            "manual",
+            "assisted",
+            "automated"
+          ]
+        },
+        "tool": {
+          "type": "string"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "person": {
+          "type": "string"
+        },
+        "source_file_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_status": {
+          "enum": [
+            "unreviewed",
+            "checked",
+            "verified"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "normalized_at",
+        "normalization_method",
+        "tool",
+        "source_file_refs",
+        "review_status"
+      ],
+      "description": "Provenance of the normalization process, distinct from the issuer provenance recorded in documents and parties."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Namespaced extension container. Extension keys must use one or more dot-separated snake_case segments, for example mht.material_review or api_934_e.heat_treatment_regimen.",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$"
+      },
+      "additionalProperties": true
     }
   }
 }

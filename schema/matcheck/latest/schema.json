@@ -1,92 +1,1354 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://matjson.org/schema/matcheck/0.1/schema.json",
-  "title": "MatCheckJSON v0.1 — Concept Placeholder",
-  "description": "Proposed machine-readable results of evaluating MatJSON requirements against normalized evidence. Detailed semantics are TBC.",
-  "x-matjson-profile": "matcheck",
-  "x-matjson-status": "tbc",
+  "title": "MatCheckJSON v0.1 — Working Draft",
+  "description": "Auditable results of resolving MatSpecJSON and activated MatReqJSON requirements and evaluating those requirements against normalized MatRecordJSON evidence. MatCheckJSON records decisions; it does not replace the source requirements or the evidence package.",
+  "x_matjson_profile": "matcheck",
+  "x_matjson_status": "working_draft",
+  "x_matjson_naming_convention": "snake_case",
   "type": "object",
+  "additionalProperties": false,
   "required": [
     "matjson",
     "check",
-    "results",
-    "summary"
+    "inputs",
+    "subjects",
+    "requirement_resolutions",
+    "findings",
+    "summary",
+    "provenance"
   ],
-  "additionalProperties": false,
   "properties": {
     "matjson": {
-      "type": "object",
-      "required": [
-        "profile",
-        "version"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "profile": {
-          "const": "matcheck"
+      "allOf": [
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/profile_envelope"
         },
-        "version": {
-          "const": "0.1"
+        {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "const": "matcheck"
+            },
+            "version": {
+              "const": "0.1"
+            }
+          }
+        }
+      ]
+    },
+    "check": {
+      "$ref": "#/$defs/check_metadata"
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/input_document"
+      }
+    },
+    "project_inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/project_input"
+      }
+    },
+    "subjects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/subject"
+      }
+    },
+    "requirement_resolutions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/requirement_resolution"
+      }
+    },
+    "calculations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/calculation_record"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "review": {
+      "$ref": "#/$defs/review"
+    },
+    "provenance": {
+      "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/provenance"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extensions": {
+      "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "check_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "created_at",
+        "engine",
+        "evaluation_policy"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "completed",
+            "reviewed",
+            "approved",
+            "superseded"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "mode"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "mode": {
+              "enum": [
+                "automated",
+                "assisted",
+                "manual"
+              ]
+            }
+          }
+        },
+        "evaluation_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri-reference"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "supersedes_check_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "check": {
+    "input_document": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "id",
-        "performed_at"
+        "role",
+        "uri",
+        "content_hash"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "role": {
+          "enum": [
+            "matspec",
+            "matreq",
+            "matrecord",
+            "requisition_context",
+            "other"
+          ]
+        },
+        "profile": {
+          "enum": [
+            "matspec",
+            "matreq",
+            "matrecord",
+            "matcheck",
+            "core"
+          ]
+        },
+        "profile_version": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "content_hash": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/content_hash"
+        },
+        "schema_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "document_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "string"
+        },
+        "edition": {
+          "type": "string"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "embedded_path": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "matspec"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "profile",
+              "profile_version"
+            ],
+            "properties": {
+              "profile": {
+                "const": "matspec"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "matreq"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "profile",
+              "profile_version"
+            ],
+            "properties": {
+              "profile": {
+                "const": "matreq"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "matrecord"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "profile",
+              "profile_version"
+            ],
+            "properties": {
+              "profile": {
+                "const": "matrecord"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "project_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "provided",
+            "defaulted",
+            "not_provided",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "value": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "source_input_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/record_object_ref"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "provided",
+                  "defaulted"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "value"
+            ]
+          }
+        }
+      ]
+    },
+    "selector_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grade": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uns": {
+          "type": "string"
+        },
+        "product_form": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "heat": {
+          "type": "string"
+        },
+        "lot": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$"
+          },
+          "additionalProperties": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+          }
+        },
+        "other": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$"
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "matrecord_input_ref",
+        "material_refs"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "matrecord_input_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "material_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "primary",
+            "related",
+            "source_material",
+            "finished_product",
+            "coupon",
+            "specimen"
+          ]
+        },
+        "selector_context": {
+          "$ref": "#/$defs/selector_context"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activation_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "explanation"
+      ],
+      "properties": {
+        "basis": {
+          "enum": [
+            "intrinsic_to_matspec",
+            "document_invoked",
+            "scope_invoked",
+            "condition_met",
+            "explicit_requisition_invocation",
+            "inherited_dependency",
+            "contractual_elevation",
+            "other"
+          ]
+        },
+        "condition_result": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "condition": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/condition_expr"
+        },
+        "project_input_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "precedence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship",
+        "strategy"
+      ],
+      "properties": {
+        "relationship": {
+          "enum": [
+            "intrinsic",
+            "supplements",
+            "restricts",
+            "replaces",
+            "prohibits",
+            "selects",
+            "merges",
+            "purchaser_defined"
+          ]
+        },
+        "strategy": {
+          "enum": [
+            "not_required",
+            "supplement",
+            "explicit_override",
+            "most_stringent",
+            "source_precedence",
+            "project_selection",
+            "no_automatic_resolution"
+          ]
+        },
+        "selected_source_indexes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    },
+    "effective_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "property_limit",
+            "composition_limit",
+            "computed_limit",
+            "required_condition",
+            "required_test",
+            "required_examination",
+            "required_heat_treatment",
+            "required_product_form",
+            "required_manufacturing_route",
+            "required_document",
+            "required_report_field",
+            "required_traceability",
+            "required_marking",
+            "required_statement",
+            "sampling_requirement",
+            "test_acceptance",
+            "prohibited",
+            "allowed_only",
+            "reference_compliance",
+            "decision_procedure",
+            "other"
+          ]
+        },
+        "property": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_term"
+        },
+        "analyte": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_term"
+        },
+        "operator": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/comparison_operator"
+        },
+        "expected": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "allowed_values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+          }
+        },
+        "test_type": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_term"
+        },
+        "document_type": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_term"
+        },
+        "calculation": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/calculation_spec"
+        },
+        "frequency": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "scope": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "reporting": {
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "alternatives": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/effective_requirement"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "expected"
+          ]
+        },
+        {
+          "required": [
+            "allowed_values"
+          ]
+        },
+        {
+          "required": [
+            "test_type"
+          ]
+        },
+        {
+          "required": [
+            "document_type"
+          ]
+        },
+        {
+          "required": [
+            "condition"
+          ]
+        },
+        {
+          "required": [
+            "calculation"
+          ]
+        },
+        {
+          "required": [
+            "text"
+          ]
+        },
+        {
+          "required": [
+            "alternatives"
+          ]
+        }
+      ]
+    },
+    "verification_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "missing_result_status"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "direct",
+            "computed",
+            "record_review",
+            "cross_document",
+            "inspection_record",
+            "manual_review"
+          ]
+        },
+        "checkability": {
+          "enum": [
+            "mtr_direct",
+            "mtr_computed",
+            "mtr_statement",
+            "supporting_report",
+            "requisition_completeness",
+            "design_or_service_evaluation",
+            "cross_document",
+            "manual_only"
+          ]
+        },
+        "required_evidence_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "record_object_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_result_status": {
+          "enum": [
+            "missing_evidence",
+            "missing_project_input",
+            "manual_review_required",
+            "external_evidence_required",
+            "unsupported_evaluation"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requirement_resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_requirement_refs",
+        "subject_refs",
+        "category",
+        "normativity",
+        "resolution_status",
+        "activation_basis"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "source_requirement_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/requirement_ref"
+          }
+        },
+        "subject_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "material_selection",
+            "product_form",
+            "chemistry",
+            "mechanical",
+            "impact",
+            "hardness",
+            "metallurgy",
+            "corrosion_testing",
+            "heat_treatment",
+            "manufacturing",
+            "welding_consumable",
+            "fabrication",
+            "nde",
+            "pmi",
+            "documentation",
+            "traceability",
+            "marking",
+            "dimensions",
+            "external_standard",
+            "other"
+          ]
+        },
+        "normativity": {
+          "enum": [
+            "mandatory",
+            "prohibited",
+            "recommended",
+            "permitted",
+            "informative"
+          ]
+        },
+        "resolution_status": {
+          "enum": [
+            "active",
+            "inactive",
+            "not_applicable",
+            "unresolved_selector",
+            "missing_project_input",
+            "superseded",
+            "overridden",
+            "conflict",
+            "manual_resolution_required"
+          ]
+        },
+        "activation_basis": {
+          "$ref": "#/$defs/activation_basis"
+        },
+        "selector_context": {
+          "$ref": "#/$defs/selector_context"
+        },
+        "precedence": {
+          "$ref": "#/$defs/precedence"
+        },
+        "effective_requirement": {
+          "$ref": "#/$defs/effective_requirement"
+        },
+        "verification_plan": {
+          "$ref": "#/$defs/verification_plan"
+        },
+        "source_text": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "resolution_status": {
+                "const": "active"
+              }
+            },
+            "required": [
+              "resolution_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "effective_requirement",
+              "verification_plan"
+            ]
+          }
+        }
+      ]
+    },
+    "calculation_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "value": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/record_object_ref"
+          }
+        },
+        "conversion": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/unit_conversion"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "calculation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "expression",
+        "expression_language",
+        "inputs",
+        "result"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "expression_language": {
+          "enum": [
+            "matjson_infix_0.1",
+            "source_text",
+            "other"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/calculation_input"
+          }
+        },
+        "result": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "rounding": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/rounding_rule"
+        },
+        "source_requirement_resolution_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "observed_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "value",
+        "source_refs"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "measured",
+            "calculated",
+            "declared",
+            "converted",
+            "observed",
+            "derived"
+          ]
+        },
+        "value": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "normalized_value": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/record_object_ref"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operator",
+        "expected",
+        "observed",
+        "result"
+      ],
+      "properties": {
+        "operator": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/comparison_operator"
+        },
+        "expected": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "observed": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/result_value"
+        },
+        "result": {
+          "enum": [
+            "true",
+            "false",
+            "indeterminate"
+          ]
+        },
+        "unit_conversions": {
+          "type": "array",
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/unit_conversion"
+          }
+        },
+        "rounding": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/rounding_rule"
+        },
+        "calculation_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "requirement_resolution_ref",
+        "subject_refs",
+        "status",
+        "severity",
+        "evaluation_mode",
+        "explanation"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "requirement_resolution_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "subject_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_applicable",
+            "missing_evidence",
+            "missing_project_input",
+            "requisition_gap",
+            "ambiguous_material_selector",
+            "conflicting_requirements",
+            "manual_review_required",
+            "external_evidence_required",
+            "unsupported_evaluation",
+            "not_evaluated"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning",
+            "information"
+          ]
+        },
+        "evaluation_mode": {
+          "enum": [
+            "direct",
+            "computed",
+            "record_review",
+            "cross_document",
+            "inspection_record",
+            "manual_review"
+          ]
+        },
+        "observed_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observed_value"
+          }
+        },
+        "comparison": {
+          "$ref": "#/$defs/comparison"
+        },
+        "calculation_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/record_object_ref"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evaluated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evaluator": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/actor"
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "finding_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pass": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "fail": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "not_applicable": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "missing_evidence": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "missing_project_input": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "requisition_gap": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "ambiguous_material_selector": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "conflicting_requirements": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "manual_review_required": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "external_evidence_required": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "unsupported_evaluation": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "not_evaluated": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "mandatory_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active",
+        "evaluated",
+        "passed",
+        "failed",
+        "unresolved"
+      ],
+      "properties": {
+        "active": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "requirement_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "active",
+        "inactive",
+        "not_applicable",
+        "unresolved"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "active": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inactive": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_applicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "aggregation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
       ],
       "properties": {
         "id": {
           "type": "string"
         },
-        "performed_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "tool": {
+        "version": {
           "type": "string"
         },
-        "reviewer": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      }
-    },
-    "results": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "requirement_id",
-          "status"
-        ],
-        "properties": {
-          "requirement_id": {
-            "type": "string"
-          },
-          "origin": {
-            "type": "object"
-          },
-          "status": {
-            "enum": [
-              "pass",
-              "fail",
-              "not_applicable",
-              "needs_project_input",
-              "missing_evidence",
-              "requisition_gap",
-              "manual_review_required"
-            ]
-          },
-          "required": {},
-          "reported": {},
-          "evidence": {
-            "type": "array"
-          },
-          "explanation": {
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "description": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
             "type": "string"
           }
         }
@@ -94,17 +1356,168 @@
     },
     "summary": {
       "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "overall_status",
+        "finding_counts",
+        "requirement_counts",
+        "mandatory_counts",
+        "aggregation_policy"
+      ],
       "properties": {
         "overall_status": {
-          "type": "string"
+          "enum": [
+            "pass",
+            "pass_with_warnings",
+            "incomplete",
+            "fail",
+            "not_evaluated"
+          ]
         },
-        "counts": {
-          "type": "object"
+        "finding_counts": {
+          "$ref": "#/$defs/finding_counts"
+        },
+        "requirement_counts": {
+          "$ref": "#/$defs/requirement_counts"
+        },
+        "mandatory_counts": {
+          "$ref": "#/$defs/mandatory_counts"
+        },
+        "blocking_finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "unresolved_finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "warning_finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "aggregation_policy": {
+          "$ref": "#/$defs/aggregation_policy"
+        },
+        "rationale": {
+          "type": "string"
         }
       }
     },
-    "extensions": {
-      "type": "object"
+    "review_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_ref",
+        "original_status",
+        "final_status",
+        "reason",
+        "reviewer"
+      ],
+      "properties": {
+        "finding_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "original_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_applicable",
+            "missing_evidence",
+            "missing_project_input",
+            "requisition_gap",
+            "ambiguous_material_selector",
+            "conflicting_requirements",
+            "manual_review_required",
+            "external_evidence_required",
+            "unsupported_evaluation",
+            "not_evaluated"
+          ]
+        },
+        "final_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_applicable",
+            "missing_evidence",
+            "missing_project_input",
+            "requisition_gap",
+            "ambiguous_material_selector",
+            "conflicting_requirements",
+            "manual_review_required",
+            "external_evidence_required",
+            "unsupported_evaluation",
+            "not_evaluated"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reviewer": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/actor"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unreviewed",
+            "in_review",
+            "accepted",
+            "accepted_with_comments",
+            "rejected"
+          ]
+        },
+        "reviewers": {
+          "type": "array",
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/actor"
+          }
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/review_override"
+          }
+        },
+        "final_overall_status": {
+          "enum": [
+            "pass",
+            "pass_with_warnings",
+            "incomplete",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

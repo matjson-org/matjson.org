@@ -1,60 +1,208 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://matjson.org/schema/core/0.1/schema.json",
-  "title": "MatJSON Core v0.1 — Architecture Placeholder",
-  "description": "Shared semantic primitives for MatJSON profiles. This starter schema is intentionally incomplete and must not be treated as a stable production contract.",
-  "x-matjson-profile": "core",
-  "x-matjson-status": "tbc",
+  "title": "MatJSON Core v0.1 — Working Draft",
+  "description": "Reusable semantic primitives shared by MatSpecJSON, MatReqJSON, MatRecordJSON, MatCheckJSON, and future MatJSON profiles. Core is a schema module, not a material business document. Existing profile schemas are not retroactively refactored to Core in v0.1.",
+  "x_matjson_profile": "core",
+  "x_matjson_status": "working_draft",
+  "x_matjson_naming_convention": "snake_case",
   "type": "object",
+  "additionalProperties": true,
   "$defs": {
-    "identifier": {
+    "local_id": {
       "type": "string",
-      "format": "uri",
-      "description": "Stable MatJSON identifier or another authoritative URI."
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$",
+      "description": "Document-local stable identifier. Identifier values are not required to use snake_case."
     },
-    "quantity": {
-      "type": "object",
-      "required": [
-        "value",
-        "unit"
+    "profile_name": {
+      "enum": [
+        "core",
+        "matspec",
+        "matreq",
+        "matrecord",
+        "matcheck"
       ],
+      "description": "Registered MatJSON profile name."
+    },
+    "profile_envelope": {
+      "type": "object",
       "additionalProperties": false,
+      "required": [
+        "profile",
+        "version"
+      ],
       "properties": {
+        "profile": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/profile_name"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+(?:\\.[0-9]+)?(?:[-+][A-Za-z0-9._-]+)?$"
+        },
+        "schema_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      },
+      "description": "Common in-document profile and version discriminator."
+    },
+    "content_hash": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "algorithm",
+            "value"
+          ],
+          "properties": {
+            "algorithm": {
+              "const": "sha256"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[A-Fa-f0-9]{64}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "algorithm",
+            "value"
+          ],
+          "properties": {
+            "algorithm": {
+              "const": "sha384"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[A-Fa-f0-9]{96}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "algorithm",
+            "value"
+          ],
+          "properties": {
+            "algorithm": {
+              "const": "sha512"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[A-Fa-f0-9]{128}$"
+            }
+          }
+        }
+      ],
+      "description": "Cryptographic content identity for reproducible evaluations."
+    },
+    "coded_term": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scheme": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      },
+      "description": "Machine-oriented code with optional source-facing label and vocabulary identity."
+    },
+    "typed_identifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "value"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
         "value": {
-          "type": "number"
+          "type": "string",
+          "minLength": 1
         },
-        "unit": {
+        "scheme": {
           "type": "string"
         },
-        "basis": {
+        "issuer": {
           "type": "string"
         },
-        "source": {
-          "$ref": "#/$defs/source"
+        "label": {
+          "type": "string"
         }
       }
     },
-    "source": {
+    "standard_reference": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
-        "document",
-        "locator"
+        "designation"
       ],
       "properties": {
-        "document": {
+        "organization": {
           "type": "string"
+        },
+        "designation": {
+          "type": "string",
+          "minLength": 1
         },
         "edition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
           "type": "string"
         },
-        "locator": {
+        "clause": {
           "type": "string"
+        },
+        "section_path": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "page": {
-          "type": [
-            "integer",
-            "string"
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "string"
+            }
           ]
+        },
+        "table": {
+          "type": "string"
+        },
+        "figure": {
+          "type": "string"
         },
         "text_role": {
           "enum": [
@@ -62,19 +210,795 @@
             "informative",
             "example",
             "note",
+            "annex",
+            "appendix",
+            "table",
+            "figure",
+            "other",
             "unknown"
           ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "raw": {
+          "type": "string"
         }
       }
     },
-    "expression": {
+    "document_identity": {
       "type": "object",
-      "description": "TBC Boolean or numeric expression tree for applicability, calculations, and decision procedures."
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "content_hash"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "profile": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/profile_name"
+        },
+        "profile_version": {
+          "type": "string"
+        },
+        "document_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "designation": {
+          "type": "string"
+        },
+        "edition": {
+          "type": "string"
+        },
+        "content_hash": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/content_hash"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "schema_uri": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
     },
-    "extensionContainer": {
+    "quantity_value": {
       "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "kind": {
+          "const": "quantity"
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualifier": {
+          "enum": [
+            "exact",
+            "less_than",
+            "less_than_or_equal",
+            "greater_than",
+            "greater_than_or_equal",
+            "approximate"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "range_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "minimum",
+        "maximum",
+        "unit"
+      ],
+      "properties": {
+        "kind": {
+          "const": "range"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum_inclusive": {
+          "type": "boolean",
+          "default": true
+        },
+        "maximum_inclusive": {
+          "type": "boolean",
+          "default": true
+        },
+        "basis": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "text_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "text"
+        },
+        "value": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "boolean_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "boolean"
+        },
+        "value": {
+          "type": "boolean"
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "coded_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "coded"
+        },
+        "value": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_term"
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "unavailable_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "properties": {
+        "kind": {
+          "const": "unavailable"
+        },
+        "reason": {
+          "enum": [
+            "not_reported",
+            "not_applicable",
+            "not_performed",
+            "illegible",
+            "not_extracted",
+            "blank_on_source",
+            "not_required",
+            "unknown"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "string"
+        }
+      },
+      "description": "Unavailable is not zero and is not equivalent to absence of a requirement."
+    },
+    "scalar_value": {
+      "oneOf": [
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/quantity_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/range_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/text_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/boolean_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/coded_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/unavailable_value"
+        }
+      ]
+    },
+    "array_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "values"
+      ],
+      "properties": {
+        "kind": {
+          "const": "array"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/scalar_value"
+          }
+        },
+        "raw": {
+          "type": "string"
+        }
+      }
+    },
+    "result_value": {
+      "oneOf": [
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/scalar_value"
+        },
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/array_value"
+        }
+      ]
+    },
+    "comparison_operator": {
+      "enum": [
+        "eq",
+        "ne",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "between",
+        "in",
+        "not_in",
+        "exists",
+        "contains",
+        "matches",
+        "satisfies_any",
+        "satisfies_all"
+      ]
+    },
+    "condition_leaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "op"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$"
+        },
+        "op": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/comparison_operator"
+        },
+        "value": {},
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "condition_expr": {
+      "oneOf": [
+        {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/condition_leaf"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/condition_expr"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/condition_expr"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/condition_expr"
+            }
+          }
+        }
+      ]
+    },
+    "rounding_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "none",
+            "decimal_places",
+            "significant_figures",
+            "increment",
+            "source_defined"
+          ]
+        },
+        "digits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "increment": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/quantity_value"
+        },
+        "source": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/standard_reference"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "unit_conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_unit",
+        "to_unit",
+        "method"
+      ],
+      "properties": {
+        "from_unit": {
+          "type": "string"
+        },
+        "to_unit": {
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "factor",
+            "affine",
+            "identity",
+            "source_defined"
+          ]
+        },
+        "factor": {
+          "type": "number"
+        },
+        "offset": {
+          "type": "number"
+        },
+        "source": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/standard_reference"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "calculation_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "input_names"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expression_language": {
+          "enum": [
+            "matjson_infix_0.1",
+            "source_text",
+            "other"
+          ]
+        },
+        "input_names": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          }
+        },
+        "result_unit": {
+          "type": "string"
+        },
+        "rounding": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/rounding_rule"
+        },
+        "source": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/standard_reference"
+        }
+      }
+    },
+    "requirement_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_ref",
+        "profile"
+      ],
+      "properties": {
+        "input_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "profile": {
+          "enum": [
+            "matspec",
+            "matreq"
+          ]
+        },
+        "requirement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "json_pointer": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "grade_id": {
+          "type": "string"
+        },
+        "rule_id": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/standard_reference"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "requirement_id"
+          ]
+        },
+        {
+          "required": [
+            "json_pointer"
+          ]
+        },
+        {
+          "required": [
+            "rule_id"
+          ]
+        }
+      ],
+      "description": "Stable reference to an atomic requirement. MatSpecJSON v0.2 commonly uses content hash plus JSON Pointer; MatReqJSON v0.2 normally uses rule_id."
+    },
+    "record_object_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_ref",
+        "object_type",
+        "object_id"
+      ],
+      "properties": {
+        "input_ref": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "object_type": {
+          "enum": [
+            "file",
+            "document",
+            "party",
+            "business_reference",
+            "material",
+            "specification_claim",
+            "process",
+            "process_stage",
+            "test",
+            "result",
+            "claim",
+            "attestation",
+            "annotation",
+            "evidence"
+          ]
+        },
+        "object_id": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "json_pointer": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "description": "Reference to a normalized object in one MatRecordJSON input."
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "px",
+            "normalized",
+            "pt",
+            "mm"
+          ]
+        },
+        "rotation_degrees": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height",
+        "unit"
+      ]
+    },
+    "evidence_locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "table": {
+          "type": "string"
+        },
+        "row": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "column": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "region": {
+          "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/region"
+        },
+        "raw_locator": {
+          "type": "string"
+        }
+      }
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "native_text",
+            "manual_transcription",
+            "assisted_vision",
+            "ocr",
+            "barcode",
+            "qr_code",
+            "edi",
+            "imported_structured_data"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reviewed": {
+          "type": "boolean"
+        },
+        "reviewer": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "organization": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created_at",
+        "method",
+        "tool",
+        "review_status"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "enum": [
+            "manual",
+            "assisted",
+            "automated",
+            "mixed"
+          ]
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "person": {
+          "type": "string"
+        },
+        "review_status": {
+          "enum": [
+            "unreviewed",
+            "checked",
+            "verified",
+            "approved"
+          ]
+        },
+        "input_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://matjson.org/schema/core/0.1/schema.json#/$defs/local_id"
+          }
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Namespaced extension container using dot-separated lowercase snake_case segments.",
       "propertyNames": {
-        "format": "uri"
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$"
       },
       "additionalProperties": true
     }

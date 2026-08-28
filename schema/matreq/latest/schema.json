@@ -21,22 +21,22 @@
       "$ref": "#/$defs/document"
     },
     "invocation_model": {
-      "$ref": "#/$defs/invocationModel"
+      "$ref": "#/$defs/invocation_model"
     },
     "scope": {
-      "$ref": "#/$defs/documentScope"
+      "$ref": "#/$defs/document_scope"
     },
     "references": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/documentReference"
+        "$ref": "#/$defs/document_reference"
       }
     },
     "requisition_interface": {
       "type": "array",
       "description": "Inputs or decisions that the governing document requires the purchaser/material requisition to provide. These are not project values; they define what the requisition must resolve when the associated rule is active.",
       "items": {
-        "$ref": "#/$defs/requisitionInput"
+        "$ref": "#/$defs/requisition_input"
       }
     },
     "rules": {
@@ -57,7 +57,12 @@
     },
     "extensions": {
       "type": "object",
-      "additionalProperties": true
+      "additionalProperties": true,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+        "description": "Direct extension namespace keys use lowercase snake_case."
+      },
+      "description": "Extension namespaces and implementation-specific metadata. Direct MatJSON-controlled keys use lowercase snake_case."
     },
     "coverage": {
       "$ref": "#/$defs/coverage"
@@ -196,7 +201,7 @@
         }
       }
     },
-    "invocationModel": {
+    "invocation_model": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -330,7 +335,7 @@
               }
             }
           },
-          "description": "A material requisition may elevate an otherwise informative/example source scope into a binding contractual requirement when it explicitly requires compliance, e.g. 'Material must meet API TR 938-C Appendix A'. Merely saying 'refer to' or 'see' does not by itself create the same obligation."
+          "description": "A material requisition may elevate an otherwise informative/example source scope into a binding contractual requirement when it explicitly requires compliance, e.g. 'Material shall meet API TR 938-C Appendix A'. Merely saying 'refer to' or 'see' does not by itself create the same obligation."
         },
         "cross_reference_policy": {
           "type": "object",
@@ -350,7 +355,7 @@
         }
       }
     },
-    "documentScope": {
+    "document_scope": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -470,11 +475,11 @@
         "references": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/documentReference"
+            "$ref": "#/$defs/document_reference"
           }
         },
         "source": {
-          "$ref": "#/$defs/sourceRef"
+          "$ref": "#/$defs/source_ref"
         },
         "notes": {
           "type": "array",
@@ -497,12 +502,16 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "$ref": "#/$defs/sourceRef"
+            "$ref": "#/$defs/source_ref"
           }
         },
         "extensions": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+            "description": "Direct rule-extension keys use lowercase snake_case."
+          }
         }
       }
     },
@@ -649,7 +658,7 @@
           ]
         },
         "when": {
-          "$ref": "#/$defs/conditionExpr"
+          "$ref": "#/$defs/condition_expr"
         },
         "requisition_input_ids": {
           "type": "array",
@@ -667,10 +676,10 @@
         }
       }
     },
-    "conditionExpr": {
+    "condition_expr": {
       "oneOf": [
         {
-          "$ref": "#/$defs/conditionLeaf"
+          "$ref": "#/$defs/condition_leaf"
         },
         {
           "type": "object",
@@ -683,7 +692,7 @@
               "type": "array",
               "minItems": 1,
               "items": {
-                "$ref": "#/$defs/conditionExpr"
+                "$ref": "#/$defs/condition_expr"
               }
             }
           }
@@ -699,7 +708,7 @@
               "type": "array",
               "minItems": 1,
               "items": {
-                "$ref": "#/$defs/conditionExpr"
+                "$ref": "#/$defs/condition_expr"
               }
             }
           }
@@ -712,13 +721,13 @@
           ],
           "properties": {
             "not": {
-              "$ref": "#/$defs/conditionExpr"
+              "$ref": "#/$defs/condition_expr"
             }
           }
         }
       ]
     },
-    "conditionLeaf": {
+    "condition_leaf": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -727,7 +736,9 @@
       ],
       "properties": {
         "field": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*)*$",
+          "description": "Internal condition field path in lowercase snake_case."
         },
         "op": {
           "enum": [
@@ -834,7 +845,7 @@
           "description": "ID of the purchaser/project value that must be obtained from the material requisition; does not store the project value in the MatReq."
         },
         "referenced_standard": {
-          "$ref": "#/$defs/referenceTarget"
+          "$ref": "#/$defs/reference_target"
         },
         "method": {
           "type": [
@@ -943,7 +954,7 @@
           "type": "string"
         },
         "source": {
-          "$ref": "#/$defs/sourceRef"
+          "$ref": "#/$defs/source_ref"
         }
       }
     },
@@ -1075,7 +1086,7 @@
         }
       }
     },
-    "referenceTarget": {
+    "reference_target": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1109,7 +1120,7 @@
         }
       }
     },
-    "documentReference": {
+    "document_reference": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1118,7 +1129,7 @@
       ],
       "properties": {
         "target": {
-          "$ref": "#/$defs/referenceTarget"
+          "$ref": "#/$defs/reference_target"
         },
         "effect": {
           "enum": [
@@ -1132,10 +1143,10 @@
           ]
         },
         "activation_when": {
-          "$ref": "#/$defs/conditionExpr"
+          "$ref": "#/$defs/condition_expr"
         },
         "source": {
-          "$ref": "#/$defs/sourceRef"
+          "$ref": "#/$defs/source_ref"
         },
         "notes": {
           "type": "array",
@@ -1145,7 +1156,7 @@
         }
       }
     },
-    "requisitionInput": {
+    "requisition_input": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1176,17 +1187,17 @@
           "type": "string"
         },
         "required_when": {
-          "$ref": "#/$defs/conditionExpr"
+          "$ref": "#/$defs/condition_expr"
         },
         "allowed_values": {
           "type": "array"
         },
         "source": {
-          "$ref": "#/$defs/sourceRef"
+          "$ref": "#/$defs/source_ref"
         }
       }
     },
-    "sourceRef": {
+    "source_ref": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1342,7 +1353,7 @@
       }
     }
   },
-  "x-matjson-profile": "matreq",
-  "x-matjson-status": "draft",
-  "x-matjson-source": "MatJSON working schema; canonicalized for the matjson.org starter site."
+  "x_matjson_profile": "matreq",
+  "x_matjson_status": "working_draft",
+  "x_matjson_naming_convention": "snake_case"
 }
